@@ -1,0 +1,63 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# VSCode
+.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Windows build output
+/windows/flutter/
+**/windows/**/generated_plugin_registrant.cc
+**/windows/**/generated_plugin_registrant.h
+**/windows/**/generated_plugins.cmake
+
+# Temporary files
+*.tmp
+*.temp
+nul
+probe.txt
+flutter_setup.log
+setup_status.log
+
+# Claude AI
+.claude/
+
+# Python virtual environments
+venv/
+env/
+ENV/
