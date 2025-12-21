@@ -15,7 +15,8 @@ class GameState extends ChangeNotifier {
   List<Move> _moveHistory = [];
   bool _isEngineThinking = false;
   String _statusMessage = 'Blue to move (초 선공)';
-  
+  bool _isGameOver = false;
+
   // Getters
   Board get board => _board;
   PieceColor get currentPlayer => _currentPlayer;
@@ -24,6 +25,7 @@ class GameState extends ChangeNotifier {
   List<Move> get moveHistory => _moveHistory;
   bool get isEngineThinking => _isEngineThinking;
   String get statusMessage => _statusMessage;
+  bool get isGameOver => _isGameOver;
 
   GameState() {
     _initializeGame();
@@ -35,8 +37,26 @@ class GameState extends ChangeNotifier {
     _selectedPosition = null;
     _validMoves = [];
     _moveHistory = [];
-    _statusMessage = 'Blue to move (초 선공)';
+    _isGameOver = false;
+    _updateStatusMessage();
     notifyListeners();
+  }
+
+  /// Update status message with current player and check indication
+  void _updateStatusMessage() {
+    if (_isGameOver) return; // Don't update if game is over
+
+    final baseMessage = _currentPlayer == PieceColor.blue
+        ? 'Blue to move (초)'
+        : 'Red to move (한)';
+
+    // Check if current player is in check
+    if (_isKingInCheck(_currentPlayer)) {
+      _statusMessage = '$baseMessage - CHECK!';
+      debugPrint('_updateStatusMessage: ${_currentPlayer.name} is in CHECK');
+    } else {
+      _statusMessage = baseMessage;
+    }
   }
 
   /// Start a new game
@@ -47,6 +67,13 @@ class GameState extends ChangeNotifier {
   /// Handle square tap
   Future<void> onSquareTapped(Position position) async {
     debugPrint('onSquareTapped: position=$position');
+
+    // Don't allow moves if game is over
+    if (_isGameOver) {
+      debugPrint('onSquareTapped: Game is over, ignoring tap');
+      return;
+    }
+
     if (_isEngineThinking) {
       debugPrint('onSquareTapped: engine is thinking, ignoring');
       return;
@@ -115,6 +142,16 @@ class GameState extends ChangeNotifier {
     final move = Move(from: from, to: to, capturedPiece: captured);
     _moveHistory.add(move);
 
+    // Check if King (General) was captured - game ends
+    if (captured != null && captured.type == PieceType.general) {
+      final winner = piece.color == PieceColor.blue ? 'Blue (초)' : 'Red (한)';
+      _statusMessage = 'Game Over! $winner wins by capturing the King!';
+      _isGameOver = true;
+      debugPrint('_makeMove: GAME OVER - King captured by ${piece.color}');
+      notifyListeners();
+      return; // End game - no further moves
+    }
+
     // Convert to UCI and log
     final uciMove = StockfishConverter.moveToUCI(from, to);
     debugPrint('_makeMove: UCI notation: $uciMove');
@@ -125,9 +162,8 @@ class GameState extends ChangeNotifier {
         ? PieceColor.red
         : PieceColor.blue;
 
-    _statusMessage = _currentPlayer == PieceColor.blue
-        ? 'Blue to move (초)'
-        : 'Red to move (한)';
+    // Update status message with check indication
+    _updateStatusMessage();
 
     debugPrint('_makeMove: Calling notifyListeners');
     notifyListeners();
@@ -148,13 +184,15 @@ class GameState extends ChangeNotifier {
     try {
       debugPrint('_getAIMove: Starting AI move calculation');
 
-      // Build moves list for position command
-      final moves = _moveHistory.map((m) => m.toUCI()).toList();
-      debugPrint('_getAIMove: Move history: $moves');
+      // Generate FEN from current board state
+      // This avoids "invalid move" errors from move history
+      final fen = StockfishConverter.boardToFEN(_board, _currentPlayer);
+      debugPrint('_getAIMove: Current FEN: $fen');
+      debugPrint('_getAIMove: Current player: $_currentPlayer (should be Red for AI)');
 
-      // Set position
+      // Set position using FEN (no move history needed)
       debugPrint('_getAIMove: Setting position...');
-      StockfishFFI.setPosition(moves: moves);
+      StockfishFFI.setPosition(fen: fen);
 
       // Get best move with timeout
       debugPrint('_getAIMove: Requesting best move...');
@@ -187,10 +225,11 @@ class GameState extends ChangeNotifier {
         final fromUCI = bestMoveUCI.substring(0, secondPartStart);
         final toUCI = bestMoveUCI.substring(secondPartStart);
 
+        debugPrint('_getAIMove: Parsing UCI: $fromUCI -> $toUCI');
         final from = StockfishConverter.fromUCI(fromUCI);
         final to = StockfishConverter.fromUCI(toUCI);
 
-        debugPrint('_getAIMove: AI moving from $from to $to');
+        debugPrint('_getAIMove: Converted to Flutter coords: from=$from(file=${from.file},rank=${from.rank}) to=$to(file=${to.file},rank=${to.rank})');
 
         // Check if there's a piece at the from position
         final piece = _board.getPiece(from);
@@ -202,6 +241,15 @@ class GameState extends ChangeNotifier {
           return;
         }
 
+        // Validate the AI move before applying it
+        if (!_isValidMove(piece, from, to)) {
+          debugPrint('_getAIMove: ERROR - Invalid move from $from to $to for piece $piece!');
+          debugPrint('_getAIMove: This indicates a problem with Stockfish coordination or FEN conversion.');
+          _statusMessage = 'AI attempted illegal move - please check logs';
+          _currentPlayer = PieceColor.blue; // Give turn back to player
+          return;
+        }
+
         // Make the AI move
         final captured = _board.movePiece(from, to);
         debugPrint('_getAIMove: Move result - captured: $captured');
@@ -209,9 +257,17 @@ class GameState extends ChangeNotifier {
         final move = Move(from: from, to: to, capturedPiece: captured);
         _moveHistory.add(move);
 
+        // Check if King (General) was captured - game ends
+        if (captured != null && captured.type == PieceType.general) {
+          _statusMessage = 'Game Over! Red (한) wins by capturing the King!';
+          _isGameOver = true;
+          debugPrint('_getAIMove: GAME OVER - King captured by AI');
+          return; // End game - no further moves
+        }
+
         // Switch back to player (Blue)
         _currentPlayer = PieceColor.blue;
-        _statusMessage = 'Blue to move (초)';
+        _updateStatusMessage();
       } else {
         debugPrint('_getAIMove: No valid move received from Stockfish');
         _statusMessage = 'AI failed to move';
@@ -230,6 +286,7 @@ class GameState extends ChangeNotifier {
   }
 
   /// Get valid moves for a position based on Janggi rules
+  /// This includes check validation - moves that would leave the king in check are filtered out
   List<Position> _getValidMovesForPosition(Position from) {
     final piece = _board.getPiece(from);
     if (piece == null) return [];
@@ -251,7 +308,11 @@ class GameState extends ChangeNotifier {
 
         // Check if this move is valid according to piece-specific rules
         if (_isValidMove(piece, from, to)) {
-          moves.add(to);
+          // Additionally check if this move would leave our king in check
+          // Filter out illegal moves that would expose the king
+          if (!_wouldMoveCauseCheck(from, to)) {
+            moves.add(to);
+          }
         }
       }
     }
@@ -291,18 +352,44 @@ class GameState extends ChangeNotifier {
 
       case PieceType.chariot:
         // Chariot moves orthogonally any distance with clear path
-        if (!_isOrthogonalMove(from, to)) return false;
-        return _isPathClear(from, to);
+        // Also can move along palace diagonals
+        if (_isOrthogonalMove(from, to)) {
+          return _isPathClear(from, to);
+        }
+
+        // Check palace diagonal movement
+        if (from.isInPalace(isRedPalace: piece.color == PieceColor.red) &&
+            to.isInPalace(isRedPalace: piece.color == PieceColor.red)) {
+          if (_isPalaceDiagonal(from, to, piece.color == PieceColor.red)) {
+            return _isPalaceDiagonalPathClear(from, to, piece.color == PieceColor.red);
+          }
+        }
+
+        return false;
 
       case PieceType.cannon:
         // Cannon moves orthogonally, must jump over exactly one piece
+        // Also can move along palace diagonals
         // Cannot capture another cannon
-        if (!_isOrthogonalMove(from, to)) return false;
         final targetPiece = _board.getPiece(to);
         if (targetPiece != null && targetPiece.type == PieceType.cannon) {
           return false;
         }
-        return _isValidCannonMove(from, to);
+
+        // Check orthogonal movement
+        if (_isOrthogonalMove(from, to)) {
+          return _isValidCannonMove(from, to);
+        }
+
+        // Check palace diagonal movement
+        if (from.isInPalace(isRedPalace: piece.color == PieceColor.red) &&
+            to.isInPalace(isRedPalace: piece.color == PieceColor.red)) {
+          if (_isPalaceDiagonal(from, to, piece.color == PieceColor.red)) {
+            return _isValidCannonDiagonalMove(from, to, piece.color == PieceColor.red);
+          }
+        }
+
+        return false;
 
       case PieceType.soldier:
         // Soldier moves one step forward or sideways (not backward)
@@ -403,6 +490,38 @@ class GameState extends ChangeNotifier {
     return piecesJumped == 1;
   }
 
+  /// Check if cannon diagonal move in palace is valid (must jump exactly one piece)
+  bool _isValidCannonDiagonalMove(Position from, Position to, bool isRedPalace) {
+    final centerFile = 4;
+    final centerRank = isRedPalace ? 8 : 1;
+    final center = Position(file: centerFile, rank: centerRank);
+
+    // Cannon must jump over exactly one piece on diagonal
+    // The only piece that can be jumped is at the palace center
+
+    // If moving through center (corner to corner)
+    if (from != center && to != center) {
+      final centerPiece = _board.getPiece(center);
+      // Must have exactly one piece at center to jump over
+      if (centerPiece != null && centerPiece.type != PieceType.cannon) {
+        return true;
+      }
+      return false;
+    }
+
+    // If moving from/to center, there should be no pieces to jump
+    // (Cannon needs to jump, so direct move from center is invalid for capture)
+    // But for non-capture move, it's not valid either (must jump)
+    final targetPiece = _board.getPiece(to);
+    if (targetPiece == null) {
+      // Non-capture move: still needs to jump over something
+      return false;
+    }
+
+    // This shouldn't happen as palace diagonal is only 1 step
+    return false;
+  }
+
   /// Check if soldier move is valid
   bool _isValidSoldierMove(Piece piece, Position from, Position to) {
     final fileDiff = to.file - from.file;
@@ -417,11 +536,12 @@ class GameState extends ChangeNotifier {
       if (rankDiff == 1 && fileDiff == 0) return true;
       // Sideways: one step left or right (same rank)
       if (rankDiff == 0 && fileDiff.abs() == 1) return true;
-      // In palace, can move along diagonals forward
+      // In palace, can move along valid palace diagonal lines (forward only)
       if (from.isInPalace(isRedPalace: false) &&
           to.isInPalace(isRedPalace: false) &&
           rankDiff == 1 && fileDiff.abs() == 1) {
-        return true;
+        // Must be on a valid palace diagonal line
+        return _isPalaceDiagonal(from, to, false);
       }
     } else {
       // Red moves down (decreasing rank)
@@ -429,10 +549,41 @@ class GameState extends ChangeNotifier {
       if (rankDiff == -1 && fileDiff == 0) return true;
       // Sideways: one step left or right (same rank)
       if (rankDiff == 0 && fileDiff.abs() == 1) return true;
-      // In palace, can move along diagonals forward
+      // In palace, can move along valid palace diagonal lines (forward only)
       if (from.isInPalace(isRedPalace: true) &&
           to.isInPalace(isRedPalace: true) &&
           rankDiff == -1 && fileDiff.abs() == 1) {
+        // Must be on a valid palace diagonal line
+        return _isPalaceDiagonal(from, to, true);
+      }
+    }
+
+    return false;
+  }
+
+  /// Check if a move is along a palace diagonal line
+  /// Palace diagonals only exist at specific positions:
+  /// Blue palace (ranks 0-2, files 3-5):
+  ///   (3,0)↔(4,1), (5,0)↔(4,1), (3,2)↔(4,1), (5,2)↔(4,1)
+  /// Red palace (ranks 7-9, files 3-5):
+  ///   (3,7)↔(4,8), (5,7)↔(4,8), (3,9)↔(4,8), (5,9)↔(4,8)
+  bool _isPalaceDiagonal(Position from, Position to, bool isRedPalace) {
+    final centerFile = 4; // e file
+    final centerRank = isRedPalace ? 8 : 1; // Middle of palace
+
+    // Valid diagonal connections to/from palace center
+    final validDiagonals = [
+      // Center to corners
+      [Position(file: centerFile, rank: centerRank), Position(file: 3, rank: isRedPalace ? 7 : 0)],
+      [Position(file: centerFile, rank: centerRank), Position(file: 5, rank: isRedPalace ? 7 : 0)],
+      [Position(file: centerFile, rank: centerRank), Position(file: 3, rank: isRedPalace ? 9 : 2)],
+      [Position(file: centerFile, rank: centerRank), Position(file: 5, rank: isRedPalace ? 9 : 2)],
+    ];
+
+    // Check if move matches any diagonal (in either direction)
+    for (final diagonal in validDiagonals) {
+      if ((from == diagonal[0] && to == diagonal[1]) ||
+          (from == diagonal[1] && to == diagonal[0])) {
         return true;
       }
     }
@@ -440,9 +591,25 @@ class GameState extends ChangeNotifier {
     return false;
   }
 
+  /// Check if one-step move is valid within palace (orthogonal or valid diagonal)
   bool _isOneStepMove(Position from, Position to) {
-    return (to.file - from.file).abs() <= 1 &&
-        (to.rank - from.rank).abs() <= 1;
+    final fileDiff = (to.file - from.file).abs();
+    final rankDiff = (to.rank - from.rank).abs();
+
+    // Must be exactly one step
+    if (fileDiff > 1 || rankDiff > 1) return false;
+    if (fileDiff == 0 && rankDiff == 0) return false;
+
+    // Orthogonal moves (horizontal/vertical) are always valid
+    if (fileDiff == 0 || rankDiff == 0) return true;
+
+    // Diagonal moves only valid along palace diagonal lines
+    if (fileDiff == 1 && rankDiff == 1) {
+      final isRedPalace = from.isInPalace(isRedPalace: true);
+      return _isPalaceDiagonal(from, to, isRedPalace);
+    }
+
+    return false;
   }
 
   bool _isOrthogonalMove(Position from, Position to) {
@@ -474,6 +641,266 @@ class GameState extends ChangeNotifier {
     }
 
     return true;
+  }
+
+  /// Check if path is clear for palace diagonal move
+  bool _isPalaceDiagonalPathClear(Position from, Position to, bool isRedPalace) {
+    // For one-step diagonal, path is always clear
+    if ((to.file - from.file).abs() == 1 && (to.rank - from.rank).abs() == 1) {
+      return true;
+    }
+
+    // For multi-step diagonal (chariot/cannon in palace)
+    final centerFile = 4;
+    final centerRank = isRedPalace ? 8 : 1;
+    final center = Position(file: centerFile, rank: centerRank);
+
+    // Check if path goes through center
+    // Path: corner → center or center → corner
+    if (from == center || to == center) {
+      // Direct diagonal, no pieces in between for 1-step
+      return true;
+    }
+
+    // If both positions are corners, must go through center
+    // Check if center is occupied
+    return _board.getPiece(center) == null;
+  }
+
+  /// Check if a king of the given color is in check on a specific board
+  /// Returns true if any opponent piece can attack the king
+  bool _isKingInCheck(PieceColor kingColor, [Board? testBoard]) {
+    final board = testBoard ?? _board;
+
+    // Find the king position
+    Position? kingPosition;
+    for (int rank = 0; rank < 10; rank++) {
+      for (int file = 0; file < 9; file++) {
+        final pos = Position(file: file, rank: rank);
+        final piece = board.getPiece(pos);
+        if (piece != null &&
+            piece.type == PieceType.general &&
+            piece.color == kingColor) {
+          kingPosition = pos;
+          break;
+        }
+      }
+      if (kingPosition != null) break;
+    }
+
+    // If no king found, not in check (shouldn't happen in normal game)
+    if (kingPosition == null) return false;
+
+    // Check if any opponent piece can attack the king
+    final opponentColor = kingColor == PieceColor.blue
+        ? PieceColor.red
+        : PieceColor.blue;
+
+    for (int rank = 0; rank < 10; rank++) {
+      for (int file = 0; file < 9; file++) {
+        final pos = Position(file: file, rank: rank);
+        final piece = board.getPiece(pos);
+
+        if (piece != null && piece.color == opponentColor) {
+          // Check if this opponent piece can attack the king
+          // We need to use a temporary board state for validation
+          if (_isValidMoveOnBoard(piece, pos, kingPosition, board)) {
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
+  }
+
+  /// Check if a move would leave the player's own king in check
+  /// Returns true if the move would cause or leave the king in check (illegal move)
+  bool _wouldMoveCauseCheck(Position from, Position to) {
+    final piece = _board.getPiece(from);
+    if (piece == null) return true; // Invalid move
+
+    // Create a copy of the board to simulate the move
+    final testBoard = _board.copy();
+    testBoard.movePiece(from, to);
+
+    // Check if this move would leave our own king in check
+    return _isKingInCheck(piece.color, testBoard);
+  }
+
+  /// Validate move on a specific board (used for check detection)
+  /// This is a version of _isValidMove that works on a test board
+  bool _isValidMoveOnBoard(Piece piece, Position from, Position to, Board board) {
+    switch (piece.type) {
+      case PieceType.general:
+      case PieceType.guard:
+        // Must stay in palace and be one step move
+        if (!from.isInPalace(isRedPalace: piece.color == PieceColor.red) ||
+            !to.isInPalace(isRedPalace: piece.color == PieceColor.red)) {
+          return false;
+        }
+        return _isOneStepMoveSimple(from, to);
+
+      case PieceType.horse:
+        return _isValidHorseMoveSimple(from, to, board);
+
+      case PieceType.elephant:
+        return _isValidElephantMoveSimple(from, to, board);
+
+      case PieceType.chariot:
+        if (_isOrthogonalMove(from, to)) {
+          return _isPathClearOnBoard(from, to, board);
+        }
+        if (from.isInPalace(isRedPalace: piece.color == PieceColor.red) &&
+            to.isInPalace(isRedPalace: piece.color == PieceColor.red)) {
+          if (_isPalaceDiagonal(from, to, piece.color == PieceColor.red)) {
+            return _isPalaceDiagonalPathClearOnBoard(from, to, piece.color == PieceColor.red, board);
+          }
+        }
+        return false;
+
+      case PieceType.cannon:
+        final targetPiece = board.getPiece(to);
+        if (targetPiece != null && targetPiece.type == PieceType.cannon) {
+          return false;
+        }
+        if (_isOrthogonalMove(from, to)) {
+          return _isValidCannonMoveOnBoard(from, to, board);
+        }
+        if (from.isInPalace(isRedPalace: piece.color == PieceColor.red) &&
+            to.isInPalace(isRedPalace: piece.color == PieceColor.red)) {
+          if (_isPalaceDiagonal(from, to, piece.color == PieceColor.red)) {
+            return _isValidCannonDiagonalMoveOnBoard(from, to, piece.color == PieceColor.red, board);
+          }
+        }
+        return false;
+
+      case PieceType.soldier:
+        return _isValidSoldierMoveSimple(piece, from, to);
+    }
+  }
+
+  // Helper methods for board-specific validation
+  bool _isOneStepMoveSimple(Position from, Position to) {
+    final fileDiff = (to.file - from.file).abs();
+    final rankDiff = (to.rank - from.rank).abs();
+    if (fileDiff > 1 || rankDiff > 1) return false;
+    if (fileDiff == 0 && rankDiff == 0) return false;
+    if (fileDiff == 0 || rankDiff == 0) return true;
+    if (fileDiff == 1 && rankDiff == 1) {
+      final isRedPalace = from.isInPalace(isRedPalace: true);
+      return _isPalaceDiagonal(from, to, isRedPalace);
+    }
+    return false;
+  }
+
+  bool _isValidHorseMoveSimple(Position from, Position to, Board board) {
+    final fileDiff = to.file - from.file;
+    final rankDiff = to.rank - from.rank;
+    if (fileDiff.abs() == 2 && rankDiff.abs() == 1) {
+      final blockPos = Position(file: from.file + (fileDiff > 0 ? 1 : -1), rank: from.rank);
+      return board.getPiece(blockPos) == null;
+    } else if (fileDiff.abs() == 1 && rankDiff.abs() == 2) {
+      final blockPos = Position(file: from.file, rank: from.rank + (rankDiff > 0 ? 1 : -1));
+      return board.getPiece(blockPos) == null;
+    }
+    return false;
+  }
+
+  bool _isValidElephantMoveSimple(Position from, Position to, Board board) {
+    final fileDiff = to.file - from.file;
+    final rankDiff = to.rank - from.rank;
+    if (fileDiff.abs() == 3 && rankDiff.abs() == 2) {
+      final block1 = Position(file: from.file + (fileDiff > 0 ? 1 : -1), rank: from.rank);
+      final block2 = Position(file: from.file + (fileDiff > 0 ? 2 : -2), rank: from.rank + (rankDiff > 0 ? 1 : -1));
+      return board.getPiece(block1) == null && board.getPiece(block2) == null;
+    } else if (fileDiff.abs() == 2 && rankDiff.abs() == 3) {
+      final block1 = Position(file: from.file, rank: from.rank + (rankDiff > 0 ? 1 : -1));
+      final block2 = Position(file: from.file + (fileDiff > 0 ? 1 : -1), rank: from.rank + (rankDiff > 0 ? 2 : -2));
+      return board.getPiece(block1) == null && board.getPiece(block2) == null;
+    }
+    return false;
+  }
+
+  bool _isPathClearOnBoard(Position from, Position to, Board board) {
+    if (!_isOrthogonalMove(from, to)) return false;
+    final fileDiff = to.file - from.file;
+    final rankDiff = to.rank - from.rank;
+    final fileStep = fileDiff == 0 ? 0 : (fileDiff > 0 ? 1 : -1);
+    final rankStep = rankDiff == 0 ? 0 : (rankDiff > 0 ? 1 : -1);
+    var current = Position(file: from.file + fileStep, rank: from.rank + rankStep);
+    while (current != to) {
+      if (board.getPiece(current) != null) return false;
+      current = Position(file: current.file + fileStep, rank: current.rank + rankStep);
+    }
+    return true;
+  }
+
+  bool _isPalaceDiagonalPathClearOnBoard(Position from, Position to, bool isRedPalace, Board board) {
+    if ((to.file - from.file).abs() == 1 && (to.rank - from.rank).abs() == 1) {
+      return true;
+    }
+    final center = Position(file: 4, rank: isRedPalace ? 8 : 1);
+    if (from == center || to == center) {
+      return true;
+    }
+    return board.getPiece(center) == null;
+  }
+
+  bool _isValidCannonMoveOnBoard(Position from, Position to, Board board) {
+    if (!_isOrthogonalMove(from, to)) return false;
+    final fileDiff = to.file - from.file;
+    final rankDiff = to.rank - from.rank;
+    final fileStep = fileDiff == 0 ? 0 : (fileDiff > 0 ? 1 : -1);
+    final rankStep = rankDiff == 0 ? 0 : (rankDiff > 0 ? 1 : -1);
+    var current = Position(file: from.file + fileStep, rank: from.rank + rankStep);
+    int piecesJumped = 0;
+    while (current != to) {
+      final piece = board.getPiece(current);
+      if (piece != null) {
+        piecesJumped++;
+        if (piece.type == PieceType.cannon) return false;
+      }
+      current = Position(file: current.file + fileStep, rank: current.rank + rankStep);
+    }
+    return piecesJumped == 1;
+  }
+
+  bool _isValidCannonDiagonalMoveOnBoard(Position from, Position to, bool isRedPalace, Board board) {
+    final center = Position(file: 4, rank: isRedPalace ? 8 : 1);
+    if (from != center && to != center) {
+      final centerPiece = board.getPiece(center);
+      if (centerPiece != null && centerPiece.type != PieceType.cannon) {
+        return true;
+      }
+      return false;
+    }
+    final targetPiece = board.getPiece(to);
+    if (targetPiece == null) return false;
+    return false;
+  }
+
+  bool _isValidSoldierMoveSimple(Piece piece, Position from, Position to) {
+    final fileDiff = to.file - from.file;
+    final rankDiff = to.rank - from.rank;
+    if (piece.color == PieceColor.blue) {
+      if (rankDiff == 1 && fileDiff == 0) return true;
+      if (rankDiff == 0 && fileDiff.abs() == 1) return true;
+      if (from.isInPalace(isRedPalace: false) &&
+          to.isInPalace(isRedPalace: false) &&
+          rankDiff == 1 && fileDiff.abs() == 1) {
+        return _isPalaceDiagonal(from, to, false);
+      }
+    } else {
+      if (rankDiff == -1 && fileDiff == 0) return true;
+      if (rankDiff == 0 && fileDiff.abs() == 1) return true;
+      if (from.isInPalace(isRedPalace: true) &&
+          to.isInPalace(isRedPalace: true) &&
+          rankDiff == -1 && fileDiff.abs() == 1) {
+        return _isPalaceDiagonal(from, to, true);
+      }
+    }
+    return false;
   }
 
   /// Undo last move

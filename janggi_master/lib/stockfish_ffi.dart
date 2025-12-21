@@ -1,6 +1,7 @@
 import 'dart:ffi';
 import 'dart:io';
 import 'package:ffi/ffi.dart';
+import 'package:flutter/foundation.dart';
 
 // Define the C function signatures
 typedef StockfishInitC = Void Function();
@@ -119,21 +120,28 @@ class StockfishFFI {
   static void setPosition({String? fen, List<String>? moves}) {
     String cmd = 'position ';
     if (fen != null) {
+      debugPrint('StockfishFFI.setPosition: Using FEN: $fen');
       cmd += 'fen $fen';
     } else {
-      // Janggi FEN - reads from rank 10 (top, Red) to rank 1 (bottom, Blue)
-      // FEN uses: uppercase=Red(한), lowercase=Blue(초)
-      // Flutter rank 9 (Red back): R E H A _ A H E R → REHA1AHER
-      // Flutter rank 8 (Red general): _ _ _ _ K _ _ _ _ → 4K4
-      // Flutter rank 7 (Red cannons): _ C _ _ _ _ _ C _ → 1C5C1
-      // Flutter rank 6 (Red soldiers): P _ P _ P _ P _ P → P1P1P1P1P
-      // Flutter rank 5-4 (empty): 9/9
-      // Flutter rank 3 (Blue soldiers): p _ p _ p _ p _ p → p1p1p1p1p
-      // Flutter rank 2 (Blue cannons): _ c _ _ _ _ _ c _ → 1c5c1
-      // Flutter rank 1 (Blue general): _ _ _ _ k _ _ _ _ → 4k4
-      // Flutter rank 0 (Blue back): r e h a _ a h e r → reha1aher
-      // Blue (lowercase/BLACK) moves first, so use 'b' for BLACK to move
-      cmd += 'fen REHA1AHER/4K4/1C5C1/P1P1P1P1P/9/9/p1p1p1p1p/1c5c1/4k4/reha1aher b - - 0 1';
+      debugPrint('StockfishFFI.setPosition: Using default startpos FEN');
+      // Janggi FEN - standard mapping (rank + 1)
+      // FEN reads from rank 10 (top) to rank 1 (bottom)
+      // Direct mapping: Stockfish rank = Flutter rank + 1
+      //
+      // IMPORTANT: Fairy-Stockfish Janggi has uppercase (White) at bottom!
+      // Piece letters: R=rook(차), N=knight(마), B=bishop(상), A=alfil(사), K=king(장), C=cannon(포), P=pawn(병)
+      // FEN Line 1 (rank 10) → Flutter rank 9 (Red back): rnba1abnr (lowercase)
+      // FEN Line 2 (rank 9) → Flutter rank 8 (Red general): 4k4 (lowercase)
+      // FEN Line 3 (rank 8) → Flutter rank 7 (Red cannons): 1c5c1 (lowercase)
+      // FEN Line 4 (rank 7) → Flutter rank 6 (Red soldiers): p1p1p1p1p (lowercase)
+      // FEN Line 5-6 (rank 6-5) → Flutter rank 5-4 (empty): 9/9
+      // FEN Line 7 (rank 4) → Flutter rank 3 (Blue soldiers): P1P1P1P1P (uppercase)
+      // FEN Line 8 (rank 3) → Flutter rank 2 (Blue cannons): 1C5C1 (uppercase)
+      // FEN Line 9 (rank 2) → Flutter rank 1 (Blue general): 4K4 (uppercase)
+      // FEN Line 10 (rank 1) → Flutter rank 0 (Blue back): RNBA1ABNR (uppercase)
+      //
+      // Blue (uppercase/WHITE) moves first
+      cmd += 'fen rnba1abnr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RNBA1ABNR w - - 0 1';
     }
 
     if (moves != null && moves.isNotEmpty) {
@@ -152,7 +160,9 @@ class StockfishFFI {
       cmd += ' depth $depth';
     }
 
+    debugPrint('StockfishFFI.getBestMove: Sending command: $cmd');
     final response = command(cmd);
+    debugPrint('StockfishFFI.getBestMove: Full response:\n$response');
 
     // Parse the bestmove from response
     final lines = response.split('\n');
@@ -160,10 +170,12 @@ class StockfishFFI {
       if (line.startsWith('bestmove')) {
         final parts = line.split(' ');
         if (parts.length >= 2) {
+          debugPrint('StockfishFFI.getBestMove: Parsed bestmove: ${parts[1]}');
           return parts[1];
         }
       }
     }
+    debugPrint('StockfishFFI.getBestMove: No bestmove found in response!');
     return null;
   }
 }
