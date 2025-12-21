@@ -17,6 +17,10 @@ class GameState extends ChangeNotifier {
   String _statusMessage = 'Blue to move (초 선공)';
   bool _isGameOver = false;
 
+  // For repetition detection - track board positions (FEN strings)
+  final Map<String, int> _positionHistory = {};
+  int _halfMoveClock = 0; // For 50-move rule (counts half-moves since last capture/pawn move)
+
   // Getters
   Board get board => _board;
   PieceColor get currentPlayer => _currentPlayer;
@@ -38,6 +42,13 @@ class GameState extends ChangeNotifier {
     _validMoves = [];
     _moveHistory = [];
     _isGameOver = false;
+    _positionHistory.clear();
+    _halfMoveClock = 0;
+
+    // Record initial position
+    final initialFen = StockfishConverter.boardToFEN(_board, _currentPlayer);
+    _positionHistory[initialFen] = 1;
+
     _updateStatusMessage();
     notifyListeners();
   }
@@ -49,6 +60,40 @@ class GameState extends ChangeNotifier {
     final baseMessage = _currentPlayer == PieceColor.blue
         ? 'Blue to move (초)'
         : 'Red to move (한)';
+
+    // Check for draw conditions first
+    if (_isThreefoldRepetition()) {
+      _statusMessage = 'Draw by threefold repetition!';
+      _isGameOver = true;
+      debugPrint('_updateStatusMessage: DRAW - Threefold repetition');
+      return;
+    }
+
+    if (_isFiftyMoveRule()) {
+      _statusMessage = 'Draw by 50-move rule!';
+      _isGameOver = true;
+      debugPrint('_updateStatusMessage: DRAW - 50-move rule');
+      return;
+    }
+
+    // Check for checkmate
+    if (_isCheckmate(_currentPlayer)) {
+      final winner = _currentPlayer == PieceColor.blue
+          ? 'Red (한)'
+          : 'Blue (초)';
+      _statusMessage = 'Checkmate! $winner wins!';
+      _isGameOver = true;
+      debugPrint('_updateStatusMessage: CHECKMATE - ${_currentPlayer.name} has no legal moves and is in check');
+      return;
+    }
+
+    // Check for stalemate
+    if (_isStalemate(_currentPlayer)) {
+      _statusMessage = 'Stalemate! Game is a draw.';
+      _isGameOver = true;
+      debugPrint('_updateStatusMessage: STALEMATE - ${_currentPlayer.name} has no legal moves but is not in check');
+      return;
+    }
 
     // Check if current player is in check
     if (_isKingInCheck(_currentPlayer)) {
@@ -142,6 +187,17 @@ class GameState extends ChangeNotifier {
     final move = Move(from: from, to: to, capturedPiece: captured);
     _moveHistory.add(move);
 
+    // Update 50-move rule counter
+    // Reset if there was a capture or if a soldier (pawn) moved
+    if (captured != null || piece.type == PieceType.soldier) {
+      _halfMoveClock = 0;
+      _positionHistory.clear(); // Irreversible move, clear position history
+      debugPrint('_makeMove: Reset halfMoveClock and position history (capture or pawn move)');
+    } else {
+      _halfMoveClock++;
+      debugPrint('_makeMove: Incremented halfMoveClock to $_halfMoveClock');
+    }
+
     // Check if King (General) was captured - game ends
     if (captured != null && captured.type == PieceType.general) {
       final winner = piece.color == PieceColor.blue ? 'Blue (초)' : 'Red (한)';
@@ -161,6 +217,9 @@ class GameState extends ChangeNotifier {
     _currentPlayer = _currentPlayer == PieceColor.blue
         ? PieceColor.red
         : PieceColor.blue;
+
+    // Record position for repetition detection
+    _recordPosition();
 
     // Update status message with check indication
     _updateStatusMessage();
@@ -257,6 +316,16 @@ class GameState extends ChangeNotifier {
         final move = Move(from: from, to: to, capturedPiece: captured);
         _moveHistory.add(move);
 
+        // Update 50-move rule counter for AI move
+        if (captured != null || piece.type == PieceType.soldier) {
+          _halfMoveClock = 0;
+          _positionHistory.clear();
+          debugPrint('_getAIMove: Reset halfMoveClock and position history (capture or pawn move)');
+        } else {
+          _halfMoveClock++;
+          debugPrint('_getAIMove: Incremented halfMoveClock to $_halfMoveClock');
+        }
+
         // Check if King (General) was captured - game ends
         if (captured != null && captured.type == PieceType.general) {
           _statusMessage = 'Game Over! Red (한) wins by capturing the King!';
@@ -267,6 +336,10 @@ class GameState extends ChangeNotifier {
 
         // Switch back to player (Blue)
         _currentPlayer = PieceColor.blue;
+
+        // Record position for repetition detection
+        _recordPosition();
+
         _updateStatusMessage();
       } else {
         debugPrint('_getAIMove: No valid move received from Stockfish');
@@ -712,6 +785,84 @@ class GameState extends ChangeNotifier {
     }
 
     return false;
+  }
+
+  /// Check if the current player is in checkmate
+  /// Checkmate = king is in check AND no legal moves available
+  bool _isCheckmate(PieceColor playerColor) {
+    // First, check if the king is in check
+    if (!_isKingInCheck(playerColor)) {
+      return false; // Not in check, so can't be checkmate
+    }
+
+    // Check if there are any legal moves available
+    // If any piece has at least one legal move, it's not checkmate
+    for (int rank = 0; rank < 10; rank++) {
+      for (int file = 0; file < 9; file++) {
+        final pos = Position(file: file, rank: rank);
+        final piece = _board.getPiece(pos);
+
+        if (piece != null && piece.color == playerColor) {
+          // Get valid moves for this piece (already filters out moves that leave king in check)
+          final validMoves = _getValidMovesForPosition(pos);
+          if (validMoves.isNotEmpty) {
+            // Found at least one legal move, not checkmate
+            return false;
+          }
+        }
+      }
+    }
+
+    // King is in check and no legal moves available = checkmate
+    return true;
+  }
+
+  /// Check if the current player is in stalemate
+  /// Stalemate = NOT in check but no legal moves available
+  bool _isStalemate(PieceColor playerColor) {
+    // First, check if the king is NOT in check
+    if (_isKingInCheck(playerColor)) {
+      return false; // In check, so can't be stalemate
+    }
+
+    // Check if there are any legal moves available
+    for (int rank = 0; rank < 10; rank++) {
+      for (int file = 0; file < 9; file++) {
+        final pos = Position(file: file, rank: rank);
+        final piece = _board.getPiece(pos);
+
+        if (piece != null && piece.color == playerColor) {
+          final validMoves = _getValidMovesForPosition(pos);
+          if (validMoves.isNotEmpty) {
+            return false; // Found a legal move, not stalemate
+          }
+        }
+      }
+    }
+
+    // Not in check but no legal moves = stalemate
+    return true;
+  }
+
+  /// Check for threefold repetition
+  /// If the same position occurs 3 times, it's a draw
+  bool _isThreefoldRepetition() {
+    final currentFen = StockfishConverter.boardToFEN(_board, _currentPlayer);
+    final count = _positionHistory[currentFen] ?? 0;
+    return count >= 3;
+  }
+
+  /// Check for 50-move rule
+  /// If 50 moves (100 half-moves) pass without a capture or pawn move, it's a draw
+  bool _isFiftyMoveRule() {
+    return _halfMoveClock >= 100;
+  }
+
+  /// Record the current position in history after a move
+  void _recordPosition() {
+    final currentFen = StockfishConverter.boardToFEN(_board, _currentPlayer);
+    _positionHistory[currentFen] = (_positionHistory[currentFen] ?? 0) + 1;
+    debugPrint('_recordPosition: Position count for this FEN: ${_positionHistory[currentFen]}');
   }
 
   /// Check if a move would leave the player's own king in check
