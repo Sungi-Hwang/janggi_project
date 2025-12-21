@@ -21,6 +21,10 @@ class GameState extends ChangeNotifier {
   final Map<String, int> _positionHistory = {};
   int _halfMoveClock = 0; // For 50-move rule (counts half-moves since last capture/pawn move)
 
+  // Piece setup configurations
+  PieceSetup _blueSetup = PieceSetup.horseElephantHorseElephant;  // Default: 마상마상
+  PieceSetup _redSetup = PieceSetup.horseElephantHorseElephant;   // Default: 마상마상
+
   // Getters
   Board get board => _board;
   PieceColor get currentPlayer => _currentPlayer;
@@ -36,7 +40,10 @@ class GameState extends ChangeNotifier {
   }
 
   void _initializeGame() {
-    _board.setupInitialPosition();
+    _board.setupInitialPosition(
+      blueSetup: _blueSetup,
+      redSetup: _redSetup,
+    );
     _currentPlayer = PieceColor.blue;  // Blue (초) starts first
     _selectedPosition = null;
     _validMoves = [];
@@ -52,6 +59,20 @@ class GameState extends ChangeNotifier {
     _updateStatusMessage();
     notifyListeners();
   }
+
+  /// Set piece setup configurations and restart game
+  void setPieceSetup({
+    required PieceSetup blueSetup,
+    required PieceSetup redSetup,
+  }) {
+    _blueSetup = blueSetup;
+    _redSetup = redSetup;
+    _initializeGame();
+  }
+
+  // Getters for piece setup
+  PieceSetup get blueSetup => _blueSetup;
+  PieceSetup get redSetup => _redSetup;
 
   /// Update status message with current player and check indication
   void _updateStatusMessage() {

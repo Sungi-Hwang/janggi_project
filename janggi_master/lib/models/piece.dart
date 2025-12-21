@@ -15,6 +15,55 @@ enum PieceColor {
   blue,  // Han (Blue/Chu)
 }
 
+/// Represents initial piece setup configurations
+/// 외상 = Elephant outside (Chariot-Elephant-Horse)
+/// 내상 = Elephant inside (Chariot-Horse-Elephant)
+enum PieceSetup {
+  /// 상마마상 (Elephant-Horse-Horse-Elephant)
+  /// Left: 차상마, Right: 마상차
+  elephantHorseHorseElephant,
+
+  /// 상마상마 (Elephant-Horse-Elephant-Horse)
+  /// Left: 차상마, Right: 상마차
+  elephantHorseElephantHorse,
+
+  /// 마상상마 (Horse-Elephant-Elephant-Horse)
+  /// Left: 차마상, Right: 상마차
+  horseElephantElephantHorse,
+
+  /// 마상마상 (Horse-Elephant-Horse-Elephant)
+  /// Left: 차마상, Right: 마상차
+  horseElephantHorseElephant,
+}
+
+extension PieceSetupExtension on PieceSetup {
+  String get displayName {
+    switch (this) {
+      case PieceSetup.elephantHorseHorseElephant:
+        return '상마마상';
+      case PieceSetup.elephantHorseElephantHorse:
+        return '상마상마';
+      case PieceSetup.horseElephantElephantHorse:
+        return '마상상마';
+      case PieceSetup.horseElephantHorseElephant:
+        return '마상마상';
+    }
+  }
+
+  String get description {
+    switch (this) {
+      case PieceSetup.elephantHorseHorseElephant:
+        return '외상 배치 (차상마-마상차)';
+      case PieceSetup.elephantHorseElephantHorse:
+        return '차상마-상마차';
+      case PieceSetup.horseElephantElephantHorse:
+        return '차마상-상마차';
+      case PieceSetup.horseElephantHorseElephant:
+        return '내상 배치 (차마상-마상차)';
+    }
+  }
+}
+
 /// Represents a Janggi piece
 class Piece {
   final PieceType type;

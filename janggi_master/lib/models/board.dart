@@ -95,21 +95,15 @@ class Board {
   /// Set up initial Janggi position
   /// 楚(Cho/Blue) = 파란색 = 선공 = bottom (ranks 0-3)
   /// 漢(Han/Red) = 빨간색 = 후공 = top (ranks 6-9)
-  /// 외상 배치 (차-상-마)
-  void setupInitialPosition() {
+  void setupInitialPosition({
+    PieceSetup blueSetup = PieceSetup.horseElephantHorseElephant,
+    PieceSetup redSetup = PieceSetup.horseElephantHorseElephant,
+  }) {
     clear();
 
     // Blue pieces 楚 (bottom, ranks 0-3) - 선공, 파란색
-    // Rank 0: Back row - 외상 배치 (Chariot-Elephant-Horse on both sides)
-    setPiece(Position(file: 0, rank: 0), Piece(type: PieceType.chariot, color: PieceColor.blue));
-    setPiece(Position(file: 1, rank: 0), Piece(type: PieceType.elephant, color: PieceColor.blue));
-    setPiece(Position(file: 2, rank: 0), Piece(type: PieceType.horse, color: PieceColor.blue));
-    setPiece(Position(file: 3, rank: 0), Piece(type: PieceType.guard, color: PieceColor.blue));
-    // File 4 empty at rank 0
-    setPiece(Position(file: 5, rank: 0), Piece(type: PieceType.guard, color: PieceColor.blue));
-    setPiece(Position(file: 6, rank: 0), Piece(type: PieceType.horse, color: PieceColor.blue));
-    setPiece(Position(file: 7, rank: 0), Piece(type: PieceType.elephant, color: PieceColor.blue));
-    setPiece(Position(file: 8, rank: 0), Piece(type: PieceType.chariot, color: PieceColor.blue));
+    // Rank 0: Back row
+    _setupBackRow(0, PieceColor.blue, blueSetup);
 
     // Rank 1: General in palace center
     setPiece(Position(file: 4, rank: 1), Piece(type: PieceType.general, color: PieceColor.blue));
@@ -140,16 +134,57 @@ class Board {
     // Rank 8: General in palace center
     setPiece(Position(file: 4, rank: 8), Piece(type: PieceType.general, color: PieceColor.red));
 
-    // Rank 9: Back row - 외상 배치 (Chariot-Elephant-Horse on both sides)
-    setPiece(Position(file: 0, rank: 9), Piece(type: PieceType.chariot, color: PieceColor.red));
-    setPiece(Position(file: 1, rank: 9), Piece(type: PieceType.elephant, color: PieceColor.red));
-    setPiece(Position(file: 2, rank: 9), Piece(type: PieceType.horse, color: PieceColor.red));
-    setPiece(Position(file: 3, rank: 9), Piece(type: PieceType.guard, color: PieceColor.red));
-    // File 4 empty at rank 9
-    setPiece(Position(file: 5, rank: 9), Piece(type: PieceType.guard, color: PieceColor.red));
-    setPiece(Position(file: 6, rank: 9), Piece(type: PieceType.horse, color: PieceColor.red));
-    setPiece(Position(file: 7, rank: 9), Piece(type: PieceType.elephant, color: PieceColor.red));
-    setPiece(Position(file: 8, rank: 9), Piece(type: PieceType.chariot, color: PieceColor.red));
+    // Rank 9: Back row
+    _setupBackRow(9, PieceColor.red, redSetup);
+  }
+
+  /// Setup back row based on piece configuration
+  /// Rank: 0 for Blue, 9 for Red
+  void _setupBackRow(int rank, PieceColor color, PieceSetup setup) {
+    // Chariots always at corners
+    setPiece(Position(file: 0, rank: rank), Piece(type: PieceType.chariot, color: color));
+    setPiece(Position(file: 8, rank: rank), Piece(type: PieceType.chariot, color: color));
+
+    // Guards always at files 3 and 5
+    setPiece(Position(file: 3, rank: rank), Piece(type: PieceType.guard, color: color));
+    setPiece(Position(file: 5, rank: rank), Piece(type: PieceType.guard, color: color));
+
+    // File 4 (center) is always empty
+
+    // Setup horses and elephants based on configuration
+    switch (setup) {
+      case PieceSetup.elephantHorseHorseElephant:
+        // 상마마상: Left(차상마), Right(마상차)
+        setPiece(Position(file: 1, rank: rank), Piece(type: PieceType.elephant, color: color));
+        setPiece(Position(file: 2, rank: rank), Piece(type: PieceType.horse, color: color));
+        setPiece(Position(file: 6, rank: rank), Piece(type: PieceType.horse, color: color));
+        setPiece(Position(file: 7, rank: rank), Piece(type: PieceType.elephant, color: color));
+        break;
+
+      case PieceSetup.elephantHorseElephantHorse:
+        // 상마상마: Left(차상마), Right(상마차)
+        setPiece(Position(file: 1, rank: rank), Piece(type: PieceType.elephant, color: color));
+        setPiece(Position(file: 2, rank: rank), Piece(type: PieceType.horse, color: color));
+        setPiece(Position(file: 6, rank: rank), Piece(type: PieceType.elephant, color: color));
+        setPiece(Position(file: 7, rank: rank), Piece(type: PieceType.horse, color: color));
+        break;
+
+      case PieceSetup.horseElephantElephantHorse:
+        // 마상상마: Left(차마상), Right(상마차)
+        setPiece(Position(file: 1, rank: rank), Piece(type: PieceType.horse, color: color));
+        setPiece(Position(file: 2, rank: rank), Piece(type: PieceType.elephant, color: color));
+        setPiece(Position(file: 6, rank: rank), Piece(type: PieceType.elephant, color: color));
+        setPiece(Position(file: 7, rank: rank), Piece(type: PieceType.horse, color: color));
+        break;
+
+      case PieceSetup.horseElephantHorseElephant:
+        // 마상마상: Left(차마상), Right(마상차) - 내상 (default)
+        setPiece(Position(file: 1, rank: rank), Piece(type: PieceType.horse, color: color));
+        setPiece(Position(file: 2, rank: rank), Piece(type: PieceType.elephant, color: color));
+        setPiece(Position(file: 6, rank: rank), Piece(type: PieceType.horse, color: color));
+        setPiece(Position(file: 7, rank: rank), Piece(type: PieceType.elephant, color: color));
+        break;
+    }
   }
 
   /// Create a copy of this board

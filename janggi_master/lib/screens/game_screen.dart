@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../game/game_state.dart';
 import '../widgets/janggi_board_widget.dart';
 import '../stockfish_ffi.dart';
+import '../models/piece.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -123,6 +124,13 @@ class _GameScreenState extends State<GameScreen> {
                         label: const Text('New Game'),
                       ),
                       ElevatedButton.icon(
+                        onPressed: () {
+                          _showSetupDialog(context, gameState);
+                        },
+                        icon: const Icon(Icons.settings),
+                        label: const Text('Setup'),
+                      ),
+                      ElevatedButton.icon(
                         onPressed: gameState.moveHistory.isNotEmpty
                             ? () {
                                 gameState.undoMove();
@@ -165,6 +173,88 @@ class _GameScreenState extends State<GameScreen> {
           },
         ),
       ),
+    );
+  }
+
+  void _showSetupDialog(BuildContext context, GameState gameState) {
+    PieceSetup selectedBlueSetup = gameState.blueSetup;
+    PieceSetup selectedRedSetup = gameState.redSetup;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('기물 배치 선택 (Piece Setup)'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Blue setup
+                  const Text('초 (Blue) 배치:', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  DropdownButton<PieceSetup>(
+                    value: selectedBlueSetup,
+                    isExpanded: true,
+                    items: PieceSetup.values.map((setup) {
+                      return DropdownMenuItem(
+                        value: setup,
+                        child: Text('${setup.displayName} - ${setup.description}'),
+                      );
+                    }).toList(),
+                    onChanged: (PieceSetup? newValue) {
+                      if (newValue != null) {
+                        setState(() {
+                          selectedBlueSetup = newValue;
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  // Red setup
+                  const Text('한 (Red) 배치:', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  DropdownButton<PieceSetup>(
+                    value: selectedRedSetup,
+                    isExpanded: true,
+                    items: PieceSetup.values.map((setup) {
+                      return DropdownMenuItem(
+                        value: setup,
+                        child: Text('${setup.displayName} - ${setup.description}'),
+                      );
+                    }).toList(),
+                    onChanged: (PieceSetup? newValue) {
+                      if (newValue != null) {
+                        setState(() {
+                          selectedRedSetup = newValue;
+                        });
+                      }
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('취소'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    gameState.setPieceSetup(
+                      blueSetup: selectedBlueSetup,
+                      redSetup: selectedRedSetup,
+                    );
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('시작'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
