@@ -14,6 +14,7 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> {
   bool _engineInitialized = false;
+  bool _gameOverDialogShown = false;
 
   @override
   void initState() {
@@ -63,6 +64,19 @@ class _GameScreenState extends State<GameScreen> {
         ),
         body: Consumer<GameState>(
           builder: (context, gameState, child) {
+            // Show game over dialog when game ends (only once)
+            if (gameState.isGameOver && gameState.gameOverReason != null && !_gameOverDialogShown) {
+              _gameOverDialogShown = true;
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                _showGameOverDialog(context, gameState);
+              });
+            }
+
+            // Reset dialog flag when game restarts
+            if (!gameState.isGameOver && _gameOverDialogShown) {
+              _gameOverDialogShown = false;
+            }
+
             return Column(
               children: [
                 // Status bar
@@ -143,6 +157,39 @@ class _GameScreenState extends State<GameScreen> {
                   ),
                 ),
 
+                // DEBUG: Test buttons for game over dialogs
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Wrap(
+                    spacing: 8,
+                    children: [
+                      const Text('디버그:', style: TextStyle(fontWeight: FontWeight.bold)),
+                      ElevatedButton(
+                        onPressed: () {
+                          gameState.testGameOver('blue_wins_checkmate');
+                        },
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                        child: const Text('Blue 승리', style: TextStyle(fontSize: 12)),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          gameState.testGameOver('red_wins_capture');
+                        },
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                        child: const Text('Red 승리', style: TextStyle(fontSize: 12)),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          gameState.testGameOver('threefold_repetition');
+                        },
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.grey),
+                        child: const Text('무승부(3수)', style: TextStyle(fontSize: 12)),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+
                 // Move history
                 Container(
                   height: 100,
@@ -173,6 +220,81 @@ class _GameScreenState extends State<GameScreen> {
           },
         ),
       ),
+    );
+  }
+
+  void _showGameOverDialog(BuildContext context, GameState gameState) {
+    final reason = gameState.gameOverReason;
+    if (reason == null) return;
+
+    String title;
+    String message;
+    IconData icon;
+    Color iconColor;
+
+    if (reason == 'blue_wins_checkmate' || reason == 'blue_wins_capture') {
+      title = '초(Blue) 승리!';
+      message = reason == 'blue_wins_checkmate'
+          ? '체크메이트로 승리했습니다!'
+          : '왕을 잡아서 승리했습니다!';
+      icon = Icons.emoji_events;
+      iconColor = Colors.blue;
+    } else if (reason == 'red_wins_checkmate' || reason == 'red_wins_capture') {
+      title = '한(Red) 승리!';
+      message = reason == 'red_wins_checkmate'
+          ? '체크메이트로 승리했습니다!'
+          : '왕을 잡아서 승리했습니다!';
+      icon = Icons.emoji_events;
+      iconColor = Colors.red;
+    } else {
+      // Draw conditions (장기: 3수 동형, 50수 규칙만 해당)
+      title = '무승부!';
+      icon = Icons.handshake;
+      iconColor = Colors.grey;
+
+      if (reason == 'threefold_repetition') {
+        message = '3수 동형 - 같은 국면이 3번 반복되었습니다.';
+      } else if (reason == 'fifty_move_rule') {
+        message = '50수 규칙 - 50수 동안 잡거나 졸이 움직이지 않았습니다.';
+      } else {
+        message = '게임이 무승부로 끝났습니다.';
+      }
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(
+            children: [
+              Icon(icon, color: iconColor, size: 32),
+              const SizedBox(width: 12),
+              Text(title),
+            ],
+          ),
+          content: Text(
+            message,
+            style: const TextStyle(fontSize: 16),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('확인'),
+            ),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.of(context).pop();
+                gameState.newGame();
+              },
+              icon: const Icon(Icons.refresh),
+              label: const Text('새 게임'),
+            ),
+          ],
+        );
+      },
     );
   }
 

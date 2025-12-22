@@ -25,6 +25,9 @@ class GameState extends ChangeNotifier {
   PieceSetup _blueSetup = PieceSetup.horseElephantHorseElephant;  // Default: 마상마상
   PieceSetup _redSetup = PieceSetup.horseElephantHorseElephant;   // Default: 마상마상
 
+  // Game over details
+  String? _gameOverReason;
+
   // Getters
   Board get board => _board;
   PieceColor get currentPlayer => _currentPlayer;
@@ -34,6 +37,7 @@ class GameState extends ChangeNotifier {
   bool get isEngineThinking => _isEngineThinking;
   String get statusMessage => _statusMessage;
   bool get isGameOver => _isGameOver;
+  String? get gameOverReason => _gameOverReason;
 
   GameState() {
     _initializeGame();
@@ -49,6 +53,7 @@ class GameState extends ChangeNotifier {
     _validMoves = [];
     _moveHistory = [];
     _isGameOver = false;
+    _gameOverReason = null;
     _positionHistory.clear();
     _halfMoveClock = 0;
 
@@ -86,6 +91,7 @@ class GameState extends ChangeNotifier {
     if (_isThreefoldRepetition()) {
       _statusMessage = 'Draw by threefold repetition!';
       _isGameOver = true;
+      _gameOverReason = 'threefold_repetition';
       debugPrint('_updateStatusMessage: DRAW - Threefold repetition');
       return;
     }
@@ -93,6 +99,7 @@ class GameState extends ChangeNotifier {
     if (_isFiftyMoveRule()) {
       _statusMessage = 'Draw by 50-move rule!';
       _isGameOver = true;
+      _gameOverReason = 'fifty_move_rule';
       debugPrint('_updateStatusMessage: DRAW - 50-move rule');
       return;
     }
@@ -104,17 +111,12 @@ class GameState extends ChangeNotifier {
           : 'Blue (초)';
       _statusMessage = 'Checkmate! $winner wins!';
       _isGameOver = true;
+      _gameOverReason = _currentPlayer == PieceColor.blue ? 'red_wins_checkmate' : 'blue_wins_checkmate';
       debugPrint('_updateStatusMessage: CHECKMATE - ${_currentPlayer.name} has no legal moves and is in check');
       return;
     }
 
-    // Check for stalemate
-    if (_isStalemate(_currentPlayer)) {
-      _statusMessage = 'Stalemate! Game is a draw.';
-      _isGameOver = true;
-      debugPrint('_updateStatusMessage: STALEMATE - ${_currentPlayer.name} has no legal moves but is not in check');
-      return;
-    }
+    // 장기에는 스테일메이트 없음 - 체크메이트, 왕 포획, 3수 동형, 50수만 게임 종료
 
     // Check if current player is in check
     if (_isKingInCheck(_currentPlayer)) {
@@ -224,6 +226,7 @@ class GameState extends ChangeNotifier {
       final winner = piece.color == PieceColor.blue ? 'Blue (초)' : 'Red (한)';
       _statusMessage = 'Game Over! $winner wins by capturing the King!';
       _isGameOver = true;
+      _gameOverReason = piece.color == PieceColor.blue ? 'blue_wins_capture' : 'red_wins_capture';
       debugPrint('_makeMove: GAME OVER - King captured by ${piece.color}');
       notifyListeners();
       return; // End game - no further moves
@@ -351,6 +354,7 @@ class GameState extends ChangeNotifier {
         if (captured != null && captured.type == PieceType.general) {
           _statusMessage = 'Game Over! Red (한) wins by capturing the King!';
           _isGameOver = true;
+          _gameOverReason = 'red_wins_capture';
           debugPrint('_getAIMove: GAME OVER - King captured by AI');
           return; // End game - no further moves
         }
@@ -478,9 +482,9 @@ class GameState extends ChangeNotifier {
         // Check palace diagonal movement
         if (from.isInPalace(isRedPalace: piece.color == PieceColor.red) &&
             to.isInPalace(isRedPalace: piece.color == PieceColor.red)) {
-          if (_isPalaceDiagonal(from, to, piece.color == PieceColor.red)) {
-            return _isValidCannonDiagonalMove(from, to, piece.color == PieceColor.red);
-          }
+          // For cannon, we don't use _isPalaceDiagonal because it doesn't support corner-to-corner
+          // Instead, _isValidCannonDiagonalMove handles all diagonal cases
+          return _isValidCannonDiagonalMove(from, to, piece.color == PieceColor.red);
         }
 
         return false;
@@ -590,11 +594,24 @@ class GameState extends ChangeNotifier {
     final centerRank = isRedPalace ? 8 : 1;
     final center = Position(file: centerFile, rank: centerRank);
 
-    // Cannon must jump over exactly one piece on diagonal
-    // The only piece that can be jumped is at the palace center
+    // Cannon MUST jump over exactly one piece on diagonal - NEVER moves without jumping!
+    // Palace diagonal paths (STRAIGHT diagonals):
+    // Blue: (d0)-(e1)-(f2) and (f0)-(e1)-(d2)
+    // Red: (d7)-(e8)-(f9) and (f7)-(e8)-(d9)
 
-    // If moving through center (corner to corner)
+    // Case 1: Corner to corner (jumping through center)
     if (from != center && to != center) {
+      // Check if from and to are on the same diagonal line
+      // Valid corner pairs: (d0, f2) and (f0, d2) for blue palace
+      // Valid corner pairs: (d7, f9) and (f7, d9) for red palace
+      final fileDiff = (to.file - from.file).abs();
+      final rankDiff = (to.rank - from.rank).abs();
+
+      // Corner to corner must be 2 steps diagonally
+      if (fileDiff != 2 || rankDiff != 2) {
+        return false;
+      }
+
       final centerPiece = _board.getPiece(center);
       // Must have exactly one piece at center to jump over
       if (centerPiece != null && centerPiece.type != PieceType.cannon) {
@@ -603,16 +620,30 @@ class GameState extends ChangeNotifier {
       return false;
     }
 
-    // If moving from/to center, there should be no pieces to jump
-    // (Cannon needs to jump, so direct move from center is invalid for capture)
-    // But for non-capture move, it's not valid either (must jump)
-    final targetPiece = _board.getPiece(to);
-    if (targetPiece == null) {
-      // Non-capture move: still needs to jump over something
+    // Case 2: Center to corner or corner to center (ONE step diagonal)
+    // For cannon, this is NOT allowed because there's no piece to jump over!
+    // Cannon cannot move one step diagonally - it must jump over a piece
+    // Example: e1(center) → d0(corner) is INVALID for cannon (no piece to jump)
+    // Only valid if jumping: e1 → (jump over piece at intermediate) → corner
+
+    if (from == center || to == center) {
+      final cornerPos = from == center ? to : from;
+      final centerPos = center;
+
+      final fileDiff = (cornerPos.file - centerPos.file).abs();
+      final rankDiff = (cornerPos.rank - centerPos.rank).abs();
+
+      // One-step diagonal move (center to/from adjacent corner)
+      if (fileDiff == 1 && rankDiff == 1) {
+        // For cannon, one-step diagonal is NEVER allowed (no piece to jump over)
+        // The diagonal line is direct: d0-e1 or e1-f2, etc.
+        return false;
+      }
+
+      // Shouldn't reach here for valid palace positions
       return false;
     }
 
-    // This shouldn't happen as palace diagonal is only 1 step
     return false;
   }
 
@@ -838,32 +869,6 @@ class GameState extends ChangeNotifier {
     return true;
   }
 
-  /// Check if the current player is in stalemate
-  /// Stalemate = NOT in check but no legal moves available
-  bool _isStalemate(PieceColor playerColor) {
-    // First, check if the king is NOT in check
-    if (_isKingInCheck(playerColor)) {
-      return false; // In check, so can't be stalemate
-    }
-
-    // Check if there are any legal moves available
-    for (int rank = 0; rank < 10; rank++) {
-      for (int file = 0; file < 9; file++) {
-        final pos = Position(file: file, rank: rank);
-        final piece = _board.getPiece(pos);
-
-        if (piece != null && piece.color == playerColor) {
-          final validMoves = _getValidMovesForPosition(pos);
-          if (validMoves.isNotEmpty) {
-            return false; // Found a legal move, not stalemate
-          }
-        }
-      }
-    }
-
-    // Not in check but no legal moves = stalemate
-    return true;
-  }
 
   /// Check for threefold repetition
   /// If the same position occurs 3 times, it's a draw
@@ -1040,15 +1045,41 @@ class GameState extends ChangeNotifier {
 
   bool _isValidCannonDiagonalMoveOnBoard(Position from, Position to, bool isRedPalace, Board board) {
     final center = Position(file: 4, rank: isRedPalace ? 8 : 1);
+
+    // Case 1: Corner to corner (jumping through center)
     if (from != center && to != center) {
+      final fileDiff = (to.file - from.file).abs();
+      final rankDiff = (to.rank - from.rank).abs();
+
+      // Corner to corner must be 2 steps diagonally
+      if (fileDiff != 2 || rankDiff != 2) {
+        return false;
+      }
+
       final centerPiece = board.getPiece(center);
       if (centerPiece != null && centerPiece.type != PieceType.cannon) {
         return true;
       }
       return false;
     }
-    final targetPiece = board.getPiece(to);
-    if (targetPiece == null) return false;
+
+    // Case 2: Center to corner or corner to center (ONE step diagonal)
+    // For cannon, one-step diagonal is NOT allowed (no piece to jump over)
+    if (from == center || to == center) {
+      final cornerPos = from == center ? to : from;
+      final centerPos = center;
+
+      final fileDiff = (cornerPos.file - centerPos.file).abs();
+      final rankDiff = (cornerPos.rank - centerPos.rank).abs();
+
+      // One-step diagonal move - NOT allowed for cannon
+      if (fileDiff == 1 && rankDiff == 1) {
+        return false;
+      }
+
+      return false;
+    }
+
     return false;
   }
 
@@ -1081,6 +1112,35 @@ class GameState extends ChangeNotifier {
 
     // TODO: Implement proper undo with captured pieces
     _statusMessage = 'Undo not yet implemented';
+    notifyListeners();
+  }
+
+  /// DEBUG: Test game over dialog
+  void testGameOver(String reason) {
+    _isGameOver = true;
+    _gameOverReason = reason;
+
+    switch (reason) {
+      case 'blue_wins_checkmate':
+        _statusMessage = 'Checkmate! Blue (초) wins!';
+        break;
+      case 'blue_wins_capture':
+        _statusMessage = 'Game Over! Blue (초) wins by capturing the King!';
+        break;
+      case 'red_wins_checkmate':
+        _statusMessage = 'Checkmate! Red (한) wins!';
+        break;
+      case 'red_wins_capture':
+        _statusMessage = 'Game Over! Red (한) wins by capturing the King!';
+        break;
+      case 'threefold_repetition':
+        _statusMessage = 'Draw by threefold repetition!';
+        break;
+      case 'fifty_move_rule':
+        _statusMessage = 'Draw by 50-move rule!';
+        break;
+    }
+
     notifyListeners();
   }
 }
