@@ -5,6 +5,7 @@ import '../models/position.dart';
 import '../models/move.dart';
 import '../stockfish_ffi.dart';
 import '../utils/stockfish_converter.dart';
+import '../screens/game_screen.dart' show GameMode;
 
 /// Manages the game state and logic
 class GameState extends ChangeNotifier {
@@ -13,6 +14,13 @@ class GameState extends ChangeNotifier {
   Position? _selectedPosition;
   List<Position> _validMoves = [];
   List<Move> _moveHistory = [];
+
+  // Game mode
+  final GameMode _gameMode;
+
+  // AI settings
+  int _aiDepth = 5; // Default: 중수 (Medium)
+  PieceColor _aiColor = PieceColor.red; // AI plays as Red (한) by default
   bool _isEngineThinking = false;
   String _statusMessage = 'Blue to move (초 선공)';
   bool _isGameOver = false;
@@ -28,6 +36,11 @@ class GameState extends ChangeNotifier {
   // Game over details
   String? _gameOverReason;
 
+  // Animation state
+  Move? _animatingMove; // The move currently being animated
+  bool _isAnimating = false;
+  Piece? _animatingPiece; // The piece being animated
+
   // Getters
   Board get board => _board;
   PieceColor get currentPlayer => _currentPlayer;
@@ -38,10 +51,38 @@ class GameState extends ChangeNotifier {
   String get statusMessage => _statusMessage;
   bool get isGameOver => _isGameOver;
   String? get gameOverReason => _gameOverReason;
+  int get aiDepth => _aiDepth;
+  PieceColor get aiColor => _aiColor;
+  Move? get animatingMove => _animatingMove;
+  bool get isAnimating => _isAnimating;
+  Piece? get animatingPiece => _animatingPiece;
 
-  GameState() {
+  /// Set AI difficulty level (depth)
+  void setAIDifficulty(int depth) {
+    _aiDepth = depth.clamp(1, 15);
+    debugPrint('AI difficulty set to depth: $_aiDepth');
+    notifyListeners();
+  }
+
+  /// Set AI color (which side AI plays)
+  void setAIColor(PieceColor color) {
+    _aiColor = color;
+    debugPrint('AI color set to: ${color == PieceColor.blue ? "초 (Blue)" : "한 (Red)"}');
+    notifyListeners();
+  }
+
+  GameState({
+    GameMode gameMode = GameMode.vsAI,
+    int aiDifficulty = 10,
+    PieceColor aiColor = PieceColor.red,
+  }) : _gameMode = gameMode,
+       _aiDepth = aiDifficulty,
+       _aiColor = aiColor {
     _initializeGame();
   }
+
+  /// Getter for game mode
+  GameMode get gameMode => _gameMode;
 
   void _initializeGame() {
     _board.setupInitialPosition(
@@ -63,6 +104,11 @@ class GameState extends ChangeNotifier {
 
     _updateStatusMessage();
     notifyListeners();
+
+    // If AI is Blue (초), AI should move first
+    if (_gameMode == GameMode.vsAI && _aiColor == PieceColor.blue) {
+      Future.microtask(() => _getAIMove());
+    }
   }
 
   /// Set piece setup configurations and restart game
@@ -142,8 +188,20 @@ class GameState extends ChangeNotifier {
       return;
     }
 
+    // Don't allow input during animation
+    if (_isAnimating) {
+      debugPrint('onSquareTapped: Animation in progress, ignoring input');
+      return;
+    }
+
     if (_isEngineThinking) {
       debugPrint('onSquareTapped: engine is thinking, ignoring');
+      return;
+    }
+
+    // In AI mode, don't allow player to move during AI's turn
+    if (_gameMode == GameMode.vsAI && _currentPlayer == _aiColor) {
+      debugPrint('onSquareTapped: AI turn, ignoring player input');
       return;
     }
 
@@ -186,7 +244,7 @@ class GameState extends ChangeNotifier {
     debugPrint('onSquareTapped: checking if $position is in valid moves: ${_validMoves.contains(position)}');
     if (_validMoves.contains(position)) {
       debugPrint('onSquareTapped: making move from $_selectedPosition to $position');
-      await _makeMove(_selectedPosition!, position);
+      await _makeMove(_selectedPosition!, position, isPlayerMove: true);
       _selectedPosition = null;
       _validMoves = [];
       notifyListeners();
@@ -195,15 +253,27 @@ class GameState extends ChangeNotifier {
     }
   }
 
-  /// Make a move on the board
-  Future<void> _makeMove(Position from, Position to) async {
+  /// Make a move on the board with animation
+  Future<void> _makeMove(Position from, Position to, {bool isPlayerMove = false}) async {
     final piece = _board.getPiece(from);
     if (piece == null) return;
 
-    debugPrint('_makeMove: Moving $piece from $from to $to');
+    debugPrint('_makeMove: Moving $piece from $from to $to (isPlayerMove: $isPlayerMove)');
 
-    // Make the move
-    final captured = _board.movePiece(from, to);
+    // Start animation - save piece info and move, but DON'T update board yet
+    _isAnimating = true;
+    _animatingPiece = piece; // Save the moving piece
+    final captured = _board.getPiece(to); // Save captured piece before move
+    _animatingMove = Move(from: from, to: to, capturedPiece: captured);
+
+    // Immediately show animation start
+    notifyListeners();
+
+    // Wait for animation to complete (both player and AI)
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    // NOW make the move on the board (after animation)
+    _board.movePiece(from, to);
     debugPrint('_makeMove: Move completed. Captured: $captured');
 
     // Record the move
@@ -211,10 +281,9 @@ class GameState extends ChangeNotifier {
     _moveHistory.add(move);
 
     // Update 50-move rule counter
-    // Reset if there was a capture or if a soldier (pawn) moved
     if (captured != null || piece.type == PieceType.soldier) {
       _halfMoveClock = 0;
-      _positionHistory.clear(); // Irreversible move, clear position history
+      _positionHistory.clear();
       debugPrint('_makeMove: Reset halfMoveClock and position history (capture or pawn move)');
     } else {
       _halfMoveClock++;
@@ -228,8 +297,11 @@ class GameState extends ChangeNotifier {
       _isGameOver = true;
       _gameOverReason = piece.color == PieceColor.blue ? 'blue_wins_capture' : 'red_wins_capture';
       debugPrint('_makeMove: GAME OVER - King captured by ${piece.color}');
+      _isAnimating = false;
+      _animatingMove = null;
+      _animatingPiece = null;
       notifyListeners();
-      return; // End game - no further moves
+      return;
     }
 
     // Convert to UCI and log
@@ -245,16 +317,26 @@ class GameState extends ChangeNotifier {
     // Record position for repetition detection
     _recordPosition();
 
-    // Update status message with check indication
+    // Update status message
     _updateStatusMessage();
+
+    // End animation
+    _isAnimating = false;
+    _animatingMove = null;
+    _animatingPiece = null;
 
     debugPrint('_makeMove: Calling notifyListeners');
     notifyListeners();
 
-    // AI enabled - Stockfish is now working!
-    // If it's now AI's turn (Red/한), get AI move
-    if (_currentPlayer == PieceColor.red) {
-      await _getAIMove();
+    // If it's AI mode and it's now AI's turn, get AI move
+    if (_gameMode == GameMode.vsAI && _currentPlayer == _aiColor) {
+      if (isPlayerMove) {
+        // Give UI a frame to update before starting AI animation
+        await Future.delayed(const Duration(milliseconds: 50));
+        _getAIMove();
+      } else {
+        await _getAIMove();
+      }
     }
   }
 
@@ -271,17 +353,17 @@ class GameState extends ChangeNotifier {
       // This avoids "invalid move" errors from move history
       final fen = StockfishConverter.boardToFEN(_board, _currentPlayer);
       debugPrint('_getAIMove: Current FEN: $fen');
-      debugPrint('_getAIMove: Current player: $_currentPlayer (should be Red for AI)');
+      debugPrint('_getAIMove: Current player: $_currentPlayer');
 
       // Set position using FEN (no move history needed)
       debugPrint('_getAIMove: Setting position...');
       StockfishFFI.setPosition(fen: fen);
 
       // Get best move with timeout
-      debugPrint('_getAIMove: Requesting best move...');
+      debugPrint('_getAIMove: Requesting best move with depth $_aiDepth...');
       final bestMoveUCI = await Future.delayed(
         Duration.zero,
-        () => StockfishFFI.getBestMove(depth: 5), // Reduced depth for faster response
+        () => StockfishFFI.getBestMove(depth: _aiDepth),
       ).timeout(
         const Duration(seconds: 5),
         onTimeout: () {
@@ -333,8 +415,18 @@ class GameState extends ChangeNotifier {
           return;
         }
 
-        // Make the AI move
-        final captured = _board.movePiece(from, to);
+        // Start AI move animation - save piece info, but DON'T update board yet
+        _isAnimating = true;
+        _animatingPiece = piece; // Save the moving piece
+        final captured = _board.getPiece(to); // Save captured piece before move
+        _animatingMove = Move(from: from, to: to, capturedPiece: captured);
+        notifyListeners();
+
+        // Wait for animation
+        await Future.delayed(const Duration(milliseconds: 300));
+
+        // NOW make the AI move (after animation)
+        _board.movePiece(from, to);
         debugPrint('_getAIMove: Move result - captured: $captured');
 
         final move = Move(from: from, to: to, capturedPiece: captured);
@@ -352,30 +444,41 @@ class GameState extends ChangeNotifier {
 
         // Check if King (General) was captured - game ends
         if (captured != null && captured.type == PieceType.general) {
-          _statusMessage = 'Game Over! Red (한) wins by capturing the King!';
+          final winnerColor = _aiColor == PieceColor.blue ? 'Blue (초)' : 'Red (한)';
+          _statusMessage = 'Game Over! $winnerColor wins by capturing the King!';
           _isGameOver = true;
-          _gameOverReason = 'red_wins_capture';
+          _gameOverReason = _aiColor == PieceColor.blue ? 'blue_wins_capture' : 'red_wins_capture';
           debugPrint('_getAIMove: GAME OVER - King captured by AI');
+          _isAnimating = false;
+          _animatingMove = null;
+          _animatingPiece = null;
           return; // End game - no further moves
         }
 
-        // Switch back to player (Blue)
-        _currentPlayer = PieceColor.blue;
+        // Switch to player's color (opposite of AI)
+        _currentPlayer = _currentPlayer == PieceColor.blue ? PieceColor.red : PieceColor.blue;
 
         // Record position for repetition detection
         _recordPosition();
 
         _updateStatusMessage();
+
+        // End animation
+        _isAnimating = false;
+        _animatingMove = null;
+        _animatingPiece = null;
       } else {
         debugPrint('_getAIMove: No valid move received from Stockfish');
         _statusMessage = 'AI failed to move';
-        _currentPlayer = PieceColor.blue; // Give turn back to player
+        // Switch to player's color (opposite of AI)
+        _currentPlayer = _aiColor == PieceColor.blue ? PieceColor.red : PieceColor.blue;
       }
     } catch (e, stackTrace) {
       _statusMessage = 'AI error: $e';
       debugPrint('AI move error: $e');
       debugPrint('Stack trace: $stackTrace');
-      _currentPlayer = PieceColor.blue; // Give turn back to player on error
+      // Switch to player's color (opposite of AI)
+      _currentPlayer = _aiColor == PieceColor.blue ? PieceColor.red : PieceColor.blue;
     } finally {
       _isEngineThinking = false;
       debugPrint('_getAIMove: Calling final notifyListeners');
@@ -1106,12 +1209,51 @@ class GameState extends ChangeNotifier {
     return false;
   }
 
-  /// Undo last move
+  /// Undo last move (or last 2 moves in AI mode to undo both player and AI moves)
   void undoMove() {
     if (_moveHistory.isEmpty) return;
 
-    // TODO: Implement proper undo with captured pieces
-    _statusMessage = 'Undo not yet implemented';
+    // In AI mode, undo 2 moves (player + AI) to return to player's turn
+    // In 2-player mode, undo 1 move
+    final movesToUndo = (_gameMode == GameMode.vsAI) ? 2 : 1;
+
+    for (int i = 0; i < movesToUndo && _moveHistory.isNotEmpty; i++) {
+      final lastMove = _moveHistory.removeLast();
+
+      // Move piece back to original position
+      final piece = _board.getPiece(lastMove.to);
+      if (piece != null) {
+        _board.setPiece(lastMove.to, null); // Remove from destination
+        _board.setPiece(lastMove.from, piece); // Put back to origin
+      }
+
+      // Restore captured piece if any
+      if (lastMove.capturedPiece != null) {
+        _board.setPiece(lastMove.to, lastMove.capturedPiece!);
+      }
+
+      // Switch back to previous player
+      _currentPlayer = _currentPlayer == PieceColor.blue ? PieceColor.red : PieceColor.blue;
+
+      // Update position history (remove last position)
+      final lastFen = StockfishConverter.boardToFEN(_board, _currentPlayer);
+      if (_positionHistory.containsKey(lastFen)) {
+        final count = _positionHistory[lastFen]!;
+        if (count <= 1) {
+          _positionHistory.remove(lastFen);
+        } else {
+          _positionHistory[lastFen] = count - 1;
+        }
+      }
+    }
+
+    // Clear selection and valid moves
+    _selectedPosition = null;
+    _validMoves = [];
+    _isGameOver = false;
+    _gameOverReason = null;
+
+    _updateStatusMessage();
     notifyListeners();
   }
 

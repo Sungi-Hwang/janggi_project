@@ -66,6 +66,12 @@ class StockfishFFI {
         _stockfishCommand(cmdP2.cast<Char>());
         malloc.free(cmdP2);
 
+        // Set MultiPV for variety in moves (analyze top 3 moves)
+        print('Setting MultiPV to 3 for move variety...');
+        final cmdP4 = 'setoption name MultiPV value 3'.toNativeUtf8();
+        _stockfishCommand(cmdP4.cast<Char>());
+        malloc.free(cmdP4);
+
         // Send isready to confirm
         final cmdP3 = 'isready'.toNativeUtf8();
         final resultP3 = _stockfishCommand(cmdP3.cast<Char>());
@@ -164,18 +170,61 @@ class StockfishFFI {
     final response = command(cmd);
     debugPrint('StockfishFFI.getBestMove: Full response:\n$response');
 
-    // Parse the bestmove from response
+    // Parse all PV lines to get top moves (for variety)
     final lines = response.split('\n');
+    final topMoves = <String>[];
+
     for (final line in lines) {
-      if (line.startsWith('bestmove')) {
-        final parts = line.split(' ');
-        if (parts.length >= 2) {
-          debugPrint('StockfishFFI.getBestMove: Parsed bestmove: ${parts[1]}');
-          return parts[1];
+      // Look for "info ... pv <move>" lines from MultiPV
+      if (line.contains('info') && line.contains('pv ')) {
+        final pvIndex = line.indexOf('pv ');
+        if (pvIndex != -1) {
+          final moveStart = pvIndex + 3;
+          final moveEnd = line.indexOf(' ', moveStart);
+          final move = moveEnd == -1
+              ? line.substring(moveStart).trim()
+              : line.substring(moveStart, moveEnd).trim();
+          if (move.isNotEmpty && !topMoves.contains(move)) {
+            topMoves.add(move);
+          }
         }
       }
     }
-    debugPrint('StockfishFFI.getBestMove: No bestmove found in response!');
-    return null;
+
+    // If we have multiple top moves, randomly pick one (weighted towards better moves)
+    String? selectedMove;
+    if (topMoves.isNotEmpty) {
+      // 60% chance to pick best move, 30% for 2nd, 10% for 3rd
+      final random = DateTime.now().microsecond % 100;
+      if (random < 60 && topMoves.isNotEmpty) {
+        selectedMove = topMoves[0]; // Best move
+      } else if (random < 90 && topMoves.length > 1) {
+        selectedMove = topMoves[1]; // 2nd best move
+      } else if (topMoves.length > 2) {
+        selectedMove = topMoves[2]; // 3rd best move
+      } else {
+        selectedMove = topMoves[0]; // Fallback to best
+      }
+      debugPrint('StockfishFFI.getBestMove: Top moves: $topMoves, Selected: $selectedMove');
+    }
+
+    // Fallback: parse the bestmove from response
+    if (selectedMove == null) {
+      for (final line in lines) {
+        if (line.startsWith('bestmove')) {
+          final parts = line.split(' ');
+          if (parts.length >= 2) {
+            selectedMove = parts[1];
+            debugPrint('StockfishFFI.getBestMove: Using bestmove from response: $selectedMove');
+            break;
+          }
+        }
+      }
+    }
+
+    if (selectedMove == null) {
+      debugPrint('StockfishFFI.getBestMove: No bestmove found in response!');
+    }
+    return selectedMove;
   }
 }

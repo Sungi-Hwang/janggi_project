@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'screens/game_screen.dart';
+import 'screens/game_screen.dart' show GameScreen, GameMode;
+import 'models/piece.dart' show PieceColor;
 
 void main() {
   runApp(const MyApp());
@@ -82,93 +83,62 @@ class MainMenu extends StatelessWidget {
               ),
               const SizedBox(height: 48),
 
-              // Play vs AI Button - SF Neon Design
-              InkWell(
+              // 1. Play vs AI Button - Cyan Neon
+              _buildMenuButton(
+                context: context,
+                label: 'AI 대국',
+                icon: Icons.smart_toy,
+                gradientColors: const [Color(0xFF0a4d68), Color(0xFF05161a)],
+                neonColor: const Color(0xFF00d9ff),
+                onTap: () => _showAIDifficultyDialog(context),
+              ),
+              const SizedBox(height: 16),
+
+              // 2. Play vs Player Button - Green Neon
+              _buildMenuButton(
+                context: context,
+                label: '친구 대국',
+                icon: Icons.people,
+                gradientColors: const [Color(0xFF0a4d1a), Color(0xFF051a08)],
+                neonColor: const Color(0xFF00ff88),
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const GameScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => const GameScreen(gameMode: GameMode.twoPlayer),
+                    ),
                   );
                 },
-                borderRadius: BorderRadius.circular(50),
-                child: Container(
-                  width: 320,
-                  height: 65,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Color(0xFF0a4d68), // Dark teal
-                        Color(0xFF05161a), // Very dark blue
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(50),
-                    border: Border.all(
-                      color: const Color(0xFF00d9ff),
-                      width: 2.5,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF00d9ff).withOpacity(0.8),
-                        blurRadius: 25,
-                        spreadRadius: 3,
-                        offset: const Offset(0, 0),
-                      ),
-                      BoxShadow(
-                        color: const Color(0xFF00d9ff).withOpacity(0.5),
-                        blurRadius: 40,
-                        spreadRadius: 5,
-                        offset: const Offset(0, 0),
-                      ),
-                      const BoxShadow(
-                        color: Color(0x6600d9ff),
-                        blurRadius: 50,
-                        spreadRadius: -5,
-                        offset: Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.play_arrow,
-                        size: 36,
-                        color: Color(0xFF00d9ff),
-                        shadows: [
-                          Shadow(
-                            color: Color(0xFF00d9ff),
-                            blurRadius: 10,
-                            offset: Offset(0, 0),
-                          ),
-                        ],
-                      ),
-                      SizedBox(width: 12),
-                      Text(
-                        'Play vs AI',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF00d9ff),
-                          letterSpacing: 1.5,
-                          shadows: [
-                            Shadow(
-                              color: Color(0xFF00d9ff),
-                              blurRadius: 10,
-                              offset: Offset(0, 0),
-                            ),
-                            Shadow(
-                              color: Color(0xFF00d9ff),
-                              blurRadius: 20,
-                              offset: Offset(0, 0),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              ),
+              const SizedBox(height: 16),
+
+              // 3. Puzzles Button - Purple Neon
+              _buildMenuButton(
+                context: context,
+                label: '묘수풀이',
+                icon: Icons.extension,
+                gradientColors: const [Color(0xFF4d0a68), Color(0xFF1a0522)],
+                neonColor: const Color(0xFFd900ff),
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('준비중입니다!')),
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+
+              // 4. Settings Button - Orange Neon
+              _buildMenuButton(
+                context: context,
+                label: '설정',
+                icon: Icons.settings,
+                gradientColors: const [Color(0xFF4d2a0a), Color(0xFF1a1005)],
+                neonColor: const Color(0xFFff9900),
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('준비중입니다!')),
+                  );
+                },
               ),
               const SizedBox(height: 32),
 
@@ -233,6 +203,203 @@ class MainMenu extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  /// Build a neon-styled menu button
+  Widget _buildMenuButton({
+    required BuildContext context,
+    required String label,
+    required IconData icon,
+    required List<Color> gradientColors,
+    required Color neonColor,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(50),
+      child: Container(
+        width: 320,
+        height: 65,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: gradientColors,
+          ),
+          borderRadius: BorderRadius.circular(50),
+          border: Border.all(
+            color: neonColor,
+            width: 2.5,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: neonColor.withOpacity(0.8),
+              blurRadius: 25,
+              spreadRadius: 3,
+              offset: const Offset(0, 0),
+            ),
+            BoxShadow(
+              color: neonColor.withOpacity(0.5),
+              blurRadius: 40,
+              spreadRadius: 5,
+              offset: const Offset(0, 0),
+            ),
+            BoxShadow(
+              color: neonColor.withOpacity(0.4),
+              blurRadius: 50,
+              spreadRadius: -5,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 36,
+              color: neonColor,
+              shadows: [
+                Shadow(
+                  color: neonColor,
+                  blurRadius: 10,
+                  offset: const Offset(0, 0),
+                ),
+              ],
+            ),
+            const SizedBox(width: 12),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: neonColor,
+                letterSpacing: 1.5,
+                shadows: [
+                  Shadow(
+                    color: neonColor,
+                    blurRadius: 10,
+                    offset: const Offset(0, 0),
+                  ),
+                  Shadow(
+                    color: neonColor,
+                    blurRadius: 20,
+                    offset: const Offset(0, 0),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Show AI difficulty selection dialog
+  void _showAIDifficultyDialog(BuildContext context) {
+    int selectedDifficulty = 10;
+    PieceColor selectedAIColor = PieceColor.red;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('AI 대국 설정'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // AI Color Selection
+                  const Text('AI 진영:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  const SizedBox(height: 8),
+                  DropdownButton<PieceColor>(
+                    value: selectedAIColor,
+                    isExpanded: true,
+                    items: const [
+                      DropdownMenuItem(
+                        value: PieceColor.red,
+                        child: Text('한 (Red) - AI가 한나라'),
+                      ),
+                      DropdownMenuItem(
+                        value: PieceColor.blue,
+                        child: Text('초 (Blue) - AI가 초나라'),
+                      ),
+                    ],
+                    onChanged: (PieceColor? newValue) {
+                      if (newValue != null) {
+                        setState(() {
+                          selectedAIColor = newValue;
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                  // AI Difficulty Selection
+                  const Text('AI 난이도:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  const SizedBox(height: 8),
+                  ListTile(
+                    leading: const Icon(Icons.child_care, color: Colors.green),
+                    title: const Text('초급'),
+                    subtitle: const Text('초보자용 - 쉬운 난이도'),
+                    selected: selectedDifficulty == 5,
+                    onTap: () {
+                      setState(() {
+                        selectedDifficulty = 5;
+                      });
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.person, color: Colors.orange),
+                    title: const Text('중급'),
+                    subtitle: const Text('중간 난이도'),
+                    selected: selectedDifficulty == 10,
+                    onTap: () {
+                      setState(() {
+                        selectedDifficulty = 10;
+                      });
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.workspace_premium, color: Colors.red),
+                    title: const Text('고급'),
+                    subtitle: const Text('프로 수준 - 어려운 난이도'),
+                    selected: selectedDifficulty == 15,
+                    onTap: () {
+                      setState(() {
+                        selectedDifficulty = 15;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  child: const Text('취소'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(dialogContext).pop();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => GameScreen(
+                          gameMode: GameMode.vsAI,
+                          aiDifficulty: selectedDifficulty,
+                          aiColor: selectedAIColor,
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text('시작'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

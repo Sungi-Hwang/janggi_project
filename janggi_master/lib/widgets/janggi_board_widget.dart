@@ -2,14 +2,19 @@ import 'package:flutter/material.dart';
 import '../models/board.dart';
 import '../models/piece.dart';
 import '../models/position.dart';
+import '../models/move.dart';
+import 'traditional_piece_widget.dart';
 
 /// Widget that renders the Janggi board
-class JanggiBoardWidget extends StatelessWidget {
+class JanggiBoardWidget extends StatefulWidget {
   final Board board;
   final Position? selectedPosition;
   final List<Position> validMoves;
   final Function(Position)? onSquareTapped;
   final bool flipBoard;
+  final Move? animatingMove;
+  final bool isAnimating;
+  final Piece? animatingPiece;
 
   const JanggiBoardWidget({
     super.key,
@@ -18,7 +23,52 @@ class JanggiBoardWidget extends StatelessWidget {
     this.validMoves = const [],
     this.onSquareTapped,
     this.flipBoard = false,
+    this.animatingMove,
+    this.isAnimating = false,
+    this.animatingPiece,
   });
+
+  @override
+  State<JanggiBoardWidget> createState() => _JanggiBoardWidgetState();
+}
+
+class _JanggiBoardWidgetState extends State<JanggiBoardWidget> {
+  // Track the current animating move to detect when it changes
+  Move? _currentAnimatingMove;
+  bool _animationStarted = false;
+
+  @override
+  void didUpdateWidget(JanggiBoardWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // When animation starts OR when animatingMove changes to a different move
+    final animationJustStarted = widget.isAnimating && !oldWidget.isAnimating;
+    final animationMoveChanged = widget.isAnimating &&
+                                  widget.animatingMove != null &&
+                                  widget.animatingMove != _currentAnimatingMove;
+
+    if (animationJustStarted || animationMoveChanged) {
+      debugPrint('[BoardWidget] Animation starting: from=${widget.animatingMove?.from} to=${widget.animatingMove?.to} piece=${widget.animatingPiece}');
+      _currentAnimatingMove = widget.animatingMove;
+      _animationStarted = false;
+      // Trigger animation to 'to' position on next frame
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && widget.isAnimating && widget.animatingMove == _currentAnimatingMove) {
+          setState(() {
+            debugPrint('[BoardWidget] Animation transition: from -> to');
+            _animationStarted = true;
+          });
+        }
+      });
+    }
+
+    // When animation ends, reset
+    if (!widget.isAnimating && oldWidget.isAnimating) {
+      debugPrint('[BoardWidget] Animation ended');
+      _currentAnimatingMove = null;
+      _animationStarted = false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,20 +79,41 @@ class JanggiBoardWidget extends StatelessWidget {
           color: const Color(0xFFE6C8A0),
           border: Border.all(color: Colors.black, width: 2),
         ),
-        clipBehavior: Clip.none, // Allow pieces to extend beyond board edges
+        clipBehavior: Clip.hardEdge, // Keep everything within bounds
         child: LayoutBuilder(
           builder: (context, constraints) {
+            // Add padding to keep pieces within board
+            const margin = 35.0;
+            final innerWidth = constraints.maxWidth - (margin * 2);
+            final innerHeight = constraints.maxHeight - (margin * 2);
+
             // Calculate grid spacing (distance between intersection points)
-            final gridSpacing = constraints.maxWidth / 8; // 8 spaces for 9 vertical lines
+            final gridSpacing = innerWidth / 8; // 8 spaces for 9 vertical lines
+
             return Stack(
-              clipBehavior: Clip.none, // Allow pieces to extend beyond bounds
+              clipBehavior: Clip.hardEdge,
               children: [
-                // Draw board lines
-                CustomPaint(
-                  size: Size(constraints.maxWidth, constraints.maxHeight),
-                  painter: BoardLinesPainter(
-                    gridSpacing: gridSpacing,
-                    flipBoard: flipBoard,
+                // Background image - rotated 90 degrees clockwise
+                Positioned.fill(
+                  child: RotatedBox(
+                    quarterTurns: 1, // 90 degrees clockwise
+                    child: Image.asset(
+                      'assets/images/janggi_pan.png',
+                      fit: BoxFit.fill,
+                      opacity: const AlwaysStoppedAnimation(0.8),
+                    ),
+                  ),
+                ),
+                // Draw board lines with margin
+                Positioned(
+                  left: margin,
+                  top: margin,
+                  child: CustomPaint(
+                    size: Size(innerWidth, innerHeight),
+                    painter: BoardLinesPainter(
+                      gridSpacing: gridSpacing,
+                      flipBoard: widget.flipBoard,
+                    ),
                   ),
                 ),
                 // Draw interactive squares (tap areas) - centered on intersections
@@ -51,21 +122,19 @@ class JanggiBoardWidget extends StatelessWidget {
                   (rank) => List.generate(
                     9,
                     (file) {
-                      // Red is at bottom (rank 0-3), Blue at top (rank 6-9)
-                      // Screen rank 0 (top) = board rank 9, screen rank 9 (bottom) = board rank 0
-                      final boardRank = flipBoard ? rank : (9 - rank);
-                      final boardFile = flipBoard ? (8 - file) : file;
+                      final boardRank = widget.flipBoard ? rank : (9 - rank);
+                      final boardFile = widget.flipBoard ? (8 - file) : file;
                       final position = Position(file: boardFile, rank: boardRank);
 
                       final tapSize = gridSpacing * 0.95;
 
                       return Positioned(
-                        left: file * gridSpacing - (tapSize / 2),
-                        top: rank * gridSpacing - (tapSize / 2),
+                        left: margin + file * gridSpacing - (tapSize / 2),
+                        top: margin + rank * gridSpacing - (tapSize / 2),
                         width: tapSize,
                         height: tapSize,
                         child: GestureDetector(
-                          onTap: () => onSquareTapped?.call(position),
+                          onTap: () => widget.onSquareTapped?.call(position),
                           child: Container(
                             decoration: BoxDecoration(
                               color: _getSquareColor(position),
@@ -79,33 +148,7 @@ class JanggiBoardWidget extends StatelessWidget {
                 ).expand((list) => list),
 
                 // Draw pieces EXACTLY on grid intersections
-                ...List.generate(
-                  10,
-                  (rank) => List.generate(
-                    9,
-                    (file) {
-                      final boardRank = flipBoard ? rank : (9 - rank);
-                      final boardFile = flipBoard ? (8 - file) : file;
-                      final position = Position(file: boardFile, rank: boardRank);
-                      final piece = board.getPiece(position);
-
-                      if (piece == null) return const SizedBox.shrink();
-
-                      // Place piece centered on intersection point
-                      final pieceSize = gridSpacing * 0.9;
-
-                      return Positioned(
-                        left: file * gridSpacing - (pieceSize / 2),
-                        top: rank * gridSpacing - (pieceSize / 2),
-                        width: pieceSize,
-                        height: pieceSize,
-                        child: IgnorePointer(
-                          child: _buildPiece(piece, pieceSize),
-                        ),
-                      );
-                    },
-                  ),
-                ).expand((list) => list),
+                ..._buildPieces(margin, gridSpacing),
               ],
             );
           },
@@ -114,53 +157,97 @@ class JanggiBoardWidget extends StatelessWidget {
     );
   }
 
+  /// Build all pieces with animation support
+  List<Widget> _buildPieces(double margin, double gridSpacing) {
+    final pieces = <Widget>[];
+    final pieceSize = gridSpacing * 0.9;
+
+    // Helper function to convert board position to screen position
+    Position getScreenPosition(Position boardPos) {
+      if (widget.flipBoard) {
+        return Position(file: 8 - boardPos.file, rank: boardPos.rank);
+      } else {
+        return Position(file: boardPos.file, rank: 9 - boardPos.rank);
+      }
+    }
+
+    // Render all stationary pieces
+    for (int rank = 0; rank < 10; rank++) {
+      for (int file = 0; file < 9; file++) {
+        final boardPos = Position(file: file, rank: rank);
+        final piece = widget.board.getPiece(boardPos);
+
+        if (piece == null) continue;
+
+        // Skip the piece being animated (it will be rendered separately)
+        if (widget.isAnimating && widget.animatingMove != null) {
+          // Skip source position (the moving piece)
+          if (boardPos == widget.animatingMove!.from) {
+            continue;
+          }
+          // Skip destination position (the piece being captured) during animation
+          if (boardPos == widget.animatingMove!.to) {
+            continue;
+          }
+        }
+
+        final screenPos = getScreenPosition(boardPos);
+
+        pieces.add(
+          Positioned(
+            left: margin + screenPos.file * gridSpacing - (pieceSize / 2),
+            top: margin + screenPos.rank * gridSpacing - (pieceSize / 2),
+            width: pieceSize,
+            height: pieceSize,
+            child: IgnorePointer(
+              child: _buildPiece(piece, pieceSize),
+            ),
+          ),
+        );
+      }
+    }
+
+    // Render animating piece with AnimatedPositioned
+    if (widget.isAnimating && widget.animatingMove != null && widget.animatingPiece != null) {
+      // Use 'from' position initially, then 'to' after animation starts
+      final targetPosition = _animationStarted
+          ? widget.animatingMove!.to
+          : widget.animatingMove!.from;
+      final targetScreen = getScreenPosition(targetPosition);
+
+      pieces.add(
+        AnimatedPositioned(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          left: margin + targetScreen.file * gridSpacing - (pieceSize / 2),
+          top: margin + targetScreen.rank * gridSpacing - (pieceSize / 2),
+          width: pieceSize,
+          height: pieceSize,
+          child: IgnorePointer(
+            child: _buildPiece(widget.animatingPiece!, pieceSize),
+          ),
+        ),
+      );
+    }
+
+    return pieces;
+  }
+
   Color? _getSquareColor(Position position) {
-    if (selectedPosition == position) {
+    if (widget.selectedPosition == position) {
       return Colors.yellow.withAlpha(200);
     }
-    if (validMoves.contains(position)) {
+    if (widget.validMoves.contains(position)) {
       return Colors.green.withAlpha(150);
     }
     return Colors.transparent;
   }
 
   Widget _buildPiece(Piece piece, double size) {
-    return Center(
-      child: Container(
-        width: size * 0.85,
-        height: size * 0.85,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: piece.color == PieceColor.red
-              ? const Color(0xFFFFE0E0)
-              : const Color(0xFFE0E0FF),
-          border: Border.all(
-            color: piece.color == PieceColor.red
-                ? const Color(0xFFD00000)
-                : const Color(0xFF0000D0),
-            width: 2,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(76),
-              blurRadius: 4,
-              offset: const Offset(2, 2),
-            ),
-          ],
-        ),
-        child: Center(
-          child: Text(
-            piece.character,
-            style: TextStyle(
-              fontSize: size * 0.5,
-              fontWeight: FontWeight.bold,
-              color: piece.color == PieceColor.red
-                  ? const Color(0xFFD00000)
-                  : const Color(0xFF0000D0),
-            ),
-          ),
-        ),
-      ),
+    // Use traditional 3D style piece
+    return TraditionalPieceWidget(
+      piece: piece,
+      size: size * 0.85,
     );
   }
 }
