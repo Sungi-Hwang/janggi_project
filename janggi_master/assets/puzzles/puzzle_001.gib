@@ -1,0 +1,6 @@
+# 묘수풀이 예제 1
+Title=초나라 3수 승
+Description=초나라가 3수 안에 승리하는 묘수를 찾으세요
+Difficulty=쉬움
+FEN=4ka3/4a4/4b4/9/9/9/9/4B4/4A4/4KA3 w - - 0 1
+Comment=포를 활용한 기본 묘수입니다

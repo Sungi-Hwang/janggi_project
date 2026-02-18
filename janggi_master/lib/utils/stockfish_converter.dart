@@ -102,10 +102,10 @@ class StockfishConverter {
               pieceChar = 'a';  // alfil
               break;
             case PieceType.horse:
-              pieceChar = 'n';  // knight (NOT 'h'!)
+              pieceChar = 'n';  // knight (Fairy-Stockfish uses 'n' for horse)
               break;
             case PieceType.elephant:
-              pieceChar = 'b';  // bishop (NOT 'e'!)
+              pieceChar = 'b';  // bishop (Fairy-Stockfish uses 'b' for elephant)
               break;
             case PieceType.chariot:
               pieceChar = 'r';  // rook

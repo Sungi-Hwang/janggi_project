@@ -7,11 +7,13 @@ import 'package:flutter/foundation.dart';
 typedef StockfishInitC = Void Function();
 typedef StockfishCommandC = Pointer<Char> Function(Pointer<Char>);
 typedef StockfishCleanupC = Void Function();
+typedef StockfishAnalyzeC = Pointer<Char> Function(Pointer<Char>, Int32);
 
 // Define the Dart function types
 typedef StockfishInit = void Function();
 typedef StockfishCommand = Pointer<Char> Function(Pointer<Char>);
 typedef StockfishCleanup = void Function();
+typedef StockfishAnalyze = Pointer<Char> Function(Pointer<Char>, int);
 
 class StockfishFFI {
   static DynamicLibrary? _lib;
@@ -36,14 +38,21 @@ class StockfishFFI {
   }
 
   // Look up the C functions
-  static final StockfishInit _stockfishInit =
-      _library.lookup<NativeFunction<StockfishInitC>>('stockfish_init').asFunction();
+  static final StockfishInit _stockfishInit = _library
+      .lookup<NativeFunction<StockfishInitC>>('stockfish_init')
+      .asFunction();
 
-  static final StockfishCommand _stockfishCommand =
-      _library.lookup<NativeFunction<StockfishCommandC>>('stockfish_command').asFunction();
+  static final StockfishCommand _stockfishCommand = _library
+      .lookup<NativeFunction<StockfishCommandC>>('stockfish_command')
+      .asFunction();
 
-  static final StockfishCleanup _stockfishCleanup =
-      _library.lookup<NativeFunction<StockfishCleanupC>>('stockfish_cleanup').asFunction();
+  static final StockfishCleanup _stockfishCleanup = _library
+      .lookup<NativeFunction<StockfishCleanupC>>('stockfish_cleanup')
+      .asFunction();
+
+  static final StockfishAnalyze _stockfishAnalyze = _library
+      .lookup<NativeFunction<StockfishAnalyzeC>>('stockfish_analyze')
+      .asFunction();
 
   // Public Dart methods
   static void init() {
@@ -135,8 +144,13 @@ class StockfishFFI {
       // Direct mapping: Stockfish rank = Flutter rank + 1
       //
       // IMPORTANT: Fairy-Stockfish Janggi has uppercase (White) at bottom!
-      // Piece letters: R=rook(차), N=knight(마), B=bishop(상), A=alfil(사), K=king(장), C=cannon(포), P=pawn(병)
-      // FEN Line 1 (rank 10) → Flutter rank 9 (Red back): rnba1abnr (lowercase)
+      // Piece letters: R=rook(차), H=horse(마), B=elephant(상... using e?), A=alfil(사), K=king(장), C=cannon(포), P=pawn(병)
+      // Fairy-Stockfish usually uses:
+      // h = horse (mao/ma 1+1)
+      // e = elephant (same 2+2 ? or pseudo-janggi elephant)
+      // Let's use 'h' and 'e' as planned.
+      //
+      // FEN Line 1 (rank 10) → Flutter rank 9 (Red back): rheakaehr (lowercase)
       // FEN Line 2 (rank 9) → Flutter rank 8 (Red general): 4k4 (lowercase)
       // FEN Line 3 (rank 8) → Flutter rank 7 (Red cannons): 1c5c1 (lowercase)
       // FEN Line 4 (rank 7) → Flutter rank 6 (Red soldiers): p1p1p1p1p (lowercase)
@@ -144,10 +158,11 @@ class StockfishFFI {
       // FEN Line 7 (rank 4) → Flutter rank 3 (Blue soldiers): P1P1P1P1P (uppercase)
       // FEN Line 8 (rank 3) → Flutter rank 2 (Blue cannons): 1C5C1 (uppercase)
       // FEN Line 9 (rank 2) → Flutter rank 1 (Blue general): 4K4 (uppercase)
-      // FEN Line 10 (rank 1) → Flutter rank 0 (Blue back): RNBA1ABNR (uppercase)
+      // FEN Line 10 (rank 1) → Flutter rank 0 (Blue back): RHEAKAEHR (uppercase)
       //
       // Blue (uppercase/WHITE) moves first
-      cmd += 'fen rnba1abnr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RNBA1ABNR w - - 0 1';
+      cmd +=
+          'fen rheakaehr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RHEAKAEHR w - - 0 1';
     }
 
     if (moves != null && moves.isNotEmpty) {
@@ -159,11 +174,9 @@ class StockfishFFI {
 
   // Helper method to get best move
   static String? getBestMove({int depth = 10, int? movetime}) {
-    String cmd = 'go';
-    if (movetime != null) {
+    String cmd = 'go depth $depth';
+    if (movetime != null && movetime > 0) {
       cmd += ' movetime $movetime';
-    } else {
-      cmd += ' depth $depth';
     }
 
     debugPrint('StockfishFFI.getBestMove: Sending command: $cmd');
@@ -176,14 +189,17 @@ class StockfishFFI {
 
     for (final line in lines) {
       // Look for "info ... pv <move>" lines from MultiPV
-      if (line.contains('info') && line.contains('pv ')) {
-        final pvIndex = line.indexOf('pv ');
+      // IMPORTANT: Use ' pv ' (with spaces) to avoid matching 'multipv'
+      if (line.contains('info') && line.contains(' pv ')) {
+        final pvIndex = line.indexOf(' pv ');
         if (pvIndex != -1) {
-          final moveStart = pvIndex + 3;
+          final moveStart = pvIndex + 4; // +4 because ' pv ' is 4 characters
           final moveEnd = line.indexOf(' ', moveStart);
           final move = moveEnd == -1
               ? line.substring(moveStart).trim()
               : line.substring(moveStart, moveEnd).trim();
+          debugPrint('StockfishFFI.getBestMove: Parsing PV line: "$line"');
+          debugPrint('StockfishFFI.getBestMove: Extracted move: "$move"');
           if (move.isNotEmpty && !topMoves.contains(move)) {
             topMoves.add(move);
           }
@@ -205,7 +221,8 @@ class StockfishFFI {
       } else {
         selectedMove = topMoves[0]; // Fallback to best
       }
-      debugPrint('StockfishFFI.getBestMove: Top moves: $topMoves, Selected: $selectedMove');
+      debugPrint(
+          'StockfishFFI.getBestMove: Top moves: $topMoves, Selected: $selectedMove');
     }
 
     // Fallback: parse the bestmove from response
@@ -215,7 +232,8 @@ class StockfishFFI {
           final parts = line.split(' ');
           if (parts.length >= 2) {
             selectedMove = parts[1];
-            debugPrint('StockfishFFI.getBestMove: Using bestmove from response: $selectedMove');
+            debugPrint(
+                'StockfishFFI.getBestMove: Using bestmove from response: $selectedMove');
             break;
           }
         }
@@ -226,5 +244,53 @@ class StockfishFFI {
       debugPrint('StockfishFFI.getBestMove: No bestmove found in response!');
     }
     return selectedMove;
+  }
+
+  /// Analyze a position and return score + bestmove directly from engine.
+  /// Returns: {'type': 'cp'/'mate', 'value': int, 'bestmove': String?}
+  /// This bypasses stdout parsing and gets score directly from Thread->rootMoves.
+  static Map<String, dynamic>? analyze(String fen, {int depth = 10}) {
+    if (!_initialized) {
+      throw StateError('Stockfish not initialized. Call init() first.');
+    }
+
+    final fenP = fen.toNativeUtf8();
+    final resultP = _stockfishAnalyze(fenP.cast<Char>(), depth);
+    final result = resultP.cast<Utf8>().toDartString();
+    malloc.free(fenP);
+
+    // debugPrint('StockfishFFI.analyze: Result: "$result"');
+
+    if (result.startsWith('error:')) {
+      debugPrint('StockfishFFI.analyze: Error: $result');
+      return null;
+    }
+
+    // Parse: "cp 300 bestmove e9f9" or "mate 5 bestmove a1a2"
+    final parts = result.split(' ');
+    if (parts.length >= 2) {
+      final type = parts[0]; // 'cp' or 'mate'
+      final value = int.tryParse(parts[1]);
+
+      if (value != null && (type == 'cp' || type == 'mate')) {
+        String? bestmove;
+        // Look for 'bestmove' in parts
+        for (int i = 2; i < parts.length - 1; i++) {
+          if (parts[i] == 'bestmove') {
+            bestmove = parts[i + 1];
+            break;
+          }
+        }
+
+        return {
+          'type': type,
+          'value': value,
+          'bestmove': bestmove,
+        };
+      }
+    }
+
+    debugPrint('StockfishFFI.analyze: Failed to parse result: $result');
+    return null;
   }
 }

@@ -38,3 +38,40 @@ target_include_directories(${BINARY_NAME} PRIVATE "${CMAKE_SOURCE_DIR}")
 
 # Run the Flutter tool portions of the build. This must not be removed.
 add_dependencies(${BINARY_NAME} flutter_assemble)
+
+# --- Stockfish Engine Configuration ---
+# Collect engine sources
+file(GLOB ENGINE_SOURCES "../../engine/src/*.cpp")
+# Exclude standalone entry points and web-specific files
+list(FILTER ENGINE_SOURCES EXCLUDE REGEX "main\\.cpp$")
+list(FILTER ENGINE_SOURCES EXCLUDE REGEX "test_dll\\.cpp$")
+list(FILTER ENGINE_SOURCES EXCLUDE REGEX "ffishjs\\.cpp$")
+list(FILTER ENGINE_SOURCES EXCLUDE REGEX "pyffish\\.cpp$")
+
+# Define the shared library
+add_library(stockfish SHARED ${ENGINE_SOURCES})
+
+# Compilation definitions (Janggi + Windows)
+target_compile_definitions(stockfish PRIVATE
+  "-DLARGEBOARDS"
+  "-DALLVARS"
+  "-DIS_64BIT"
+  "-DUSE_POPCNT"
+  "-D_WIN32"
+  "-D_WINDLL"
+  "-DNOMINMAX"
+)
+
+# Include directories
+target_include_directories(stockfish PRIVATE "../../engine/src")
+
+# Ensure stockfish is built before runner (though not strictly linked)
+add_dependencies(${BINARY_NAME} stockfish)
+
+# Copy stockfish.dll to the runner's output directory (next to runner.exe)
+add_custom_command(TARGET ${BINARY_NAME} POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  $<TARGET_FILE:stockfish>
+  $<TARGET_FILE_DIR:${BINARY_NAME}>
+)
+# --------------------------------------
