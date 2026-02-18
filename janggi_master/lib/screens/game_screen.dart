@@ -70,7 +70,7 @@ class _GameScreenState extends State<GameScreen> {
         _effectiveAiColor == PieceColor.red ? PieceColor.blue : PieceColor.red;
     _customInitialBoard = widget.initialBoard?.copy();
     _customStartingPlayer = widget.initialStartingPlayer;
-    _setupCompleted = widget.gameMode != GameMode.vsAI || _hasCustomStart;
+    _setupCompleted = _hasCustomStart;
 
     if (widget.gameMode == GameMode.vsAI) {
       _initEngine();
@@ -130,10 +130,13 @@ class _GameScreenState extends State<GameScreen> {
               }
 
               final aiIsRed = _effectiveAiColor == PieceColor.red;
-              final aiName = 'AI (${gameState.aiDepth})';
+              final aiName = widget.gameMode == GameMode.twoPlayer
+                  ? '\uC624\uD504\uB77C\uC778'
+                  : 'AI (${gameState.aiDepth})';
               const playerName = '나 (Player)';
-              final setupMode =
-                  widget.gameMode == GameMode.vsAI && !_setupCompleted;
+              final supportsSetup = widget.gameMode == GameMode.vsAI ||
+                  widget.gameMode == GameMode.twoPlayer;
+              final setupMode = supportsSetup && !_setupCompleted;
 
               final aiCaptured =
                   aiIsRed ? gameState.capturedByRed : gameState.capturedByBlue;
@@ -227,16 +230,11 @@ class _GameScreenState extends State<GameScreen> {
                                               validMoves: gameState.validMoves,
                                               onSquareTapped:
                                                   _engineInitialized &&
-                                                          (widget.gameMode !=
-                                                                  GameMode
-                                                                      .vsAI ||
-                                                              _setupCompleted)
+                                                          !setupMode
                                                       ? gameState.onSquareTapped
                                                       : null,
-                                              flipBoard: widget.gameMode ==
-                                                      GameMode.vsAI &&
-                                                  _effectiveAiColor ==
-                                                      PieceColor.blue,
+                                              flipBoard: _effectiveAiColor ==
+                                                  PieceColor.blue,
                                               animatingMove:
                                                   gameState.animatingMove,
                                               isAnimating:
@@ -300,7 +298,7 @@ class _GameScreenState extends State<GameScreen> {
                             children: [
                               _buildGameButton(
                                 icon: Icons.home,
-                                label: '메인',
+                                label: '\uBA54\uC778',
                                 color: Colors.white70,
                                 onPressed: () {
                                   Navigator.of(context)
@@ -309,7 +307,7 @@ class _GameScreenState extends State<GameScreen> {
                               ),
                               _buildGameButton(
                                 icon: Icons.flag,
-                                label: '기권',
+                                label: '\uAE30\uAD8C',
                                 color: Colors.redAccent,
                                 onPressed: setupMode
                                     ? null
@@ -350,7 +348,7 @@ class _GameScreenState extends State<GameScreen> {
                               ),
                               _buildGameButton(
                                 icon: Icons.undo,
-                                label: '무르기',
+                                label: '\uBB34\uB974\uAE30',
                                 color: Colors.blueAccent,
                                 onPressed: !setupMode &&
                                         gameState.moveHistory.isNotEmpty
@@ -450,7 +448,7 @@ class _GameScreenState extends State<GameScreen> {
       child: Row(
         children: [
           const Text(
-            'AI 난이도',
+            'AI \uB09C\uC774\uB3C4',
             style: TextStyle(
               color: Colors.white,
               fontSize: 14,
@@ -461,23 +459,41 @@ class _GameScreenState extends State<GameScreen> {
           DropdownButtonHideUnderline(
             child: DropdownButton<int>(
               value: gameState.aiDepth,
-              dropdownColor: Colors.white,
+              dropdownColor: const Color(0xFF1F1F1F),
               style: const TextStyle(
-                color: Colors.black87,
+                color: Colors.white,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
+              iconEnabledColor: Colors.white,
+              iconDisabledColor: Colors.white54,
               items: const [
-                DropdownMenuItem(value: 1, child: Text('1')),
-                DropdownMenuItem(value: 3, child: Text('3')),
-                DropdownMenuItem(value: 5, child: Text('5')),
-                DropdownMenuItem(value: 7, child: Text('7')),
-                DropdownMenuItem(value: 9, child: Text('9')),
-                DropdownMenuItem(value: 11, child: Text('11')),
-                DropdownMenuItem(value: 13, child: Text('13')),
-                DropdownMenuItem(value: 15, child: Text('15')),
+                DropdownMenuItem(
+                    value: 1,
+                    child: Text('1', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(
+                    value: 3,
+                    child: Text('3', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(
+                    value: 5,
+                    child: Text('5', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(
+                    value: 7,
+                    child: Text('7', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(
+                    value: 9,
+                    child: Text('9', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(
+                    value: 11,
+                    child: Text('11', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(
+                    value: 13,
+                    child: Text('13', style: TextStyle(color: Colors.white))),
+                DropdownMenuItem(
+                    value: 15,
+                    child: Text('15', style: TextStyle(color: Colors.white))),
               ],
-              onChanged: _engineInitialized
+              onChanged: widget.gameMode == GameMode.vsAI && _engineInitialized
                   ? (value) {
                       if (value == null) return;
                       gameState.setAIDifficulty(value);
@@ -487,7 +503,9 @@ class _GameScreenState extends State<GameScreen> {
           ),
           const SizedBox(width: 10),
           Text(
-            _pendingPlayerColor == PieceColor.blue ? '내 진영: 초' : '내 진영: 한',
+            _pendingPlayerColor == PieceColor.blue
+                ? '\uB0B4 \uC9C4\uC601: \uCD08'
+                : '\uB0B4 \uC9C4\uC601: \uD55C',
             style: const TextStyle(
               color: Colors.white70,
               fontSize: 12,
@@ -505,13 +523,24 @@ class _GameScreenState extends State<GameScreen> {
         const margin = 35.0;
         final innerWidth = constraints.maxWidth - (margin * 2);
         final gridSpacing = innerWidth / 8;
-        final boardWidth = gridSpacing * 8;
-        final boardHeight = gridSpacing * 9;
-        final startX = margin;
-        final startY = margin;
+        final boardLeft = margin;
+        final boardTop = margin;
         final flipBoard = _effectiveAiColor == PieceColor.blue;
         final topSide = flipBoard ? PieceColor.blue : PieceColor.red;
         final bottomSide = flipBoard ? PieceColor.red : PieceColor.blue;
+
+        const controlWidth = 78.0;
+        const controlHeight = 34.0;
+
+        final topSwapY = boardTop + (gridSpacing * 1) - (controlHeight / 2);
+        final bottomSwapY = boardTop + (gridSpacing * 8) - (controlHeight / 2);
+        final sideActionY =
+            boardTop + (gridSpacing * 4.5) - (controlHeight / 2);
+
+        final leftColumnCenterX = boardLeft + (gridSpacing * 1.5) + 2;
+        final rightColumnCenterX = boardLeft + (gridSpacing * 6.5) + 2;
+        final leftColumnX = leftColumnCenterX - (controlWidth / 2);
+        final rightColumnX = rightColumnCenterX - (controlWidth / 2);
 
         return Stack(
           children: [
@@ -522,73 +551,88 @@ class _GameScreenState extends State<GameScreen> {
                 ),
               ),
             ),
-            _buildSetupControlButton(
-              top: startY + gridSpacing * 0.2,
-              left: startX + gridSpacing * 1.5 - 18,
-              icon: Icons.swap_horiz,
-              tooltip: '좌측 마/상 교환',
-              onPressed: () => _toggleFlank(
-                gameState: gameState,
-                side: topSide,
-                isLeft: true,
+            Positioned(
+              top: topSwapY,
+              left: leftColumnX,
+              child: _buildSetupActionButton(
+                width: controlWidth,
+                height: controlHeight,
+                icon: Icons.swap_horiz_rounded,
+                label: null,
+                onPressed: () => _toggleFlank(
+                  gameState: gameState,
+                  side: topSide,
+                  isLeft: true,
+                ),
               ),
-            ),
-            _buildSetupControlButton(
-              top: startY + gridSpacing * 0.2,
-              left: startX + gridSpacing * 6.5 - 18,
-              icon: Icons.swap_horiz,
-              tooltip: '우측 마/상 교환',
-              onPressed: () => _toggleFlank(
-                gameState: gameState,
-                side: topSide,
-                isLeft: false,
-              ),
-            ),
-            _buildSetupControlButton(
-              top: startY + boardHeight - gridSpacing * 0.5,
-              left: startX + gridSpacing * 1.5 - 18,
-              icon: Icons.swap_horiz,
-              tooltip: '좌측 마/상 교환',
-              onPressed: () => _toggleFlank(
-                gameState: gameState,
-                side: bottomSide,
-                isLeft: true,
-              ),
-            ),
-            _buildSetupControlButton(
-              top: startY + boardHeight - gridSpacing * 0.5,
-              left: startX + gridSpacing * 6.5 - 18,
-              icon: Icons.swap_horiz,
-              tooltip: '우측 마/상 교환',
-              onPressed: () => _toggleFlank(
-                gameState: gameState,
-                side: bottomSide,
-                isLeft: false,
-              ),
-            ),
-            _buildSetupControlButton(
-              top: startY + boardHeight / 2 - 20,
-              left: startX + boardWidth * 0.28 - 20,
-              icon: Icons.swap_vert,
-              tooltip: '내 진영 전환',
-              onPressed: () => _togglePlayerSide(),
             ),
             Positioned(
-              top: startY + boardHeight / 2 - 20,
-              left: startX + boardWidth * 0.72 - 34,
-              child: ElevatedButton.icon(
+              top: topSwapY,
+              left: rightColumnX,
+              child: _buildSetupActionButton(
+                width: controlWidth,
+                height: controlHeight,
+                icon: Icons.swap_horiz_rounded,
+                label: null,
+                onPressed: () => _toggleFlank(
+                  gameState: gameState,
+                  side: topSide,
+                  isLeft: false,
+                ),
+              ),
+            ),
+            Positioned(
+              top: bottomSwapY,
+              left: leftColumnX,
+              child: _buildSetupActionButton(
+                width: controlWidth,
+                height: controlHeight,
+                icon: Icons.swap_horiz_rounded,
+                label: null,
+                onPressed: () => _toggleFlank(
+                  gameState: gameState,
+                  side: bottomSide,
+                  isLeft: true,
+                ),
+              ),
+            ),
+            Positioned(
+              top: bottomSwapY,
+              left: rightColumnX,
+              child: _buildSetupActionButton(
+                width: controlWidth,
+                height: controlHeight,
+                icon: Icons.swap_horiz_rounded,
+                label: null,
+                onPressed: () => _toggleFlank(
+                  gameState: gameState,
+                  side: bottomSide,
+                  isLeft: false,
+                ),
+              ),
+            ),
+            Positioned(
+              top: sideActionY,
+              left: leftColumnX,
+              child: _buildSetupActionButton(
+                width: controlWidth,
+                height: controlHeight,
+                icon: null,
+                label: '\uC9C4\uD615\uBCC0\uACBD',
+                onPressed: _togglePlayerSide,
+              ),
+            ),
+            Positioned(
+              top: sideActionY,
+              left: rightColumnX,
+              child: _buildSetupActionButton(
+                width: controlWidth,
+                height: controlHeight,
+                icon: null,
+                label: '\uC2DC\uC791',
                 onPressed: _engineInitialized
                     ? () => _applySetupAndStart(gameState)
                     : null,
-                icon: const Icon(Icons.play_arrow, size: 18),
-                label: const Text('시작'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF0A4D1A),
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  minimumSize: const Size(68, 40),
-                ),
               ),
             ),
           ],
@@ -597,26 +641,179 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
-  Widget _buildSetupControlButton({
-    required double top,
-    required double left,
-    required IconData icon,
-    required String tooltip,
-    required VoidCallback onPressed,
+  Widget _buildSetupActionButton({
+    required double width,
+    required double height,
+    required IconData? icon,
+    required String? label,
+    required VoidCallback? onPressed,
   }) {
-    return Positioned(
-      top: top,
-      left: left,
-      child: Material(
-        color: Colors.black.withValues(alpha: 0.5),
-        shape: const CircleBorder(),
-        child: IconButton(
-          onPressed: onPressed,
-          icon: Icon(icon, color: Colors.white, size: 20),
-          tooltip: tooltip,
+    final enabled = onPressed != null;
+    final radius = BorderRadius.circular(height / 2);
+
+    return Opacity(
+      opacity: enabled ? 1.0 : 0.55,
+      child: SizedBox(
+        width: width,
+        height: height,
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: radius,
+          child: InkWell(
+            borderRadius: radius,
+            onTap: onPressed,
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      borderRadius: radius,
+                      gradient: const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xFFDFC096),
+                          Color(0xFFB78956),
+                          Color(0xFF7D5634),
+                        ],
+                      ),
+                      border: Border.all(
+                        color: const Color(0xFFECD9B9).withValues(alpha: 0.95),
+                        width: 1.1,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.44),
+                          blurRadius: 8,
+                          offset: const Offset(1.3, 2.3),
+                        ),
+                        BoxShadow(
+                          color:
+                              const Color(0xFFFFEFD2).withValues(alpha: 0.24),
+                          blurRadius: 3,
+                          offset: const Offset(-0.8, -0.8),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Positioned.fill(
+                  child: Container(
+                    margin: const EdgeInsets.all(1.6),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular((height / 2) - 2),
+                      border: Border.all(
+                        color: const Color(0xFF5B3D26).withValues(alpha: 0.42),
+                        width: 0.9,
+                      ),
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.white.withValues(alpha: 0.15),
+                          Colors.transparent,
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                  child: Center(
+                    child: _buildSetupButtonContent(icon: icon, label: label),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
+  }
+
+  Widget _buildSetupButtonContent({
+    required IconData? icon,
+    required String? label,
+  }) {
+    Widget buildIcon(IconData data) {
+      return Stack(
+        alignment: Alignment.center,
+        children: [
+          Transform.translate(
+            offset: const Offset(0, 0.8),
+            child: Icon(
+              data,
+              size: 15,
+              color: Colors.black.withValues(alpha: 0.52),
+            ),
+          ),
+          Transform.translate(
+            offset: const Offset(0, -0.5),
+            child: Icon(
+              data,
+              size: 15,
+              color: Colors.white.withValues(alpha: 0.35),
+            ),
+          ),
+          Icon(
+            data,
+            size: 14.5,
+            color: const Color(0xFF2E1D11).withValues(alpha: 0.9),
+          ),
+        ],
+      );
+    }
+
+    if (label != null && icon == null) {
+      return Text(
+        label,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 12.6,
+          fontWeight: FontWeight.w800,
+          color: const Color(0xFF2E1D11).withValues(alpha: 0.92),
+          letterSpacing: 0.05,
+        ),
+      );
+    }
+
+    if (icon != null && label == null) {
+      return buildIcon(icon);
+    }
+
+    if (icon != null && label != null) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          buildIcon(icon),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 13.2,
+              fontWeight: FontWeight.w800,
+              color: const Color(0xFF2E1D11).withValues(alpha: 0.92),
+              letterSpacing: 0.1,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      );
+    }
+
+    return const SizedBox.shrink();
+  }
+
+  void _togglePlayerSide() {
+    setState(() {
+      _pendingPlayerColor = _pendingPlayerColor == PieceColor.blue
+          ? PieceColor.red
+          : PieceColor.blue;
+      _effectiveAiColor = _pendingPlayerColor == PieceColor.blue
+          ? PieceColor.red
+          : PieceColor.blue;
+    });
   }
 
   void _toggleFlank({
@@ -648,17 +845,6 @@ class _GameScreenState extends State<GameScreen> {
       blueSetup: _pendingBlueSetup,
       redSetup: _pendingRedSetup,
     );
-  }
-
-  void _togglePlayerSide() {
-    setState(() {
-      _pendingPlayerColor = _pendingPlayerColor == PieceColor.blue
-          ? PieceColor.red
-          : PieceColor.blue;
-      _effectiveAiColor = _pendingPlayerColor == PieceColor.blue
-          ? PieceColor.red
-          : PieceColor.blue;
-    });
   }
 
   bool _isLeftHorseFirst(PieceSetup setup) {
@@ -753,13 +939,14 @@ class _GameScreenState extends State<GameScreen> {
             ],
           ),
           content: const Text(
-            '기권하면 상대 승리로 처리됩니다.\n정말 기권하시겠습니까?',
+            '\uAE30\uAD8C\uD558\uBA74 \uC0C1\uB300 \uC2B9\uB9AC\uB85C \uCC98\uB9AC\uB429\uB2C8\uB2E4.\n'
+            '\uC815\uB9D0 \uAE30\uAD8C\uD558\uC2DC\uACA0\uC2B5\uB2C8\uAE4C?',
             style: TextStyle(fontSize: 16),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('취소'),
+              child: const Text('\uCDE8\uC18C'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -769,7 +956,10 @@ class _GameScreenState extends State<GameScreen> {
                 gameState.testGameOver('${winningColor}_wins_capture');
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child: const Text('기권', style: TextStyle(color: Colors.white)),
+              child: const Text(
+                '\uAE30\uAD8C',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         );

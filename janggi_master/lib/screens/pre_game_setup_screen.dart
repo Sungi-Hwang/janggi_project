@@ -58,8 +58,8 @@ class _PreGameSetupScreenState extends State<PreGameSetupScreen> {
                     Expanded(
                       child: Text(
                         widget.gameMode == GameMode.vsAI
-                            ? 'AI 대국 시작 설정'
-                            : '친구 대국 시작 설정',
+                            ? '\u0041\u0049 \uB300\uAD6D \uC2DC\uC791 \uC124\uC815'
+                            : '\uC624\uD504\uB77C\uC778 \uB300\uAD6D \uC2DC\uC791 \uC124\uC815',
                         style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,

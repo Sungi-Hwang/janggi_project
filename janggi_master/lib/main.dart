@@ -156,7 +156,7 @@ class MainMenu extends StatelessWidget {
                     const SizedBox(height: 16),
                     _buildMenuButton(
                       context: context,
-                      label: '친구 대국',
+                      label: '\uC624\uD504\uB77C\uC778 \uB300\uAD6D',
                       icon: Icons.people,
                       gradientColors: const [
                         Color(0xFF0A4D1A),
