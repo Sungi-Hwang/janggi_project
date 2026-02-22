@@ -31,6 +31,39 @@ Flutter 기반 장기(한국 장기) 앱 프로젝트입니다.
 - 장기 AI 엔진: `Fairy-Stockfish` 기반 커스텀 빌드
 - 플랫폼: Android 중심, Windows 포함 멀티플랫폼 구조
 
+## FFI 통신 구조 (Dart <-> C++)
+
+실행 경로는 `Dart 래퍼 -> FFI exported C API -> Fairy-Stockfish core`로 구성됩니다.
+
+| Dart 레이어 | C/C++ export | 역할 |
+| --- | --- | --- |
+| `StockfishFFI.init()` | `stockfish_init()` | 엔진/variant 초기화, 옵션 기본값 세팅 |
+| `StockfishFFI.command(cmd)` | `stockfish_command(const char*)` | UCI 명령 전송/응답 수신 |
+| `StockfishFFI.analyze(fen, depth)` | `stockfish_analyze(const char*, int)` | 점수(`cp`/`mate`)와 `bestmove` 직접 추출 |
+| `StockfishFFI.cleanup()` | `stockfish_cleanup()` | 스레드/상태 정리 |
+
+- 스레드 안전성: `engine/src/c_api.cpp`에서 전역 mutex(`g_engine_mutex`)로 보호
+- UI 응답성: `analyzeIsolated`, `getBestMoveIsolated`로 isolate에서 분석 수행
+- 분석 응답 정규화: `"cp 300 bestmove e9f9"` / `"mate 5 bestmove a1a2"` 형태를 Dart Map으로 파싱
+
+```mermaid
+sequenceDiagram
+    participant UI as Flutter UI
+    participant D as StockfishFFI (Dart)
+    participant C as c_api.cpp
+    participant E as Fairy-Stockfish
+
+    UI->>D: analyzeIsolated(fen, depth)
+    D->>D: compute() isolate 생성
+    D->>C: stockfish_init()
+    D->>C: stockfish_analyze(fen, depth)
+    C->>E: position + search
+    E-->>C: score + PV
+    C-->>D: "cp/mate ... bestmove ..."
+    D->>C: stockfish_cleanup()
+    D-->>UI: {type, value, bestmove}
+```
+
 ## 가장 오래 걸린 작업: 기존 GIB에서 묘수풀이 자동 추출
 
 프로젝트에서 가장 시간이 많이 든 부분은 **기존 경기 기보(GIB)에서 묘수 시작점을 자동 추출하는 파이프라인**이었습니다.
@@ -69,6 +102,37 @@ Flutter 기반 장기(한국 장기) 앱 프로젝트입니다.
 - 핵심 필드:
   - `fen`, `toMove`, `solution`, `mateIn`, `title`
 
+### 공유 코드 Payload 스키마 (Base64URL JSON)
+
+공유 포맷은 `JM_PUZZLE_V1:<base64url(json)>`이며, Base64URL 내부 JSON 스키마는 아래와 같습니다.
+
+| 키 | 타입 | 필수 | 설명 |
+| --- | --- | --- | --- |
+| `v` | `int` | 선택 | 포맷 버전 (`decode` 시 기본값 `1`) |
+| `t` | `string` | 선택 | `setup` 또는 `full` |
+| `title` | `string` | 선택 | 퍼즐 제목 (`trim`) |
+| `fen` | `string` | 필수 | 장기 배치 FEN (빈 문자열이면 예외) |
+| `toMove` | `string` | 선택 | `red` 또는 `blue` (`_normalizeToMove`) |
+| `solution` | `string[]` | 선택 | 정답 수순 (없으면 `[]`) |
+| `mateIn` | `int` | 선택 | 없으면 `solution` 길이 기반 자동 계산 |
+
+`decode`는 prefix가 없는 경우 raw JSON 입력도 허용합니다. 또한 `solution`이 비어있지 않으면 `t`가 없어도 `full`로 보정합니다.
+
+### 인코딩/디코딩 파이프라인
+
+```mermaid
+flowchart LR
+    A[Board / Puzzle] --> B[StockfishConverter.boardToFEN]
+    B --> C[PuzzleShareCodec.encodeSetup / encodePuzzle]
+    C --> D[jsonEncode]
+    D --> E[utf8.encode]
+    E --> F[base64Url.encode]
+    F --> G["JM_PUZZLE_V1:<payload>"]
+    G --> H[decode]
+    H --> I[유효성 검사 + normalize]
+    I --> J[toSavablePuzzle / parseFenBoard]
+```
+
 ### 구현
 
 - `lib/utils/puzzle_share_codec.dart`
@@ -83,6 +147,31 @@ Flutter 기반 장기(한국 장기) 앱 프로젝트입니다.
   - 저장된 나만의 묘수에서 공유 코드 복사
 - `lib/services/custom_puzzle_service.dart`
   - `SharedPreferences`(`custom_puzzles_v1`)에 퍼즐 저장/삭제
+
+## FEN/좌표 변환 규약 (전문 요약)
+
+`lib/utils/stockfish_converter.dart` 기준으로 장기 변형(Fairy-Stockfish) 규약을 다음처럼 고정했습니다.
+
+- 보드 좌표계:
+  - Flutter: `file 0..8`, `rank 0..9` (아래 -> 위)
+  - UCI: `a..i`, `1..10`
+  - 매핑: `uciRank = flutterRank + 1` (직접 매핑)
+- 진영 매핑:
+  - `Blue(초)` -> `White`(대문자 FEN), 선공(`w`)
+  - `Red(한)` -> `Black`(소문자 FEN), 후공(`b`)
+- 기물 문자 매핑:
+  - `general -> k`
+  - `guard -> a`
+  - `horse -> n`
+  - `elephant -> b`
+  - `chariot -> r`
+  - `cannon -> c`
+  - `soldier -> p`
+- FEN 레이아웃:
+  - rank 10 -> rank 1 순서로 직렬화
+  - 꼬리 필드 고정: `- - 0 1`
+
+공유 코드에서 FEN 역파싱(`parseFenBoard`) 시에는 `fenRank -> boardRank = 9 - fenRank` 변환으로 Flutter 보드 좌표를 복원합니다.
 
 ## 대표 오류 해결 요약
 
