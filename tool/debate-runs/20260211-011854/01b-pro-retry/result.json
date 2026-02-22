@@ -1,0 +1,8 @@
+﻿{
+    "agent":  "janggi",
+    "step":  "01b-pro-retry",
+    "elapsedSec":  14.67,
+    "text":  "`2026-02-11 01:19 (GMT+9)` 기준으로, 미해결 에러를 줄이는 협업 설계는 아래처럼 가져가면 됩니다.\r\n\r\n1. 책임 분리\r\n- `Codex`: 코드 수정, 로컬 검증, 원인 분석 리포트\r\n- `OpenClaw`: 실행 오케스트레이션, 재시도/타임아웃/폴백 제어\r\n\r\n2. 에러 코드 표준화\r\n- `timeout`, `input_invalid`, `tool_error`, `quality_fail`, `unknown`\r\n- 자유 텍스트 대신 코드+근거 경로(`timeline.log`, `result.json`) 필수 기록\r\n\r\n3. 고정 상태머신\r\n- `RUN -\u003e RETRY(최대2회) -\u003e FALLBACK -\u003e END`\r\n- 무한 재시도 금지, 예산 초과 시 즉시 폴백\r\n\r\n4. 단계별 예산\r\n- `pro/con`, `retry`, `synthesis` 타임아웃 분리\r\n- 백오프 + jitter 고정 (`예: 0.8s -\u003e 1.6s + 100~300ms`)\r\n\r\n5. 품질 게이트\r\n- 합성 결과에 `결론/찬성근거/반대근거/권장액션` 필수\r\n- “원문 붙여달라”류 응답은 즉시 `quality_fail`\r\n\r\n6. 운영 지표\r\n- `timeout_rate`, `retry_success_rate`, `fallback_rate`, `p95_latency`, `unknown_error_rate`\r\n- 지표가 임계치 넘으면 자동으로 “운영자 점검 필요” 플래그 발행\r\n\r\n원하면 다음 단계로 이 구조를 `runbook + JSON 스키마`로 바로 정리해드리겠습니다.",
+    "usage":  null,
+    "parse":  "plain_text"
+}

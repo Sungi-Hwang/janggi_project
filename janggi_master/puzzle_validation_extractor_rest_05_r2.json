@@ -1,0 +1,210 @@
+﻿{
+    "summary":  {
+                    "generatedAt":  "2026-02-14 00:55:15",
+                    "input":  "D:\\Project\\janggi-master\\janggi_master\\.\\puzzles_subset_rest_05.json",
+                    "totalPuzzles":  22,
+                    "exact":  22,
+                    "mismatch":  0,
+                    "errors":  0
+                },
+    "results":  [
+                    {
+                        "file":  "기보19.gib",
+                        "game":  3,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  7,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  11,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  14,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  22,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  24,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  27,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  29,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  30,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  36,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  42,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  50,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  54,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  59,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  60,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  67,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  71,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  77,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  84,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  87,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  93,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  104,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    }
+                ]
+}

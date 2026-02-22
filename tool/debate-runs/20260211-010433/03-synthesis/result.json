@@ -1,0 +1,8 @@
+﻿{
+    "agent":  "main",
+    "step":  "03-synthesis",
+    "elapsedSec":  10.38,
+    "text":  "두 입장 본문이 아직 없습니다.  \r\n`입장 1`과 `입장 2`를 그대로 붙여주시면, 바로 통합해 최종 결론으로 작성하겠습니다.",
+    "usage":  null,
+    "parse":  "plain_text"
+}

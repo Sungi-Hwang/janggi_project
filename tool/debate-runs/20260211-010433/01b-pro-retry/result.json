@@ -1,0 +1,8 @@
+﻿{
+    "agent":  "janggi",
+    "step":  "01b-pro-retry",
+    "elapsedSec":  36.45,
+    "text":  "`2026-02-11 01:05 (GMT+9)` 기준 검증 결과입니다.\r\n\r\n- `tool/debate-runs/20260211-010433/timeline.log`:\r\n  - `01-pro`, `02-con` 모두 `timeout` 종료\r\n  - 재시도(`01b-pro-retry`, `02b-con-retry`) 시작까지만 기록\r\n- `tool/debate-runs/20260211-010433/summary.json` 없음\r\n- `03-synthesis`/`03b-synthesis-retry`/`03c-synthesis-fallback` 디렉터리도 아직 없음\r\n\r\n판정:\r\n- 이번 런(`20260211-010433`) 기준으로는 `합성 재시도 안정화 검증` **미완료/불합격**입니다.  \r\n  이유는 재시도 후 합성 단계까지 도달하지 못했고 최종 요약 파일이 생성되지 않았기 때문입니다.\r\n\r\n직전 참고 런 `tool/debate-runs/20260211-010253/summary.json`은 `synthesis.parse=local_fallback`까지는 완료됐지만, 재시도 자체는 안정적이지 않았습니다.",
+    "usage":  null,
+    "parse":  "plain_text"
+}

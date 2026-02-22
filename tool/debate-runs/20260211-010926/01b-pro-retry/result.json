@@ -1,0 +1,8 @@
+﻿{
+    "agent":  "janggi",
+    "step":  "01b-pro-retry",
+    "elapsedSec":  19.86,
+    "text":  "`2026-02-11 01:10 (GMT+9)` 기준 실전 운영안입니다.\r\n\r\n1. 운영 등급 정의\r\n- `SUCCESS`: `synthesis.parse=ok|plain_text`\r\n- `DEGRADED`: `synthesis.parse=local_fallback`\r\n- `FAIL`: `summary.json` 미생성 또는 `blocked_missing_inputs`\r\n\r\n2. 단계별 시간 예산(SLA)\r\n- `pro/con`: 45s\r\n- `retry`: 35s\r\n- `synthesis`: 45s\r\n- 전 구간 공통 타임아웃 사용 금지\r\n\r\n3. 재시도 표준\r\n- 최대 2회\r\n- 백오프: `800ms -\u003e 1600ms` + jitter `100~300ms`\r\n- 재시도 프롬프트는 6~8줄 강제 포맷으로 축약\r\n\r\n4. 합성 안정화 체인(고정)\r\n- `03-synthesis` -\u003e 품질 실패 시 `03b-synthesis-retry` -\u003e 실패 시 `03c-synthesis-fallback`\r\n- `03c`는 장애가 아니라 가용성 보장 경로로 운영\r\n\r\n5. 필수 기록 필드\r\n- `synth_attempts`\r\n- `synth_final_parse`\r\n- `fallback_used`\r\n- `retry_delays_ms`\r\n- `end_to_end_elapsed_sec`\r\n- `failure_reason` (`timeout|quality_fail|arg_error`)\r\n\r\n6. 일일 운영 루틴\r\n- 런 종료마다 `timeline.log`, `summary.json` 자동 점검\r\n- 지표 집계: `timeout_rate`, `fallback_rate`, `retry_success_rate`, `p95_latency`\r\n- 3일 연속 SLO 미달 시 파라미터 재조정\r\n\r\n7. 현재 상태 반영\r\n- 최근 런(`tool/debate-runs/20260211-010433/summary.json`)은 `local_fallback` 종료\r\n- 즉시 우선순위: `quality_fail` 원인 태깅 강화 + 재시도 프롬프트 강제 포맷 엄수",
+    "usage":  null,
+    "parse":  "plain_text"
+}

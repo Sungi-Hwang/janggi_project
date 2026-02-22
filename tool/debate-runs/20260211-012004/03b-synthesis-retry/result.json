@@ -1,0 +1,8 @@
+﻿{
+    "agent":  "main",
+    "step":  "03b-synthesis-retry",
+    "elapsedSec":  9.11,
+    "text":  "원문 확인 준비됐습니다.  \r\n찬성/반대 텍스트를 그대로 붙여주시면 즉시 통합해 아래 형식으로 최종 정리하겠습니다.\r\n\r\n- 결론\r\n- 찬성 근거\r\n- 반대 근거\r\n- 권장 액션",
+    "usage":  null,
+    "parse":  "plain_text"
+}

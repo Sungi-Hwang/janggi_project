@@ -1,0 +1,29 @@
+﻿{
+    "topic":  "병렬 재시도 속도 테스트",
+    "request":  "병렬 재시도 속도 테스트에 대해 토론해봐",
+    "runDir":  "d:\\Project\\janggi-master\\tool\\debate-runs\\20260211-004335",
+    "pro":  {
+                "agent":  "janggi",
+                "step":  "01-pro",
+                "elapsedSec":  26.59,
+                "text":  "(timeout after 20 sec, retries: 0)",
+                "usage":  null,
+                "parse":  "timeout"
+            },
+    "con":  {
+                "agent":  "debate",
+                "step":  "02-con",
+                "elapsedSec":  31.92,
+                "text":  "(timeout after 20 sec, retries: 0)",
+                "usage":  null,
+                "parse":  "timeout"
+            },
+    "synthesis":  {
+                      "agent":  "main",
+                      "step":  "03-synthesis",
+                      "elapsedSec":  0,
+                      "text":  "SKIPPED: missing debate bodies (proOk=False, conOk=False).",
+                      "usage":  null,
+                      "parse":  "blocked_missing_inputs"
+                  }
+}

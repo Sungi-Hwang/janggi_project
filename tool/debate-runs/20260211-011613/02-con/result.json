@@ -1,0 +1,8 @@
+﻿{
+    "agent":  "debate",
+    "step":  "02-con",
+    "elapsedSec":  48.3,
+    "text":  "`2026-02-11 01:16 (GMT+9)` 기준 `합성 헛응답 방지 검증`은 아래 5가지만 고정하면 됩니다.\r\n\r\n1. 입력 유효성 게이트\r\n- 합성 전 `pro/con` 본문 길이, 금지문구(`timeout`, `empty`, `SKIPPED`) 검사\r\n- 하나라도 실패면 즉시 `fallback synthesis` 경로로 전환\r\n\r\n2. 출력 품질 게이트\r\n- 합성 결과가 최소 길이/필수 섹션(결론, 근거, 액션)을 못 채우면 실패 처리\r\n- 실패 시 “짧은 강제 포맷 프롬프트”로 1~2회 재시도\r\n\r\n3. 헛응답 패턴 차단\r\n- 금지 패턴 사전 정의: 빈 문자열, 템플릿 반복, 입력과 무관한 일반론\r\n- 매칭 시 `parse=invalid_synthesis`로 라벨링\r\n\r\n4. 안전한 폴백 보장\r\n- 최종 실패해도 `운영용 최소 응답 템플릿` 반환\r\n- 서비스는 성공 종료하되 상태코드/메타에 실패 원인 기록\r\n\r\n5. 검증 지표\r\n- `invalid_synthesis_rate`\r\n- `fallback_used_rate`\r\n- `synth_retry_success_rate`\r\n- `synth_timeout_rate`\r\n\r\n원하면 다음 단계로 `tool/ai_debate.ps1` 기준 검증 규칙(정규식/임계값)까지 바로 제시하겠습니다.",
+    "usage":  null,
+    "parse":  "plain_text"
+}

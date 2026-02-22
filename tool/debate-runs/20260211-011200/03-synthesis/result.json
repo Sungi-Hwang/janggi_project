@@ -1,0 +1,8 @@
+﻿{
+    "agent":  "main",
+    "step":  "03-synthesis",
+    "elapsedSec":  9.9,
+    "text":  "두 입장 원문이 아직 이 대화에 포함되지 않았습니다.  \r\n찬성/반대 내용을 그대로 붙여주시면, 아래 형식으로 바로 통합해 작성하겠습니다.\r\n\r\n1. 결론  \r\n2. 찬성 근거  \r\n3. 반대 근거  \r\n4. 권장 액션",
+    "usage":  null,
+    "parse":  "plain_text"
+}

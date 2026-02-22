@@ -1,0 +1,31 @@
+﻿`2026-02-11 01:20 (GMT+9)` 기준 협업 설계는 아래처럼 고정하세요.
+
+1. 책임 분리
+- `Codex`: 수정안 생성 + 패치 적용
+- `OpenClaw`: 재현/반례/리스크 검증
+- 둘 다 같은 답을 만드는 구조는 금지
+
+2. 실패 분류 표준화
+- `timeout`, `repro_failed`, `patch_failed`, `test_failed`, `invalid_output`
+- 실패 타입별 재시도 정책 분리 (무조건 재시도 금지)
+
+3. 3단계 게이트
+- `재현 성공` -> `수정 적용` -> `회귀 테스트 통과`
+- 하나라도 실패하면 “미해결”로 남기고 다음 액션 자동 생성
+
+4. 재시도 정책
+- `timeout`: 지수 백오프 + jitter, 최대 2회
+- `invalid_output`: 포맷 강제 프롬프트로 1회
+- `test_failed`: 재시도 대신 원인 분석 단계로 전환
+
+5. 부분 성공 폴백
+- 한쪽 실패해도 다른 쪽 결과로 임시 완화안(우회/롤백/가드) 즉시 제시
+- 서비스는 끊지 않고 degraded 모드로 운영
+
+6. 운영 지표
+- `unresolved_error_rate`
+- `first_pass_fix_rate`
+- `retry_success_rate`
+- `p95 time-to-resolution`
+
+원하면 이걸 바로 `SOP 체크리스트`(트리거/분기/종료조건 포함)로 작성해드리겠습니다.

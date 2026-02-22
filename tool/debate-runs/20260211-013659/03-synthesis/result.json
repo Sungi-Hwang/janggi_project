@@ -1,0 +1,8 @@
+﻿{
+    "agent":  "main",
+    "step":  "03-synthesis",
+    "elapsedSec":  79.67,
+    "text":  "status: fail  \r\n차단 사유: 심사할 `Pro/Con` 원문이 메시지에 포함되지 않아 결론을 산출할 수 없습니다.  \r\n다음 재시도: 아래 형식으로 붙여 주세요.  \r\n`Pro: ...` / `Con: ...` (각 3~10문장 권장)",
+    "usage":  null,
+    "parse":  "plain_text"
+}

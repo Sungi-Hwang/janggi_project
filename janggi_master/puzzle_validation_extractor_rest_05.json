@@ -1,0 +1,210 @@
+﻿{
+    "summary":  {
+                    "generatedAt":  "2026-02-14 00:23:52",
+                    "input":  "D:\\Project\\janggi-master\\janggi_master\\.\\puzzles_subset_rest_05.json",
+                    "totalPuzzles":  22,
+                    "exact":  9,
+                    "mismatch":  0,
+                    "errors":  13
+                },
+    "results":  [
+                    {
+                        "file":  "기보19.gib",
+                        "game":  3,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  7,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  11,
+                        "status":  "extractor_error",
+                        "mateMatch":  false,
+                        "fenMatch":  false,
+                        "solutionMatch":  false,
+                        "detail":  "exit=124 attempts=2 info string variant janggi files 9 ranks 10 pocket 0 template janggi startpos rbna1anbr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RBNA1ANBR w - - 0 1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  14,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  22,
+                        "status":  "extractor_error",
+                        "mateMatch":  false,
+                        "fenMatch":  false,
+                        "solutionMatch":  false,
+                        "detail":  "exit=124 attempts=2 info string variant janggi files 9 ranks 10 pocket 0 template janggi startpos rbna1anbr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RBNA1ANBR w - - 0 1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  24,
+                        "status":  "extractor_error",
+                        "mateMatch":  false,
+                        "fenMatch":  false,
+                        "solutionMatch":  false,
+                        "detail":  "exit=124 attempts=2 info string variant janggi files 9 ranks 10 pocket 0 template janggi startpos rbna1anbr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RBNA1ANBR w - - 0 1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  27,
+                        "status":  "extractor_error",
+                        "mateMatch":  false,
+                        "fenMatch":  false,
+                        "solutionMatch":  false,
+                        "detail":  "exit=124 attempts=2 info string variant janggi files 9 ranks 10 pocket 0 template janggi startpos rbna1anbr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RBNA1ANBR w - - 0 1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  29,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  30,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  36,
+                        "status":  "extractor_error",
+                        "mateMatch":  false,
+                        "fenMatch":  false,
+                        "solutionMatch":  false,
+                        "detail":  "exit=124 attempts=2 info string variant janggi files 9 ranks 10 pocket 0 template janggi startpos rbna1anbr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RBNA1ANBR w - - 0 1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  42,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  50,
+                        "status":  "extractor_error",
+                        "mateMatch":  false,
+                        "fenMatch":  false,
+                        "solutionMatch":  false,
+                        "detail":  "exit=124 attempts=2 info string variant janggi files 9 ranks 10 pocket 0 template janggi startpos rbna1anbr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RBNA1ANBR w - - 0 1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  54,
+                        "status":  "extractor_error",
+                        "mateMatch":  false,
+                        "fenMatch":  false,
+                        "solutionMatch":  false,
+                        "detail":  "exit=124 attempts=2 info string variant janggi files 9 ranks 10 pocket 0 template janggi startpos rbna1anbr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RBNA1ANBR w - - 0 1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  59,
+                        "status":  "extractor_error",
+                        "mateMatch":  false,
+                        "fenMatch":  false,
+                        "solutionMatch":  false,
+                        "detail":  "exit=124 attempts=2 info string variant janggi files 9 ranks 10 pocket 0 template janggi startpos rbna1anbr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RBNA1ANBR w - - 0 1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  60,
+                        "status":  "extractor_error",
+                        "mateMatch":  false,
+                        "fenMatch":  false,
+                        "solutionMatch":  false,
+                        "detail":  "exit=124 attempts=2 info string variant janggi files 9 ranks 10 pocket 0 template janggi startpos rbna1anbr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RBNA1ANBR w - - 0 1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  67,
+                        "status":  "extractor_error",
+                        "mateMatch":  false,
+                        "fenMatch":  false,
+                        "solutionMatch":  false,
+                        "detail":  "exit=124 attempts=2 info string variant janggi files 9 ranks 10 pocket 0 template janggi startpos rbna1anbr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RBNA1ANBR w - - 0 1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  71,
+                        "status":  "extractor_error",
+                        "mateMatch":  false,
+                        "fenMatch":  false,
+                        "solutionMatch":  false,
+                        "detail":  "exit=124 attempts=2 info string variant janggi files 9 ranks 10 pocket 0 template janggi startpos rbna1anbr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RBNA1ANBR w - - 0 1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  77,
+                        "status":  "extractor_error",
+                        "mateMatch":  false,
+                        "fenMatch":  false,
+                        "solutionMatch":  false,
+                        "detail":  "exit=124 attempts=2 info string variant janggi files 9 ranks 10 pocket 0 template janggi startpos rbna1anbr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RBNA1ANBR w - - 0 1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  84,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  87,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  93,
+                        "status":  "extractor_error",
+                        "mateMatch":  false,
+                        "fenMatch":  false,
+                        "solutionMatch":  false,
+                        "detail":  "exit=124 attempts=2 info string variant janggi files 9 ranks 10 pocket 0 template janggi startpos rbna1anbr/4k4/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/4K4/RBNA1ANBR w - - 0 1"
+                    },
+                    {
+                        "file":  "기보19.gib",
+                        "game":  104,
+                        "status":  "exact",
+                        "mateMatch":  true,
+                        "fenMatch":  true,
+                        "solutionMatch":  true,
+                        "detail":  "attempts=1"
+                    }
+                ]
+}

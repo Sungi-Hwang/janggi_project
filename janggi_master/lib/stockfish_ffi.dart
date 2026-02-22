@@ -18,6 +18,11 @@ typedef StockfishAnalyze = Pointer<Char> Function(Pointer<Char>, int);
 class StockfishFFI {
   static DynamicLibrary? _lib;
   static bool _initialized = false;
+  static const int _defaultHashMb = 64;
+  static const int _maxDefaultThreads = 4;
+  static const int _minHashMb = 16;
+  static const int _maxHashMb = 512;
+  static const int _maxThreads = 64;
 
   // Lazy load the library
   static DynamicLibrary get _library {
@@ -54,38 +59,61 @@ class StockfishFFI {
       .lookup<NativeFunction<StockfishAnalyzeC>>('stockfish_analyze')
       .asFunction();
 
+  static int _defaultThreads() {
+    final cpuCount = Platform.numberOfProcessors;
+    if (cpuCount <= 0) return 1;
+    if (cpuCount > _maxDefaultThreads) return _maxDefaultThreads;
+    return cpuCount;
+  }
+
+  static int _sanitizeThreads(int value) {
+    return value.clamp(1, _maxThreads).toInt();
+  }
+
+  static int _sanitizeHashMb(int value) {
+    return value.clamp(_minHashMb, _maxHashMb).toInt();
+  }
+
+  static String _commandUnchecked(String cmd) {
+    final cmdP = cmd.toNativeUtf8();
+    final resultP = _stockfishCommand(cmdP.cast<Char>());
+    final result = resultP.cast<Utf8>().toDartString();
+    malloc.free(cmdP);
+    return result.trim();
+  }
+
   // Public Dart methods
-  static void init() {
+  static void init({int? threads, int? hashMb}) {
     if (!_initialized) {
       try {
+        final resolvedThreads = _sanitizeThreads(threads ?? _defaultThreads());
+        final resolvedHashMb = _sanitizeHashMb(hashMb ?? _defaultHashMb);
+
         print('Initializing Stockfish engine...');
         _stockfishInit();
 
         // Initialize UCI protocol
         print('Sending UCI initialization commands...');
-        final cmdP1 = 'uci'.toNativeUtf8();
-        final resultP1 = _stockfishCommand(cmdP1.cast<Char>());
-        final result1 = resultP1.cast<Utf8>().toDartString();
-        malloc.free(cmdP1);
+        final result1 = _commandUnchecked('uci');
         print('UCI response: $result1');
 
         // Set variant to janggi
         print('Setting variant to janggi...');
-        final cmdP2 = 'setoption name UCI_Variant value janggi'.toNativeUtf8();
-        _stockfishCommand(cmdP2.cast<Char>());
-        malloc.free(cmdP2);
+        _commandUnchecked('setoption name UCI_Variant value janggi');
+
+        // Configure engine resources for mobile stability/performance.
+        print('Setting Threads to $resolvedThreads...');
+        _commandUnchecked('setoption name Threads value $resolvedThreads');
+
+        print('Setting Hash to ${resolvedHashMb}MB...');
+        _commandUnchecked('setoption name Hash value $resolvedHashMb');
 
         // Set MultiPV for variety in moves (analyze top 3 moves)
         print('Setting MultiPV to 3 for move variety...');
-        final cmdP4 = 'setoption name MultiPV value 3'.toNativeUtf8();
-        _stockfishCommand(cmdP4.cast<Char>());
-        malloc.free(cmdP4);
+        _commandUnchecked('setoption name MultiPV value 3');
 
         // Send isready to confirm
-        final cmdP3 = 'isready'.toNativeUtf8();
-        final resultP3 = _stockfishCommand(cmdP3.cast<Char>());
-        final result3 = resultP3.cast<Utf8>().toDartString();
-        malloc.free(cmdP3);
+        final result3 = _commandUnchecked('isready');
         print('isready response: $result3');
 
         _initialized = true;
@@ -104,11 +132,7 @@ class StockfishFFI {
       throw StateError('Stockfish not initialized. Call init() first.');
     }
 
-    final cmdP = cmd.toNativeUtf8();
-    final resultP = _stockfishCommand(cmdP.cast<Char>());
-    final result = resultP.cast<Utf8>().toDartString();
-    malloc.free(cmdP);
-    return result.trim();
+    return _commandUnchecked(cmd);
   }
 
   static void cleanup() {
@@ -292,5 +316,96 @@ class StockfishFFI {
 
     debugPrint('StockfishFFI.analyze: Failed to parse result: $result');
     return null;
+  }
+
+  /// Run best-move search in a background isolate to avoid blocking the UI.
+  static Future<String?> getBestMoveIsolated({
+    required String fen,
+    int depth = 10,
+    int? movetime,
+    int? threads,
+    int? hashMb,
+  }) {
+    return compute<Map<String, dynamic>, String?>(
+      _getBestMoveInIsolate,
+      <String, dynamic>{
+        'fen': fen,
+        'depth': depth,
+        'movetime': movetime,
+        'threads': threads,
+        'hashMb': hashMb,
+      },
+    );
+  }
+
+  /// Run direct analyze() in a background isolate to avoid blocking the UI.
+  static Future<Map<String, dynamic>?> analyzeIsolated(
+    String fen, {
+    int depth = 10,
+    int? threads,
+    int? hashMb,
+  }) {
+    return compute<Map<String, dynamic>, Map<String, dynamic>?>(
+      _analyzeInIsolate,
+      <String, dynamic>{
+        'fen': fen,
+        'depth': depth,
+        'threads': threads,
+        'hashMb': hashMb,
+      },
+    );
+  }
+
+  /// Warm up the native engine in a background isolate.
+  static Future<void> warmupIsolated({int? threads, int? hashMb}) async {
+    await compute<Map<String, dynamic>, bool>(
+      _warmupInIsolate,
+      <String, dynamic>{
+        'threads': threads,
+        'hashMb': hashMb,
+      },
+    );
+  }
+}
+
+String? _getBestMoveInIsolate(Map<String, dynamic> request) {
+  final fen = request['fen'] as String;
+  final depth = request['depth'] as int? ?? 10;
+  final movetime = request['movetime'] as int?;
+  final threads = request['threads'] as int?;
+  final hashMb = request['hashMb'] as int?;
+
+  try {
+    StockfishFFI.init(threads: threads, hashMb: hashMb);
+    StockfishFFI.setPosition(fen: fen);
+    return StockfishFFI.getBestMove(depth: depth, movetime: movetime);
+  } finally {
+    StockfishFFI.cleanup();
+  }
+}
+
+Map<String, dynamic>? _analyzeInIsolate(Map<String, dynamic> request) {
+  final fen = request['fen'] as String;
+  final depth = request['depth'] as int? ?? 10;
+  final threads = request['threads'] as int?;
+  final hashMb = request['hashMb'] as int?;
+
+  try {
+    StockfishFFI.init(threads: threads, hashMb: hashMb);
+    return StockfishFFI.analyze(fen, depth: depth);
+  } finally {
+    StockfishFFI.cleanup();
+  }
+}
+
+bool _warmupInIsolate(Map<String, dynamic> request) {
+  final threads = request['threads'] as int?;
+  final hashMb = request['hashMb'] as int?;
+
+  try {
+    StockfishFFI.init(threads: threads, hashMb: hashMb);
+    return true;
+  } finally {
+    StockfishFFI.cleanup();
   }
 }

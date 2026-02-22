@@ -1,0 +1,8 @@
+﻿{
+    "agent":  "main",
+    "step":  "03-synthesis",
+    "elapsedSec":  58.84,
+    "text":  "두 입장 원문이 현재 메시지에 없습니다.  \r\n통합할 `입장 A`와 `입장 B`를 붙여주시면, 핵심 쟁점을 정리해 하나의 최종 결론으로 바로 작성하겠습니다.",
+    "usage":  null,
+    "parse":  "plain_text"
+}

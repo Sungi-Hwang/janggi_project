@@ -1,0 +1,81 @@
+﻿아래 두 입장을 통합해서 최종 결론을 작성해라.
+형식:
+- 결론
+- 찬성 근거
+- 반대 근거
+- 권장 액션(즉시 실행 3개)
+
+[찬성]
+`2026-02-11 01:10 (GMT+9)` 기준 실전 운영안입니다.
+
+1. 운영 등급 정의
+- `SUCCESS`: `synthesis.parse=ok|plain_text`
+- `DEGRADED`: `synthesis.parse=local_fallback`
+- `FAIL`: `summary.json` 미생성 또는 `blocked_missing_inputs`
+
+2. 단계별 시간 예산(SLA)
+- `pro/con`: 45s
+- `retry`: 35s
+- `synthesis`: 45s
+- 전 구간 공통 타임아웃 사용 금지
+
+3. 재시도 표준
+- 최대 2회
+- 백오프: `800ms -> 1600ms` + jitter `100~300ms`
+- 재시도 프롬프트는 6~8줄 강제 포맷으로 축약
+
+4. 합성 안정화 체인(고정)
+- `03-synthesis` -> 품질 실패 시 `03b-synthesis-retry` -> 실패 시 `03c-synthesis-fallback`
+- `03c`는 장애가 아니라 가용성 보장 경로로 운영
+
+5. 필수 기록 필드
+- `synth_attempts`
+- `synth_final_parse`
+- `fallback_used`
+- `retry_delays_ms`
+- `end_to_end_elapsed_sec`
+- `failure_reason` (`timeout|quality_fail|arg_error`)
+
+6. 일일 운영 루틴
+- 런 종료마다 `timeline.log`, `summary.json` 자동 점검
+- 지표 집계: `timeout_rate`, `fallback_rate`, `retry_success_rate`, `p95_latency`
+- 3일 연속 SLO 미달 시 파라미터 재조정
+
+7. 현재 상태 반영
+- 최근 런(`tool/debate-runs/20260211-010433/summary.json`)은 `local_fallback` 종료
+- 즉시 우선순위: `quality_fail` 원인 태깅 강화 + 재시도 프롬프트 강제 포맷 엄수
+
+[반대]
+`2026-02-11 01:09 (GMT+9)` 기준 실전 운영 방안은 아래처럼 가져가면 됩니다.
+
+1. 운영 모드 분리
+- `Normal`: 빠른 응답 우선 (`pro/con` 짧은 timeout, retry 1회)
+- `Safe`: 안정성 우선 (timeout 상향, retry 2회, fallback synthesis 강제)
+
+2. 단계별 SLO 설정
+- `pro/con`: 성공률, timeout률
+- `synthesis`: `blocked_missing_inputs` 비율, 최종 완료율
+- 전체: `p50/p95 end-to-end latency`
+
+3. 재시도 정책 표준화
+- 고정 딜레이 금지, `exponential backoff + jitter`
+- 실패 유형별 분기: `timeout`만 재시도, 포맷 오류는 프롬프트 축약 후 1회만 재시도
+
+4. 부분 성공 허용
+- `pro` 또는 `con` 한쪽만 성공해도 축약 synthesis 실행
+- 완전 실패 시에도 최소 결론 템플릿 출력(운영 공백 방지)
+
+5. 관측성(Observability) 강화
+- 런마다 `summary.json`에 `attempt_count`, `fallback_used`, `final_parse`, `elapsed_sec` 저장
+- 일 단위로 `timeout rate`, `blocked rate` 추이 모니터링
+
+6. 장애 대응 Runbook
+- 1차: timeout 급증 시 timeout 상향 대신 프롬프트 길이 축소
+- 2차: 특정 agent 불안정 시 단일-agent degraded 모드 전환
+- 3차: 연속 실패 임계치 초과 시 자동 circuit breaker(일시 우회)
+
+7. 배포 전략
+- 파라미터 변경은 A/B(예: 20% 트래픽) 후 전면 반영
+- 승인 기준: `blocked rate` 개선 + `p95` 악화 허용치 내
+
+원하면 이걸 바로 `운영 체크리스트 + 장애 대응 표준절차(SOP)` 형식으로 정리해드리겠습니다.

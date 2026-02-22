@@ -1,0 +1,8 @@
+﻿{
+    "agent":  "debate",
+    "step":  "02-con",
+    "elapsedSec":  37.65,
+    "text":  "(timeout after 30 sec, retries: 0)",
+    "usage":  null,
+    "parse":  "timeout"
+}

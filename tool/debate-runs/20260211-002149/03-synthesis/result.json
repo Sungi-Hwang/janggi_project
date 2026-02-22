@@ -1,0 +1,8 @@
+﻿{
+    "agent":  "main",
+    "step":  "03-synthesis",
+    "elapsedSec":  0,
+    "text":  "SKIPPED: missing debate bodies (proOk=False, conOk=False).",
+    "usage":  null,
+    "parse":  "blocked_missing_inputs"
+}

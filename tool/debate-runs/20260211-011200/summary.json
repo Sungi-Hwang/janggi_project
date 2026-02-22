@@ -1,0 +1,29 @@
+﻿{
+    "topic":  "오케스트레이션 안정화 실전 운영 방안",
+    "request":  "오케스트레이션 안정화 실전 운영 방안에 대해 토론해봐",
+    "runDir":  "d:\\Project\\janggi-master\\tool\\debate-runs\\20260211-011200",
+    "pro":  {
+                "agent":  "janggi",
+                "step":  "01-pro",
+                "elapsedSec":  24.8,
+                "text":  "`2026-02-11 01:12 (GMT+9)` 기준 실전 운영 방안(최종안)입니다.\r\n\r\n1. 운영 상태 등급\r\n- `GREEN`: `synthesis.parse=ok|plain_text`\r\n- `YELLOW`: `synthesis.parse=local_fallback`\r\n- `RED`: `summary.json` 미생성 또는 `blocked_missing_inputs`\r\n\r\n2. 단계별 SLA\r\n- `pro/con`: 45초\r\n- `retry`: 35초\r\n- `synthesis`: 45초\r\n- 공통 타임아웃 1개로 운영하지 말고 단계별로 분리\r\n\r\n3. 재시도 규칙\r\n- 최대 2회\r\n- `800ms -\u003e 1600ms` + jitter `100~300ms`\r\n- 재시도 프롬프트는 6~8줄 고정 포맷(불필요 문장 제거)\r\n\r\n4. 합성 안정화 체인\r\n- `03-synthesis` 실패 -\u003e `03b-synthesis-retry` -\u003e 실패 시 `03c-synthesis-fallback`\r\n- `03c`를 실패가 아닌 “가용성 보호 모드”로 정의\r\n\r\n5. 필수 운영 지표\r\n- `timeout_rate`\r\n- `fallback_rate`\r\n- `retry_success_rate`\r\n- `p95_end_to_end_latency`\r\n- 런별 `failure_reason(timeout|quality_fail|arg_error)` 기록\r\n\r\n6. 일일 운영 루틴\r\n- 모든 런 종료 시 `timeline.log` + `summary.json` 자동 점검\r\n- 3일 연속 SLO 미달 시 SLA/재시도 파라미터 재조정\r\n- 최근 런(`tool/debate-runs/20260211-010433/summary.json`)처럼 `local_fallback`이면 품질개선 액션 트리거\r\n\r\n원하면 이 방안을 바로 `RUNBOOK.md` 체크리스트 형식으로 정리해드리겠습니다.",
+                "usage":  null,
+                "parse":  "plain_text"
+            },
+    "con":  {
+                "agent":  "debate",
+                "step":  "02-con",
+                "elapsedSec":  24.77,
+                "text":  "`2026-02-11 01:12 (GMT+9)` 기준 실전 운영안은 아래처럼 고정하면 됩니다.\r\n\r\n1. 운영 모드 2개\r\n- `Fast`: 지연 최소화 (`pro/con` 짧은 timeout, retry 1회)\r\n- `Safe`: 안정성 우선 (timeout 상향, retry 2회, fallback synthesis 강제)\r\n\r\n2. 단계별 정책\r\n- `pro/con`: 병렬 유지, 실패 시 짧은 형식 프롬프트로 1회 재시도\r\n- `synthesis`: 한쪽 입력만 있어도 축약 합성 수행\r\n- 완전 실패 시: 최소 결론 템플릿 반환(서비스 공백 방지)\r\n\r\n3. 재시도 표준\r\n- 고정 지연 금지, `exponential backoff + jitter`\r\n- 재시도 대상: `timeout` 중심\r\n- 포맷 오류: 프롬프트 축약 후 1회만\r\n\r\n4. 관측 지표(필수)\r\n- `p50/p95 end-to-end latency`\r\n- `timeout rate`\r\n- `retry success rate`\r\n- `blocked_missing_inputs rate`\r\n\r\n5. 운영 자동화\r\n- 연속 실패 임계치 초과 시 `degraded mode` 전환\r\n- 특정 에이전트 불안정 시 단일 에이전트 우회\r\n- 일 단위 추이 보고서로 파라미터 자동 튜닝 후보 산출\r\n\r\n6. 배포 방식\r\n- 파라미터 변경은 A/B(20%→50%→100%)\r\n- 승격 조건: `blocked rate` 개선 + `p95` 악화 허용치 이내\r\n\r\n원하면 다음으로 `Fast/Safe` 각각의 권장 기본 파라미터 값(초 단위)까지 바로 고정해드리겠습니다.",
+                "usage":  null,
+                "parse":  "plain_text"
+            },
+    "synthesis":  {
+                      "agent":  "main",
+                      "step":  "03c-synthesis-fallback",
+                      "elapsedSec":  0,
+                      "text":  "결론\n- 주제 \u0027오케스트레이션 안정화 실전 운영 방안\u0027는 성능 품질을 유지하면서 지연을 낮추기 위해, 병렬 실행 + 단계별 타임아웃 정책 + 실패 허용 폴백을 함께 적용하는 전략이 최적이다.\n\n찬성 근거\n- `2026-02-11 01:12 (GMT+9)` 기준 실전 운영 방안(최종안)입니다. / 1. 운영 상태 등급\n- 병렬 처리와 짧은 응답 형식은 체감 속도를 개선한다.\n\n반대 근거\n- `2026-02-11 01:12 (GMT+9)` 기준 실전 운영안은 아래처럼 고정하면 됩니다. / 1. 운영 모드 2개\n- 타임아웃과 합성 실패를 방치하면 완료율이 떨어져 운영 신뢰성이 낮아진다.\n\n권장 액션(즉시 실행 3개)\n- 1) pro/con/synthesis 타임아웃을 단계별로 분리하고 timeout 비율을 측정한다.\n- 2) synthesis 품질 검증 실패 시 1회 재합성 후 로컬 폴백 합성을 사용한다.\n- 3) run별 timeline/summary를 집계해 p95 지연과 blocked 비율을 매일 확인한다.",
+                      "usage":  null,
+                      "parse":  "local_fallback"
+                  }
+}

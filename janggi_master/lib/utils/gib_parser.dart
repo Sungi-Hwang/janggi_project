@@ -348,13 +348,13 @@ class GibParser {
   /// Evaluate position score using Stockfish's new analyze function
   /// Returns evaluation in format: {'type': 'cp'/'mate', 'value': score}
   /// This uses the new stockfish_analyze C++ function that extracts score directly
-  static Map<String, dynamic>? _evaluatePosition(
-      Board board, PieceColor currentPlayer) {
+  static Future<Map<String, dynamic>?> _evaluatePosition(
+      Board board, PieceColor currentPlayer) async {
     try {
       final fen = StockfishConverter.boardToFEN(board, currentPlayer);
 
-      // Use the new analyze() function that gets score directly from Thread->rootMoves
-      final result = StockfishFFI.analyze(fen, depth: 10);
+      // Use isolate path so puzzle loading does not block UI rendering.
+      final result = await StockfishFFI.analyzeIsolated(fen, depth: 10);
 
       if (result != null) {
         return {
@@ -397,7 +397,7 @@ class GibParser {
           (moveIdx % 2 == 0) ? PieceColor.blue : PieceColor.red;
 
       // Evaluate position
-      final eval = _evaluatePosition(board, currentPlayer);
+      final eval = await _evaluatePosition(board, currentPlayer);
       if (eval == null) continue;
 
       final currentType = eval['type'] as String;

@@ -1,0 +1,28 @@
+﻿{
+    "topic":  "스킵 검증",
+    "runDir":  "d:\\Project\\janggi-master\\tool\\debate-runs\\20260211-002149",
+    "pro":  {
+                "agent":  "janggi",
+                "step":  "01-pro",
+                "elapsedSec":  27.55,
+                "text":  "(timeout after 20 sec, retries: 0)",
+                "usage":  null,
+                "parse":  "timeout"
+            },
+    "con":  {
+                "agent":  "debate",
+                "step":  "02-con",
+                "elapsedSec":  26.23,
+                "text":  "(timeout after 20 sec, retries: 0)",
+                "usage":  null,
+                "parse":  "timeout"
+            },
+    "synthesis":  {
+                      "agent":  "main",
+                      "step":  "03-synthesis",
+                      "elapsedSec":  0,
+                      "text":  "SKIPPED: missing debate bodies (proOk=False, conOk=False).",
+                      "usage":  null,
+                      "parse":  "blocked_missing_inputs"
+                  }
+}

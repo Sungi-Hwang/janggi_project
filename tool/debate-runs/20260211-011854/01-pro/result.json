@@ -1,0 +1,8 @@
+﻿{
+    "agent":  "janggi",
+    "step":  "01-pro",
+    "elapsedSec":  32.12,
+    "text":  "핵심은 `실패를 숨기지 않고, 빠르게 분류해서, 자동으로 다음 안전 경로`로 보내는 협업 프로토콜입니다.\r\n\r\n1. 역할 분리\r\n- `Codex`: 코드 수정/검증/로컬 증거 수집 담당\r\n- `OpenClaw`: 실행 오케스트레이션/병렬 호출/재시도 정책 담당\r\n- 한 에이전트가 “추정”만 하고 끝내지 않게, 항상 `증거 파일 경로`를 남기게 설정\r\n\r\n2. 실패 타입 표준화\r\n- `timeout`\r\n- `input_invalid`\r\n- `tool_error`\r\n- `quality_fail`\r\n- `unknown`\r\n- 모든 단계에서 이 enum만 쓰고 자유 텍스트 에러 금지\r\n\r\n3. 3단계 실행 체인\r\n- 1차: 정상 실행\r\n- 2차: 짧은 강제 포맷 재시도(입력 축소 + stricter prompt)\r\n- 3차: deterministic fallback(로컬 합성/요약 템플릿)\r\n- 3차까지 가면 성공 종료하되 상태는 `DEGRADED`\r\n\r\n4. 재시도 예산\r\n- 단계별 timeout 분리 (`pro/con`, `retry`, `synthesis`)\r\n- 재시도 최대 2회\r\n- backoff + jitter 고정\r\n- 예산 초과 시 즉시 fallback (무한 재시도 금지)\r\n\r\n5. 품질 게이트\r\n- 합성 결과 필수 섹션 검사: `결론`, `찬성 근거`, `반대 근거`, `권장 액션`\r\n- 금지 패턴 검사: “원문을 붙여달라”, “입력이 없다” 류\r\n- 실패 시 `quality_fail`로 재시도/폴백\r\n\r\n6. 관측/운영 지표\r\n- `timeout_rate`\r\n- `retry_success_rate`\r\n- `fallback_rate`\r\n- `p95_end_to_end_latency`\r\n- `unknown_error_rate`\r\n- 이 5개를 런별 `summary.json`에 강제 기록\r\n\r\n7. 인간 개입 기준\r\n- `unknown_error` 2회 연속\r\n- 같은 단계 `timeout` 3회 연속\r\n- `fallback_rate` 일간 임계치 초과\r\n- 이 조건이면 자동으로 “운영자 점검 필요” 플래그 발행\r\n\r\n원하면 이걸 바로 `runbook + 상태머신 다이어그램(전이 규칙)` 형태로 정리해줄게요.",
+    "usage":  null,
+    "parse":  "plain_text"
+}

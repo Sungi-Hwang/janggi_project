@@ -1,0 +1,14 @@
+﻿{
+    "game":  69,
+    "move":  75,
+    "mateIn":  3,
+    "fen":  "3ck1b2/9/4c3C/5r2p/2p2p3/P2P5/2b3P2/4K3C/6r2/3A1AB2 b - - 0 1",
+    "solution":  [
+                     "f6e6",
+                     "d5e5",
+                     "e6e5",
+                     "e3d3",
+                     "c4a1"
+                 ],
+    "player":  "red"
+}

@@ -1,0 +1,3690 @@
+﻿{
+    "version":  "1.1-strict",
+    "generated":  "2026-02-18",
+    "total":  292,
+    "categories":  {
+                       "mate1":  {
+                                     "name":  "1수 외통",
+                                     "description":  "한 수 만에 외통을 잡는 묘수",
+                                     "count":  227
+                                 },
+                       "mate2":  {
+                                     "name":  "2수 외통",
+                                     "description":  "두 수 만에 외통을 잡는 묘수",
+                                     "count":  49
+                                 },
+                       "mate3":  {
+                                     "name":  "3수 외통",
+                                     "description":  "세 수 만에 외통을 잡는 묘수",
+                                     "count":  16
+                                 }
+                   },
+    "puzzles":  [
+                    {
+                        "id":  "m1_01",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #1",
+                        "fen":  "5ar2/7R1/5k3/1p3b1p1/6p2/5P1c1/7r1/4CC3/4AA3/R1B1K1B2 w - - 0 1",
+                        "solution":  [
+                                         "a1a8"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 3, Move 64"
+                    },
+                    {
+                        "id":  "m1_02",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #2",
+                        "fen":  "6b2/4k4/3ac4/5R2p/N1P6/9/1P3CP2/3BK3c/5r2n/3A5 b - - 0 1",
+                        "solution":  [
+                                         "i2g3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 11, Move 73"
+                    },
+                    {
+                        "id":  "m1_03",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #3",
+                        "fen":  "r4a3/3ka4/2cb5/1pp2B3/1r7/4R3P/1n2NPPN1/3KC4/3A1A1n1/9 b - - 0 1",
+                        "solution":  [
+                                         "c8c2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 21, Move 69"
+                    },
+                    {
+                        "id":  "m1_05",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #4",
+                        "fen":  "C4a3/1R1ak4/3ccb3/6pp1/3p1p3/9/B4NPP1/5B3/2nA5/4KA2r b - - 0 1",
+                        "solution":  [
+                                         "d6e6"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 36, Move 57"
+                    },
+                    {
+                        "id":  "m1_06",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #5",
+                        "fen":  "N2a5/5R3/3k1c3/4R4/2p6/7P1/1PPN5/5n1c1/4KA1r1/9 w - - 0 1",
+                        "solution":  [
+                                         "d4c6"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 37, Move 72"
+                    },
+                    {
+                        "id":  "m1_07",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #6",
+                        "fen":  "4k1b2/4a4/6n1r/1p2p1B1p/5N3/1R7/3b1PPP1/3cC4/4K2C1/2r6 w - - 0 1",
+                        "solution":  [
+                                         "h2h10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 47, Move 74"
+                    },
+                    {
+                        "id":  "m1_08",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #7",
+                        "fen":  "2b1ka3/4a4/2ncc4/1p5p1/3P3P1/1PR2b3/7R1/4N3C/4AB3/r2AKCr2 b - - 0 1",
+                        "solution":  [
+                                         "a1d1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 66, Move 67"
+                    },
+                    {
+                        "id":  "m1_09",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #8",
+                        "fen":  "C1R6/5a3/4k4/1pp6/9/5n3/PP1p3P1/9/6B2/4K2C1 w - - 0 1",
+                        "solution":  [
+                                         "e1e1"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 72, Move 60"
+                    },
+                    {
+                        "id":  "m1_10",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #9",
+                        "fen":  "2Can1b2/4k4/8r/1pp5p/9/9/7PP/1C7/4K4/1N1A5 b - - 0 1",
+                        "solution":  [
+                                         "e9e9"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 74, Move 71"
+                    },
+                    {
+                        "id":  "m1_11",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #10",
+                        "fen":  "4ck3/4Cn3/2N2c3/2p2b1p1/9/1P1R5/2PPNnb2/9/5r3/4KA2r b - - 0 1",
+                        "solution":  [
+                                         "i1f1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 86, Move 69"
+                    },
+                    {
+                        "id":  "m1_12",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #11",
+                        "fen":  "3k2c2/3aa4/1c1b5/4N1Brb/1pp1p3n/3P5/P1P5B/9/3NAA3/R3KC3 w - - 0 1",
+                        "solution":  [
+                                         "e7c8"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 93, Move 62"
+                    },
+                    {
+                        "id":  "m1_13",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #12",
+                        "fen":  "1r1aka3/9/2n2c3/4n1ppb/1p2c4/2Pp5/P1b1NPP2/R2RC3r/3CN4/3AKA3 b - - 0 1",
+                        "solution":  [
+                                         "f8b1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 94, Move 55"
+                    },
+                    {
+                        "id":  "m1_15",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #13",
+                        "fen":  "2b2a3/2Rak4/5c1r1/2p3p1p/5P3/2C6/4c3P/3N1A3/5K3/5AB2 b - - 0 1",
+                        "solution":  [
+                                         "h8h2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 98, Move 71"
+                    },
+                    {
+                        "id":  "m1_16",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #14",
+                        "fen":  "9/3ka4/2Na5/p4npp1/2p6/6PP1/c1Pp5/2N1C4/1R2KA3/3A2B2 w - - 0 1",
+                        "solution":  [
+                                         "b2b9"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 99, Move 66"
+                    },
+                    {
+                        "id":  "m1_17",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #15",
+                        "fen":  "C1bak4/3Rac3/3N5/5p3/1p4p2/4P4/4P1P2/4N4/4K4/2C5r w - - 0 1",
+                        "solution":  [
+                                         "d9d10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 1, Move 94"
+                    },
+                    {
+                        "id":  "m1_18",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #16",
+                        "fen":  "r3c4/9/4kCn2/b4R3/7p1/3n5/1P5P1/3K1B3/3A1Ar2/3N5 b - - 0 1",
+                        "solution":  [
+                                         "d5b4"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 9, Move 79"
+                    },
+                    {
+                        "id":  "m1_19",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #17",
+                        "fen":  "5a3/4ka2R/4cb3/9/1pp3p2/7NB/P1n1PP3/3C3B1/c8/4CK3 b - - 0 1",
+                        "solution":  [
+                                         "c4d2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 11, Move 79"
+                    },
+                    {
+                        "id":  "m1_20",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #18",
+                        "fen":  "5k3/4aa3/5c3/4c4/9/5p3/4p3R/9/4A4/4K4 w - - 0 1",
+                        "solution":  [
+                                         "i4i10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 17, Move 142"
+                    },
+                    {
+                        "id":  "m1_21",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #19",
+                        "fen":  "1n1ak4/4a4/5b3/2R3pp1/9/3P1P3/2bc2PP1/3rcC3/3A4r/3KCAR2 b - - 0 1",
+                        "solution":  [
+                                         "i2d2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 21, Move 81"
+                    },
+                    {
+                        "id":  "m1_22",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #20",
+                        "fen":  "CnRak4/9/3a5/3N5/6pp1/9/5p1P1/9/3B1A3/1r1AK4 w - - 0 1",
+                        "solution":  [
+                                         "e1e1"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 26, Move 110"
+                    },
+                    {
+                        "id":  "m1_23",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #21",
+                        "fen":  "3a1k3/3ca4/9/9/2n2p3/4b2b1/1BP2P3/2R6/3A4r/4CK3 b - - 0 1",
+                        "solution":  [
+                                         "i2f2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 33, Move 113"
+                    },
+                    {
+                        "id":  "m1_24",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #22",
+                        "fen":  "3k2c2/2N1a4/2c2a3/9/1B2N1p2/8p/9/1np1C4/4AA1B1/3K1C3 w - - 0 1",
+                        "solution":  [
+                                         "d1d1"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 36, Move 106"
+                    },
+                    {
+                        "id":  "m1_25",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #23",
+                        "fen":  "4k4/3aa4/3c5/3R5/p2b5/2P4N1/9/3AA4/3K2p2/4r4 b - - 0 1",
+                        "solution":  [
+                                         "d6a4"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 43, Move 99"
+                    },
+                    {
+                        "id":  "m1_27",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #24",
+                        "fen":  "1R2R4/3k1a3/5a3/2pr5/9/9/9/4r4/4A4/4KC3 w - - 0 1",
+                        "solution":  [
+                                         "b10d10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 63, Move 76"
+                    },
+                    {
+                        "id":  "m1_29",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #25",
+                        "fen":  "3k2Cc1/Nr1aan3/4c4/R5pp1/4b4/9/9/4CB3/3AA4/3K5 b - - 0 1",
+                        "solution":  [
+                                         "b9b1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 80, Move 111"
+                    },
+                    {
+                        "id":  "m1_30",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #26",
+                        "fen":  "5k3/4cb3/2nR5/4n1B2/5N3/6r2/2P6/3B2b2/2RK5/5A3 w - - 0 1",
+                        "solution":  [
+                                         "d8h10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 85, Move 96"
+                    },
+                    {
+                        "id":  "m1_32",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #27",
+                        "fen":  "9/3a5/1N1k5/4Bp3/3p5/9/1PP3r2/5A3/4AC3/4CK3 w - - 0 1",
+                        "solution":  [
+                                         "e7b5"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 95, Move 120"
+                    },
+                    {
+                        "id":  "m1_33",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #28",
+                        "fen":  "4ak3/5a3/9/9/6n2/8R/3PP4/4C4/4KAr2/3A5 w - - 0 1",
+                        "solution":  [
+                                         "i5i10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 2, Move 104"
+                    },
+                    {
+                        "id":  "m1_34",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #29",
+                        "fen":  "4kcb2/4a4/4c4/9/4P4/3R3P1/1P7/3BAB3/3AK4/r3C2r1 b - - 0 1",
+                        "solution":  [
+                                         "a1e1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 3, Move 85"
+                    },
+                    {
+                        "id":  "m1_35",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #30",
+                        "fen":  "2rka3R/3a5/1c7/3b5/9/5PB2/4P4/4C4/4AA3/4KCr2 w - - 0 1",
+                        "solution":  [
+                                         "i10e10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 10, Move 104"
+                    },
+                    {
+                        "id":  "m1_36",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #31",
+                        "fen":  "2b3b2/r8/2nkc4/2Rc3r1/1B2p1B2/9/1PP2Pp2/4C4/4A4/1N2KA3 w - - 0 1",
+                        "solution":  [
+                                         "c7d7"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 15, Move 92"
+                    },
+                    {
+                        "id":  "m1_37",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #32",
+                        "fen":  "3k5/9/2P1RP3/9/9/2p6/5P3/3AK4/6r2/3c5 w - - 0 1",
+                        "solution":  [
+                                         "f8e9"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 24, Move 184"
+                    },
+                    {
+                        "id":  "m1_38",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #33",
+                        "fen":  "4k4/6R2/9/9/2p1ppp2/9/1P1P1Pb2/1C1c3r1/3A3r1/3A1K3 b - - 0 1",
+                        "solution":  [
+                                         "h3f3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 26, Move 127"
+                    },
+                    {
+                        "id":  "m1_39",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #34",
+                        "fen":  "4k4/3aa4/9/bp3p3/6pp1/3N1P3/5nc2/3BKC3/1C1A4r/7R1 b - - 0 1",
+                        "solution":  [
+                                         "f4d5"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 31, Move 105"
+                    },
+                    {
+                        "id":  "m1_40",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #35",
+                        "fen":  "4k4/4a4/1BR2a3/1N2bc3/9/2np5/5PP1P/3A5/4A4/3K5 w - - 0 1",
+                        "solution":  [
+                                         "c8c10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 40, Move 82"
+                    },
+                    {
+                        "id":  "m1_41",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #36",
+                        "fen":  "R8/4a4/3ka4/B8/9/9/3p2r2/9/3AA4/3KC4 w - - 0 1",
+                        "solution":  [
+                                         "a10a8"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 44, Move 156"
+                    },
+                    {
+                        "id":  "m1_42",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #37",
+                        "fen":  "4kc3/R2aa3n/4c4/7p1/1P2PP3/1pp6/2b6/4rA3/5A3/3C1K3 b - - 0 1",
+                        "solution":  [
+                                         "e3e1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 55, Move 87"
+                    },
+                    {
+                        "id":  "m1_43",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #38",
+                        "fen":  "4kc3/R3ab3/4n4/3pp4/9/9/5C3/3ACK3/6r2/3A5 b - - 0 1",
+                        "solution":  [
+                                         "f9h6"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 58, Move 109"
+                    },
+                    {
+                        "id":  "m1_44",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #39",
+                        "fen":  "4k4/4a4/9/9/9/9/2b1p4/3A1p3/3A5/4CK3 b - - 0 1",
+                        "solution":  [
+                                         "f3f2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 64, Move 159"
+                    },
+                    {
+                        "id":  "m1_45",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #40",
+                        "fen":  "4kc1R1/3rr4/4c4/2R6/9/9/1p1n5/4N4/4AA3/4KC3 w - - 0 1",
+                        "solution":  [
+                                         "h10f10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 65, Move 144"
+                    },
+                    {
+                        "id":  "m1_46",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #41",
+                        "fen":  "3ck4/4aa3/4c4/P4p3/1P7/9/4p4/3A5/2rA1BR2/3K1C3 b - - 0 1",
+                        "solution":  [
+                                         "c2d2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 85, Move 81"
+                    },
+                    {
+                        "id":  "m1_48",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #42",
+                        "fen":  "3aka2R/9/4c4/3r5/1p5P1/1br2b3/8B/3n1C3/4A4/4CK3 b - - 0 1",
+                        "solution":  [
+                                         "f5i3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 98, Move 79"
+                    },
+                    {
+                        "id":  "m1_50",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #43",
+                        "fen":  "2b1k4/4r4/9/1pr2R3/9/9/5PP1P/9/3bA4/4KC3 w - - 0 1",
+                        "solution":  [
+                                         "f7f10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 19, Move 102"
+                    },
+                    {
+                        "id":  "m1_51",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #44",
+                        "fen":  "3k1c3/3aa4/3bc4/9/1pp3bB1/9/4N4/2N6/3AAB3/1R2KC1r1 b - - 0 1",
+                        "solution":  [
+                                         "h1f1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 23, Move 87"
+                    },
+                    {
+                        "id":  "m1_52",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #45",
+                        "fen":  "9/3aka3/9/1c1p2p2/2R2P3/1p7/6r2/9/3AK4/5A3 b - - 0 1",
+                        "solution":  [
+                                         "e9e9"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 29, Move 91"
+                    },
+                    {
+                        "id":  "m1_53",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #46",
+                        "fen":  "4ck3/3C5/R1R6/6p1p/2Ncn4/9/3r2b2/9/3NA4/3K1A3 b - - 0 1",
+                        "solution":  [
+                                         "d4d2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 39, Move 81"
+                    },
+                    {
+                        "id":  "m1_54",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #47",
+                        "fen":  "4k2C1/4aa1R1/9/9/9/4r4/5p3/4p4/5c3/3K4b b - - 0 1",
+                        "solution":  [
+                                         "e3e2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 42, Move 173"
+                    },
+                    {
+                        "id":  "m1_55",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #48",
+                        "fen":  "4k4/2R1a4/3ac4/2B6/9/1P7/5p3/2r6/4AA3/5K1C1 w - - 0 1",
+                        "solution":  [
+                                         "c9c10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 44, Move 118"
+                    },
+                    {
+                        "id":  "m1_56",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #49",
+                        "fen":  "3kc4/3aa4/9/1R7/9/2PP1PP2/9/5A3/3r1B3/3C1K3 b - - 0 1",
+                        "solution":  [
+                                         "d2d1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 52, Move 87"
+                    },
+                    {
+                        "id":  "m1_57",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #50",
+                        "fen":  "4ck3/4aa3/1R7/7p1/8r/2b1B4/2P2PP2/4C4/2c1AA3/3C1K3 w - - 0 1",
+                        "solution":  [
+                                         "e5h7"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 53, Move 78"
+                    },
+                    {
+                        "id":  "m1_58",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #51",
+                        "fen":  "4kc3/4a3R/3ac1r2/1pr6/9/N8/P1PPN1nB1/5A3/5A3/3C1K3 b - - 0 1",
+                        "solution":  [
+                                         "g4h2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 61, Move 85"
+                    },
+                    {
+                        "id":  "m1_59",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #52",
+                        "fen":  "4k4/5R3/9/1p7/9/P8/2R6/4K3r/3r1A3/3C5 w - - 0 1",
+                        "solution":  [
+                                         "e3e3"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 71, Move 116"
+                    },
+                    {
+                        "id":  "m1_60",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #53",
+                        "fen":  "3C5/4ak3/9/9/3P5/3c2p2/PP1n5/2R1Cr3/9/4KA3 b - - 0 1",
+                        "solution":  [
+                                         "f3d1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 73, Move 113"
+                    },
+                    {
+                        "id":  "m1_61",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #54",
+                        "fen":  "3kc4/R8/3P1a3/9/3r5/6P2/9/4C4/4A4/4KA3 w - - 0 1",
+                        "solution":  [
+                                         "a9d9"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 79, Move 128"
+                    },
+                    {
+                        "id":  "m1_62",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #55",
+                        "fen":  "3c1k3/r2a5/4RP3/9/9/9/3P5/3B5/3AK4/4C4 w - - 0 1",
+                        "solution":  [
+                                         "e8e10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 81, Move 140"
+                    },
+                    {
+                        "id":  "m1_63",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #56",
+                        "fen":  "3ak4/4a4/2Rcc4/3p4r/2p6/5P3/4PP3/9/4A4/4K4 b - - 0 1",
+                        "solution":  [
+                                         "i7i1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 82, Move 117"
+                    },
+                    {
+                        "id":  "m1_64",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #57",
+                        "fen":  "5a3/1c1C3R1/Rc1bk4/1pp3B1p/9/2n6/6PP1/1b4N2/2rAK4/5A3 w - - 0 1",
+                        "solution":  [
+                                         "e2e2"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 90, Move 62"
+                    },
+                    {
+                        "id":  "m1_65",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #58",
+                        "fen":  "4ck3/2R6/3b2c2/9/3N5/6P2/1PP6/3Cb4/4A4/r2AK4 w - - 0 1",
+                        "solution":  [
+                                         "d6e8"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 97, Move 128"
+                    },
+                    {
+                        "id":  "m1_66",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #59",
+                        "fen":  "4k4/3baa3/4cc3/5R3/9/2N2nPP1/9/4CK3/4A4/9 b - - 0 1",
+                        "solution":  [
+                                         "f5d4"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 4, Move 129"
+                    },
+                    {
+                        "id":  "m1_67",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #60",
+                        "fen":  "5a3/1N1ck4/3R5/4pcpp1/9/4P4/6rb1/9/9/3AK4 b - - 0 1",
+                        "solution":  [
+                                         "g4g1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 29, Move 115"
+                    },
+                    {
+                        "id":  "m1_69",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #61",
+                        "fen":  "2c1k4/4aa1R1/4Bb3/1Nr6/5n3/3p1b3/1P7/4C4/3CA4/3K1AB2 b - - 0 1",
+                        "solution":  [
+                                         "c7c1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 40, Move 103"
+                    },
+                    {
+                        "id":  "m1_70",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #62",
+                        "fen":  "1c7/5k3/9/1p4B1r/3B4p/1b7/5PPP1/r8/3AKA3/4CC2R w - - 0 1",
+                        "solution":  [
+                                         "f1f3"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 53, Move 116"
+                    },
+                    {
+                        "id":  "m1_71",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #63",
+                        "fen":  "2r1ck3/R1Na5/3R1a3/2r6/5pp2/1N7/P2P2b2/9/4A4/3K1A3 b - - 0 1",
+                        "solution":  [
+                                         "c7c1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 56, Move 83"
+                    },
+                    {
+                        "id":  "m1_72",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #64",
+                        "fen":  "9/4k4/4c1P2/4p4/9/3P5/6b2/5A3/3r1B3/3C1K3 b - - 0 1",
+                        "solution":  [
+                                         "d2d1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 67, Move 153"
+                    },
+                    {
+                        "id":  "m1_73",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #65",
+                        "fen":  "3a5/8R/3b1k3/6N2/9/5n3/9/5A1r1/4AK3/4C4 w - - 0 1",
+                        "solution":  [
+                                         "i9f9"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 69, Move 102"
+                    },
+                    {
+                        "id":  "m1_74",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #66",
+                        "fen":  "4c4/4kaR2/9/9/3P5/6PP1/7C1/3C1B3/3AK4/6r2 w - - 0 1",
+                        "solution":  [
+                                         "e2e2"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 76, Move 114"
+                    },
+                    {
+                        "id":  "m1_75",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #67",
+                        "fen":  "4kcR2/3b5/9/3pp4/2r6/4n2b1/R3B1P2/4NK3/4A3r/3A1C3 b - - 0 1",
+                        "solution":  [
+                                         "i2i3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 88, Move 93"
+                    },
+                    {
+                        "id":  "m1_76",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #68",
+                        "fen":  "4k4/5a3/3b1C3/1pp6/3P5/9/1PP2N3/9/4K2c1/3A1A3 w - - 0 1",
+                        "solution":  [
+                                         "e2e2"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 92, Move 112"
+                    },
+                    {
+                        "id":  "m1_77",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #69",
+                        "fen":  "3cck3/4a4/5a3/2pp5/9/5R3/4n4/9/5A3/5K3 b - - 0 1",
+                        "solution":  [
+                                         "e4g3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 98, Move 121"
+                    },
+                    {
+                        "id":  "m1_78",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #70",
+                        "fen":  "5c3/4k4/9/9/9/5P3/9/3R1p3/3B5/r2AKA3 w - - 0 1",
+                        "solution":  [
+                                         "e1e1"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 2, Move 108"
+                    },
+                    {
+                        "id":  "m1_80",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #71",
+                        "fen":  "3ack3/2Rn1a2R/5b3/3P2pp1/3c5/3r5/5p3/9/2rNAA3/3KCC3 b - - 0 1",
+                        "solution":  [
+                                         "d5d2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 13, Move 95"
+                    },
+                    {
+                        "id":  "m1_81",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #72",
+                        "fen":  "3aka3/9/9/2R6/7p1/4p4/4n1b2/9/2N3r2/R2K1B3 b - - 0 1",
+                        "solution":  [
+                                         "g2d2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 17, Move 145"
+                    },
+                    {
+                        "id":  "m1_82",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #73",
+                        "fen":  "9/4ka3/3acc3/3P2R2/1p3C3/9/5p3/9/r3AK1n1/4C1B2 b - - 0 1",
+                        "solution":  [
+                                         "f4f3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 24, Move 93"
+                    },
+                    {
+                        "id":  "m1_83",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #74",
+                        "fen":  "4ck3/1R2a4/5c3/5pp2/9/5N3/3C5/N8/5A3/2r1nK3 b - - 0 1",
+                        "solution":  [
+                                         "e1c2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 25, Move 137"
+                    },
+                    {
+                        "id":  "m1_84",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #75",
+                        "fen":  "3b1k3/4a4/6P2/2N1b4/3B5/9/9/9/4A4/5K3 w - - 0 1",
+                        "solution":  [
+                                         "f1f1"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 26, Move 180"
+                    },
+                    {
+                        "id":  "m1_85",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #76",
+                        "fen":  "4ck3/6R2/3r5/7p1/3B5/9/9/9/9/3KA4 w - - 0 1",
+                        "solution":  [
+                                         "g9f9"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 37, Move 106"
+                    },
+                    {
+                        "id":  "m1_86",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #77",
+                        "fen":  "9/5R1B1/3kc2N1/9/9/9/4p2PP/4C4/2r1AK3/6B2 w - - 0 1",
+                        "solution":  [
+                                         "h8f7"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 41, Move 132"
+                    },
+                    {
+                        "id":  "m1_87",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #78",
+                        "fen":  "2bk3r1/3aa1R2/3c5/2B1p4/1P7/7P1/3n5/3AC1N2/6r2/4KC3 b - - 0 1",
+                        "solution":  [
+                                         "d4f3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 44, Move 87"
+                    },
+                    {
+                        "id":  "m1_88",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #79",
+                        "fen":  "3c1k3/9/5P2c/9/9/4B4/6b2/4CA3/4K1p2/9 w - - 0 1",
+                        "solution":  [
+                                         "f8e9"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 45, Move 196"
+                    },
+                    {
+                        "id":  "m1_89",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #80",
+                        "fen":  "5R3/5r3/4ck3/3r5/4B4/9/2P6/9/4AK3/9 b - - 0 1",
+                        "solution":  [
+                                         "f8f8"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 61, Move 89"
+                    },
+                    {
+                        "id":  "m1_90",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #81",
+                        "fen":  "9/2B1k4/9/9/1pp4p1/9/6PP1/3A1r3/9/4K4 b - - 0 1",
+                        "solution":  [
+                                         "e9e9"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 62, Move 123"
+                    },
+                    {
+                        "id":  "m1_91",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #82",
+                        "fen":  "3ck4/4aa3/4c4/5p1p1/4b4/1P4PP1/9/3C5/3AA4/3K1B2R b - - 0 1",
+                        "solution":  [
+                                         "e6b4"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 68, Move 107"
+                    },
+                    {
+                        "id":  "m1_92",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #83",
+                        "fen":  "3kBc3/3aa4/9/p2P3p1/9/2P6/1b7/9/3B5/3KC4 b - - 0 1",
+                        "solution":  [
+                                         "a7a6"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 84, Move 111"
+                    },
+                    {
+                        "id":  "m1_93",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #84",
+                        "fen":  "9/4k4/2cn5/9/9/9/2b2p3/2CA5/4K4/5C3 b - - 0 1",
+                        "solution":  [
+                                         "e9e9"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 86, Move 171"
+                    },
+                    {
+                        "id":  "m1_94",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #85",
+                        "fen":  "3c1a3/3bk4/4n4/5pp2/4P4/9/9/4r4/4A4/r2CKA3 b - - 0 1",
+                        "solution":  [
+                                         "a1d1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 97, Move 133"
+                    },
+                    {
+                        "id":  "m1_98",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #86",
+                        "fen":  "4k4/4a4/3bc4/2p4P1/3P1P3/9/6r2/b2A5/3KA4/5C3 b - - 0 1",
+                        "solution":  [
+                                         "d8b5"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 23, Move 121"
+                    },
+                    {
+                        "id":  "m1_99",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #87",
+                        "fen":  "3a5/3k5/9/5R1pp/9/9/3PP4/4C4/4A4/b3KCr2 w - - 0 1",
+                        "solution":  [
+                                         "f7d7"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 26, Move 112"
+                    },
+                    {
+                        "id":  "m1_100",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #88",
+                        "fen":  "3kca3/3c5/3a5/1PB4pp/9/9/8P/1R2R4/3rN4/2B1KC3 b - - 0 1",
+                        "solution":  [
+                                         "d2e2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 29, Move 97"
+                    },
+                    {
+                        "id":  "m1_101",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #89",
+                        "fen":  "3c1k3/5a3/1B1a5/9/5ppp1/4R2nc/NPP6/4C4/4AA3/4K2C1 w - - 0 1",
+                        "solution":  [
+                                         "e5e10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 35, Move 110"
+                    },
+                    {
+                        "id":  "m1_103",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #90",
+                        "fen":  "2bRck3/5c3/9/9/3n5/9/1PPNNP3/9/4A4/4KA1r1 b - - 0 1",
+                        "solution":  [
+                                         "h1f1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 52, Move 83"
+                    },
+                    {
+                        "id":  "m1_104",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #91",
+                        "fen":  "3k1c3/2Rna4/9/3pb1pp1/9/n8/3Nb2PP/r4A3/1r3A3/4CK3 b - - 0 1",
+                        "solution":  [
+                                         "b2f2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 60, Move 99"
+                    },
+                    {
+                        "id":  "m1_105",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #92",
+                        "fen":  "1R1c1k3/4aa3/9/1p1b3p1/9/4P4/4B3B/2N1C2N1/3A5/3KA2n1 b - - 0 1",
+                        "solution":  [
+                                         "d7b4"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 66, Move 107"
+                    },
+                    {
+                        "id":  "m1_106",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #93",
+                        "fen":  "2Rck2C1/4a4/4B4/p8/9/9/2P3RP1/4CB3/2nr5/4K4 w - - 0 1",
+                        "solution":  [
+                                         "g4g10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 72, Move 118"
+                    },
+                    {
+                        "id":  "m1_107",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #94",
+                        "fen":  "3ck4/4a4/n2P5/4P4/4r1B2/6PP1/4r4/5R3/2p1A4/3CK4 w - - 0 1",
+                        "solution":  [
+                                         "d8e9"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 74, Move 138"
+                    },
+                    {
+                        "id":  "m1_108",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #95",
+                        "fen":  "3nka3/3C5/9/2B6/2R6/2ppc4/5r3/R4A3/4AK3/6rn1 b - - 0 1",
+                        "solution":  [
+                                         "g1a1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 79, Move 109"
+                    },
+                    {
+                        "id":  "m1_109",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #96",
+                        "fen":  "3c5/3k5/4P4/3P2B2/7p1/6P2/9/9/9/4K4 w - - 0 1",
+                        "solution":  [
+                                         "e8d8"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 85, Move 154"
+                    },
+                    {
+                        "id":  "m1_110",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #97",
+                        "fen":  "4kab2/1r2a4/4c4/1C1N1p1p1/2p6/7P1/1P2Pn3/3K1pC2/5RcB1/2BA1A3 b - - 0 1",
+                        "solution":  [
+                                         "f3e3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 89, Move 77"
+                    },
+                    {
+                        "id":  "m1_111",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #98",
+                        "fen":  "5k3/4b4/9/2p4P1/2r6/1P6n/3P4B/4A4/5K3/9 b - - 0 1",
+                        "solution":  [
+                                         "f10f10"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 99, Move 99"
+                    },
+                    {
+                        "id":  "m1_112",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #99",
+                        "fen":  "4knR2/4a4/5a3/9/5P3/6P2/PPP1Rn3/4N4/5r3/2rAKC3 b - - 0 1",
+                        "solution":  [
+                                         "f2e2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 2, Move 93"
+                    },
+                    {
+                        "id":  "m1_113",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #100",
+                        "fen":  "9/3c5/c2k5/p1p2P3/6B2/9/1n7/4C4/4A4/3A1K3 w - - 0 1",
+                        "solution":  [
+                                         "e3e1"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 6, Move 110"
+                    },
+                    {
+                        "id":  "m1_114",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #101",
+                        "fen":  "3k1c3/3aa4/2R6/1B4b2/1c1P1r3/9/9/5C3/4AA3/4CK3 w - - 0 1",
+                        "solution":  [
+                                         "c8c10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 11, Move 110"
+                    },
+                    {
+                        "id":  "m1_115",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #102",
+                        "fen":  "3r2c2/7R1/4k4/9/1p4B2/9/PP2c4/4A4/4A4/4K4 w - - 0 1",
+                        "solution":  [
+                                         "h9h8"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 13, Move 100"
+                    },
+                    {
+                        "id":  "m1_116",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #103",
+                        "fen":  "3c1k3/5a3/5a3/9/4Rb3/5p3/6PP1/9/4K4/4C4 w - - 0 1",
+                        "solution":  [
+                                         "e6e10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 16, Move 128"
+                    },
+                    {
+                        "id":  "m1_117",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #104",
+                        "fen":  "R2cka2R/4r4/9/5pp2/9/4b4/9/3A5/4A4/4KC1r1 w - - 0 1",
+                        "solution":  [
+                                         "i10f10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 28, Move 172"
+                    },
+                    {
+                        "id":  "m1_118",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #105",
+                        "fen":  "R1bkcar2/4ac3/6N2/3p3p1/9/7P1/2P2R3/9/n2r1A3/5KC2 b - - 0 1",
+                        "solution":  [
+                                         "d2f2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 33, Move 91"
+                    },
+                    {
+                        "id":  "m1_120",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #106",
+                        "fen":  "3k5/9/9/1ppp2B2/4R4/1P1c1r1n1/9/5C3/4AA3/4K4 w - - 0 1",
+                        "solution":  [
+                                         "e6e10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 40, Move 88"
+                    },
+                    {
+                        "id":  "m1_121",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #107",
+                        "fen":  "3k1c3/4a4/9/4C4/4B4/9/9/3pp4/9/4K4 b - - 0 1",
+                        "solution":  [
+                                         "d3e2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 44, Move 177"
+                    },
+                    {
+                        "id":  "m1_122",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #108",
+                        "fen":  "3c1k3/4aa3/4c4/1RBp1pp2/5n1N1/7PP/2r6/3AC4/4A4/3CK4 w - - 0 1",
+                        "solution":  [
+                                         "h6g8"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 49, Move 90"
+                    },
+                    {
+                        "id":  "m1_123",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #109",
+                        "fen":  "R2ak2r1/3cab3/3bc4/1p2pp3/9/6PN1/2P1B4/1C1B5/3A1A3/3K4R w - - 0 1",
+                        "solution":  [
+                                         "b3b10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 68, Move 92"
+                    },
+                    {
+                        "id":  "m1_124",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #110",
+                        "fen":  "2ck5/4a4/3ac4/2B1R2pp/7r1/3B1PP2/2pp5/4C4/3AA1n2/3CK4 b - - 0 1",
+                        "solution":  [
+                                         "h6h1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 72, Move 97"
+                    },
+                    {
+                        "id":  "m1_125",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #111",
+                        "fen":  "9/4k4/3a2n2/P3b4/5cpp1/5R3/6b2/3A5/2r1A4/1C1K5 b - - 0 1",
+                        "solution":  [
+                                         "c2c1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 82, Move 125"
+                    },
+                    {
+                        "id":  "m1_126",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #112",
+                        "fen":  "7n1/R2bka3/5c3/9/9/2rn5/4c4/5A3/3B1A3/3C1K3 b - - 0 1",
+                        "solution":  [
+                                         "d5e3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 84, Move 99"
+                    },
+                    {
+                        "id":  "m1_127",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #113",
+                        "fen":  "5k3/4a4/5a3/2PP5/9/3b5/7n1/9/4AK3/4C4 b - - 0 1",
+                        "solution":  [
+                                         "f8e8"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 85, Move 173"
+                    },
+                    {
+                        "id":  "m1_129",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #114",
+                        "fen":  "4k4/4a4/9/3R5/2r6/2c2P3/7P1/2n6/3AA4/3CCK3 w - - 0 1",
+                        "solution":  [
+                                         "d7d10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 98, Move 126"
+                    },
+                    {
+                        "id":  "m1_130",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #115",
+                        "fen":  "3kc4/R4a2R/5a3/9/9/2PP3P1/7n1/4NC3/3A2r1c/3KA4 w - - 0 1",
+                        "solution":  [
+                                         "f3d3"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 99, Move 112"
+                    },
+                    {
+                        "id":  "m1_132",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #116",
+                        "fen":  "3ak4/5a3/4c1n2/6B2/9/3n2P2/5NP1B/2b2A3/4AC3/cr2CK3 b - - 0 1",
+                        "solution":  [
+                                         "b1e1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 5, Move 105"
+                    },
+                    {
+                        "id":  "m1_133",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #117",
+                        "fen":  "c3k1bR1/4a4/4c4/p2pp4/9/9/3b1r1P1/5B3/4A4/3ACK3 b - - 0 1",
+                        "solution":  [
+                                         "f4f3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 9, Move 97"
+                    },
+                    {
+                        "id":  "m1_134",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #118",
+                        "fen":  "2C6/r1n2R3/3kc4/4p2b1/2pc1P3/9/PP1N5/3B1B3/3AA4/3K5 w - - 0 1",
+                        "solution":  [
+                                         "d4c6"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 12, Move 86"
+                    },
+                    {
+                        "id":  "m1_136",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #119",
+                        "fen":  "4kc3/4a4/3bc2B1/9/9/2P3p2/R4p3/6n2/Nr1AAN3/3KC4 w - - 0 1",
+                        "solution":  [
+                                         "a4a10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 24, Move 120"
+                    },
+                    {
+                        "id":  "m1_137",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #120",
+                        "fen":  "3k5/9/4c4/5PP2/9/9/9/9/4A4/3KC4 w - - 0 1",
+                        "solution":  [
+                                         "d1d1"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 32, Move 124"
+                    },
+                    {
+                        "id":  "m1_138",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #121",
+                        "fen":  "9/3k1a3/3b5/6ppb/9/1P3P3/1C2R4/4C4/4NK1n1/3r5 b - - 0 1",
+                        "solution":  [
+                                         "d1f1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 42, Move 85"
+                    },
+                    {
+                        "id":  "m1_139",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #122",
+                        "fen":  "5ab2/3k1an2/Brc6/7P1/1Bb2N3/9/2R6/9/4KA3/3AC4 w - - 0 1",
+                        "solution":  [
+                                         "c4d4"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 54, Move 98"
+                    },
+                    {
+                        "id":  "m1_140",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #123",
+                        "fen":  "3kcR3/3a5/r8/4B4/2b2pp2/1P7/1P7/4C4/4A4/3AK4 w - - 0 1",
+                        "solution":  [
+                                         "f10e10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 60, Move 100"
+                    },
+                    {
+                        "id":  "m1_141",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #124",
+                        "fen":  "2R1ck3/4a4/3ca1n2/Ppp2ppp1/4P4/2P1P4/4B1b2/5r3/3N1A3/4KC3 b - - 0 1",
+                        "solution":  [
+                                         "f3e3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 63, Move 77"
+                    },
+                    {
+                        "id":  "m1_142",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #125",
+                        "fen":  "3ck4/1r2a2R1/2ca5/1pp3B2/9/9/PP7/3A5/3A5/1C1K5 w - - 0 1",
+                        "solution":  [
+                                         "h9h10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 68, Move 84"
+                    },
+                    {
+                        "id":  "m1_143",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #126",
+                        "fen":  "1r1c1k3/3aa4/RB3r3/9/6R2/4C4/3PP1b2/3C2n2/4A4/3K5 b - - 0 1",
+                        "solution":  [
+                                         "f8b1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 69, Move 113"
+                    },
+                    {
+                        "id":  "m1_144",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #127",
+                        "fen":  "9/4k4/2ca5/2B6/9/9/3p1p3/2p6/3C5/3AK4 b - - 0 1",
+                        "solution":  [
+                                         "e9e9"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 71, Move 167"
+                    },
+                    {
+                        "id":  "m1_145",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #128",
+                        "fen":  "9/4k4/9/5ppN1/1p7/9/3P5/4KB3/3C2R2/r4r3 b - - 0 1",
+                        "solution":  [
+                                         "e9e9"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 72, Move 101"
+                    },
+                    {
+                        "id":  "m1_146",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #129",
+                        "fen":  "3ac3R/5k1N1/5a3/1p7/4ppp2/9/1P7/2r1C4/4K4/9 w - - 0 1",
+                        "solution":  [
+                                         "i10f10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 73, Move 96"
+                    },
+                    {
+                        "id":  "m1_147",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #130",
+                        "fen":  "3ak4/9/4C4/3N5/2B2N1p1/6p2/7r1/9/3bA4/3K1C3 w - - 0 1",
+                        "solution":  [
+                                         "d7e9"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 78, Move 104"
+                    },
+                    {
+                        "id":  "m1_148",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #131",
+                        "fen":  "3a1k3/9/9/9/9/4P4/7P1/3pp4/5K3/9 b - - 0 1",
+                        "solution":  [
+                                         "f10f10"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 82, Move 119"
+                    },
+                    {
+                        "id":  "m1_149",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #132",
+                        "fen":  "3ck4/4a4/1PP1c4/4p2p1/2bR5/4P1PP1/9/4KA3/3A5/9 b - - 0 1",
+                        "solution":  [
+                                         "e8e6"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 88, Move 121"
+                    },
+                    {
+                        "id":  "m1_150",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #133",
+                        "fen":  "3c1k3/2N2a1R1/5a3/4bC3/9/9/cr7/9/3NAA3/4K4 w - - 0 1",
+                        "solution":  [
+                                         "h9f9"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 95, Move 128"
+                    },
+                    {
+                        "id":  "m1_151",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #134",
+                        "fen":  "3k1a1bC/4a4/2R6/3ppp3/9/2PP2B2/1n2C2r1/4KA3/r8/3A5 b - - 0 1",
+                        "solution":  [
+                                         "h4e4"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 4, Move 149"
+                    },
+                    {
+                        "id":  "m1_153",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #135",
+                        "fen":  "1c1k5/3aa4/2P2b3/9/3P5/2P6/r8/p2A1B3/3KAN3/1R7 w - - 0 1",
+                        "solution":  [
+                                         "b1b10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 40, Move 124"
+                    },
+                    {
+                        "id":  "m1_154",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #136",
+                        "fen":  "3ak4/4a4/4c4/9/3Rnp2p/6P2/9/3KCA3/2r2A3/3N5 b - - 0 1",
+                        "solution":  [
+                                         "e6f4"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 73, Move 103"
+                    },
+                    {
+                        "id":  "m1_155",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #137",
+                        "fen":  "3k2b2/6NC1/5P3/b8/4p1p2/2pcp4/6P2/9/4A4/4K1C2 w - - 0 1",
+                        "solution":  [
+                                         "f8e9"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 81, Move 134"
+                    },
+                    {
+                        "id":  "m1_156",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #138",
+                        "fen":  "3a1a3/3c1k3/9/6R2/9/3N1P3/4P4/3BCB3/4A4/2rcK4 w - - 0 1",
+                        "solution":  [
+                                         "g7f7"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 87, Move 90"
+                    },
+                    {
+                        "id":  "m1_157",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #139",
+                        "fen":  "3ck2n1/4aa3/9/6ppb/1BbRP4/4c1P2/4P4/5B3/4A4/4KA1r1 b - - 0 1",
+                        "solution":  [
+                                         "i7g4"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 95, Move 93"
+                    },
+                    {
+                        "id":  "m1_158",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #140",
+                        "fen":  "4ka2R/R3r2N1/3b5/9/9/3rp4/6PP1/6N2/4AA3/2c2K1C1 w - - 0 1",
+                        "solution":  [
+                                         "i10f10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 96, Move 100"
+                    },
+                    {
+                        "id":  "m1_159",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #141",
+                        "fen":  "R2Ck4/9/4c4/2r2p3/9/9/9/4A4/4A4/4K4 b - - 0 1",
+                        "solution":  [
+                                         "c7c1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 97, Move 119"
+                    },
+                    {
+                        "id":  "m1_160",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #142",
+                        "fen":  "3k5/4a1R2/1c1a5/9/9/5P2p/B4r3/1C3N1p1/5A3/1N1C1K3 w - - 0 1",
+                        "solution":  [
+                                         "g9g10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 1, Move 116"
+                    },
+                    {
+                        "id":  "m1_161",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #143",
+                        "fen":  "1r1kca3/R8/3C5/3bp2p1/1B7/1b7/B3PP3/5A3/9/1N2KA2r w - - 0 1",
+                        "solution":  [
+                                         "a9d9"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 3, Move 102"
+                    },
+                    {
+                        "id":  "m1_162",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #144",
+                        "fen":  "3rck3/9/4P2c1/9/1pp3R1n/5b3/1PP6/2N1C4/4K4/3A1A3 w - - 0 1",
+                        "solution":  [
+                                         "g6f6"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 7, Move 96"
+                    },
+                    {
+                        "id":  "m1_163",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #145",
+                        "fen":  "4k4/4aC3/3bc4/7p1/5R3/3r5/8B/3C2N2/3KA1R2/2r6 b - - 0 1",
+                        "solution":  [
+                                         "d8b5"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 11, Move 87"
+                    },
+                    {
+                        "id":  "m1_164",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #146",
+                        "fen":  "5k2C/7R1/3B5/4cpp2/8p/4nn3/1P1PP4/9/4KA3/3c2r2 w - - 0 1",
+                        "solution":  [
+                                         "d8g10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 14, Move 84"
+                    },
+                    {
+                        "id":  "m1_165",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #147",
+                        "fen":  "5c3/5aR2/4ak3/6nB1/9/9/1P1P5/4C4/4K4/6r2 w - - 0 1",
+                        "solution":  [
+                                         "g9g8"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 29, Move 112"
+                    },
+                    {
+                        "id":  "m1_166",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #148",
+                        "fen":  "4ka3/4a4/4c4/9/9/9/2B1n4/3A1R3/8r/5K3 b - - 0 1",
+                        "solution":  [
+                                         "i2i1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 30, Move 117"
+                    },
+                    {
+                        "id":  "m1_167",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #149",
+                        "fen":  "3cck3/4aa3/3b5/4r4/3p5/R2p2B2/1PP3PPB/3A5/4A1N2/3K5 w - - 0 1",
+                        "solution":  [
+                                         "g5i8"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 36, Move 94"
+                    },
+                    {
+                        "id":  "m1_168",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #150",
+                        "fen":  "4ca3/4k4/9/9/9/9/4n4/3A5/4AK3/3C5 b - - 0 1",
+                        "solution":  [
+                                         "e9f8"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 42, Move 115"
+                    },
+                    {
+                        "id":  "m1_170",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #151",
+                        "fen":  "1n1aka1n1/8R/1c7/p4r3/2p4p1/9/1PP6/9/4K4/CN4BN1 b - - 0 1",
+                        "solution":  [
+                                         "e10e10"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 54, Move 77"
+                    },
+                    {
+                        "id":  "m1_171",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #152",
+                        "fen":  "2ck2c2/5P3/2N6/6B2/9/9/3p5/5A3/4A4/4K4 w - - 0 1",
+                        "solution":  [
+                                         "f9e9"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 59, Move 154"
+                    },
+                    {
+                        "id":  "m1_172",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #153",
+                        "fen":  "3ck4/3a1a3/9/7p1/9/9/9/2RA3r1/4K4/9 b - - 0 1",
+                        "solution":  [
+                                         "e10e10"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 71, Move 113"
+                    },
+                    {
+                        "id":  "m1_173",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #154",
+                        "fen":  "4kc3/4a1r2/3bnR3/2P6/4C3p/2PP5/R8/2N2B3/4A4/4KC1r1 w - - 0 1",
+                        "solution":  [
+                                         "f8f10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 77, Move 104"
+                    },
+                    {
+                        "id":  "m1_174",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #155",
+                        "fen":  "4a4/9/4kc3/2pp1pR2/p8/6PP1/9/9/4K4/9 b - - 0 1",
+                        "solution":  [
+                                         "e8e8"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 84, Move 145"
+                    },
+                    {
+                        "id":  "m1_175",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #156",
+                        "fen":  "4k4/3P5/r8/9/9/9/9/9/3A1A3/3CK4 w - - 0 1",
+                        "solution":  [
+                                         "e1e1"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 87, Move 198"
+                    },
+                    {
+                        "id":  "m1_176",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #157",
+                        "fen":  "R2ak4/9/4P4/9/9/9/1PP2nb2/3B2r2/4AA3/3KCn2c w - - 0 1",
+                        "solution":  [
+                                         "e8e9"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 104, Move 94"
+                    },
+                    {
+                        "id":  "m1_177",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #158",
+                        "fen":  "4rk3/9/4R4/2B3p2/1p7/2P1P4/1P7/9/4AA3/4K4 w - - 0 1",
+                        "solution":  [
+                                         "e8e10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 5, Move 100"
+                    },
+                    {
+                        "id":  "m1_178",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #159",
+                        "fen":  "R4a3/3ka4/5c3/5R3/9/9/3r4P/4K4/5N3/3r5 b - - 0 1",
+                        "solution":  [
+                                         "d1e1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 9, Move 83"
+                    },
+                    {
+                        "id":  "m1_179",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #160",
+                        "fen":  "R2c1kc1R/5a3/3a1b3/3pbp1p1/1B7/9/7P1/3ACK3/4A1r2/9 w - - 0 1",
+                        "solution":  [
+                                         "a10d10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 14, Move 114"
+                    },
+                    {
+                        "id":  "m1_181",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #161",
+                        "fen":  "3c5/R3a4/3ka4/1p4B2/9/4p4/5N3/9/3AA4/4KC1r1 w - - 0 1",
+                        "solution":  [
+                                         "f4e6"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 2, Move 170"
+                    },
+                    {
+                        "id":  "m1_182",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #162",
+                        "fen":  "4ck3/3na4/5c3/3B5/7p1/3P5/9/2R2B1C1/4A3r/3CK4 b - - 0 1",
+                        "solution":  [
+                                         "i2e2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 8, Move 99"
+                    },
+                    {
+                        "id":  "m1_183",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #163",
+                        "fen":  "3ak4/4a4/9/9/1pp6/5n3/2PP1b3/1CN3p1b/3CAK3/7nc b - - 0 1",
+                        "solution":  [
+                                         "i1a1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 16, Move 121"
+                    },
+                    {
+                        "id":  "m1_184",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #164",
+                        "fen":  "4c4/1R1aka3/3c1b3/2B6/9/6n2/9/9/3AAK3/5C1r1 b - - 0 1",
+                        "solution":  [
+                                         "h1h2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 24, Move 149"
+                    },
+                    {
+                        "id":  "m1_185",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #165",
+                        "fen":  "4k4/4aa3/2n1cc3/8b/6p2/4pp3/6PPB/3C5/5N2R/r2A1K1N1 b - - 0 1",
+                        "solution":  [
+                                         "a1d1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 34, Move 101"
+                    },
+                    {
+                        "id":  "m1_186",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #166",
+                        "fen":  "3k1c1r1/3aa4/3b5/6p2/1R7/5P1P1/9/1CpA2N2/3KA4/1r2C4 b - - 0 1",
+                        "solution":  [
+                                         "c3c2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 57, Move 77"
+                    },
+                    {
+                        "id":  "m1_187",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #167",
+                        "fen":  "2R1c4/3c1a3/3k5/3N5/3p5/9/1P1PP4/4AC3/5K3/8r w - - 0 1",
+                        "solution":  [
+                                         "c10c8"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 73, Move 136"
+                    },
+                    {
+                        "id":  "m1_189",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #168",
+                        "fen":  "4ck3/4a4/3b5/1p4pp1/5r3/r1n3B1P/9/2CK5/2R2A3/5AR2 b - - 0 1",
+                        "solution":  [
+                                         "f6d6"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 89, Move 83"
+                    },
+                    {
+                        "id":  "m1_190",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #169",
+                        "fen":  "3kr4/9/4R4/9/9/9/9/4C4/4K4/3C5 w - - 0 1",
+                        "solution":  [
+                                         "e2d2"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 100, Move 116"
+                    },
+                    {
+                        "id":  "m1_191",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #170",
+                        "fen":  "3c1k1n1/5b3/3a3c1/3N1ppp1/9/4B4/1r7/4C4/3AA4/4KC3 w - - 0 1",
+                        "solution":  [
+                                         "f1f8"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 32, Move 80"
+                    },
+                    {
+                        "id":  "m1_192",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #171",
+                        "fen":  "9/4aC3/4k4/9/9/2p6/1P1PP2P1/5rn2/3C5/3AK4 b - - 0 1",
+                        "solution":  [
+                                         "f3f1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 35, Move 137"
+                    },
+                    {
+                        "id":  "m1_193",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #172",
+                        "fen":  "3kc4/3n1b1b1/3R5/1p1p2B2/r3C2r1/2P1P4/1P5p1/3B5/4AA3/3CK4 w - - 0 1",
+                        "solution":  [
+                                         "d8d9"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 36, Move 90"
+                    },
+                    {
+                        "id":  "m1_194",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #173",
+                        "fen":  "3ck1n2/4a1R2/4cr3/3N2B2/1p6p/9/4p1PPB/9/3A5/3KC4 w - - 0 1",
+                        "solution":  [
+                                         "g9g10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 42, Move 90"
+                    },
+                    {
+                        "id":  "m1_195",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #174",
+                        "fen":  "5k3/9/2n2c3/4p4/5bp2/9/2n1C1b2/5Ar2/4A4/2RCK4 b - - 0 1",
+                        "solution":  [
+                                         "g3g1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 46, Move 113"
+                    },
+                    {
+                        "id":  "m1_196",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #175",
+                        "fen":  "3k5/5P3/2r6/9/4R4/9/9/3A5/4AN3/2p1KC3 w - - 0 1",
+                        "solution":  [
+                                         "f9e9"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 49, Move 156"
+                    },
+                    {
+                        "id":  "m1_197",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #176",
+                        "fen":  "CN7/3kaa3/2P6/9/P3N4/9/4pc3/3p3C1/5A3/4K4 w - - 0 1",
+                        "solution":  [
+                                         "h3a3"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 61, Move 142"
+                    },
+                    {
+                        "id":  "m1_198",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #177",
+                        "fen":  "1c3k3/4aa3/3n1b3/3pb4/np3C3/4C4/B3PP1NR/3p5/5A1r1/3A1K3 b - - 0 1",
+                        "solution":  [
+                                         "h2h1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 73, Move 115"
+                    },
+                    {
+                        "id":  "m1_199",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #178",
+                        "fen":  "3acab2/4kbR2/9/1r7/9/9/9/3p5/9/5K3 b - - 0 1",
+                        "solution":  [
+                                         "b7f7"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 74, Move 97"
+                    },
+                    {
+                        "id":  "m1_200",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #179",
+                        "fen":  "1R1ak4/9/1n2c4/8p/9/9/2PPPP3/2CK5/5Cn2/1r3A3 b - - 0 1",
+                        "solution":  [
+                                         "b1d1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 78, Move 75"
+                    },
+                    {
+                        "id":  "m1_201",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #180",
+                        "fen":  "3ak4/4a4/8R/4rn3/9/2P6/4C2b1/2N6/3AA4/2BCK4 w - - 0 1",
+                        "solution":  [
+                                         "i8i10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 81, Move 92"
+                    },
+                    {
+                        "id":  "m1_202",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #181",
+                        "fen":  "r4k3/4n4/4C4/5pp2/r4R3/5C3/4PP3/3A5/4A4/5K3 w - - 0 1",
+                        "solution":  [
+                                         "f6f7"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 85, Move 122"
+                    },
+                    {
+                        "id":  "m1_204",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #182",
+                        "fen":  "r3ka1R1/4a4/cb7/1p3R3/4p4/2B2P3/1P2P2P1/5K3/4A3r/3n5 b - - 0 1",
+                        "solution":  [
+                                         "i2i3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 71, Move 77"
+                    },
+                    {
+                        "id":  "m1_205",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #183",
+                        "fen":  "4k4/9/3cCb3/9/3p3P1/9/9/4K1n2/9/9 b - - 0 1",
+                        "solution":  [
+                                         "d8i3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 77, Move 131"
+                    },
+                    {
+                        "id":  "m1_206",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #184",
+                        "fen":  "c1b6/5R3/3k5/1p1B4P/9/9/1PP6/4C4/r4A2c/4K4 b - - 0 1",
+                        "solution":  [
+                                         "a2a1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 83, Move 85"
+                    },
+                    {
+                        "id":  "m1_207",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #185",
+                        "fen":  "3ck4/C2ba4/4c4/b8/9/1R7/3r5/4A4/4A4/4K4 b - - 0 1",
+                        "solution":  [
+                                         "d4d1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 85, Move 101"
+                    },
+                    {
+                        "id":  "m1_208",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #186",
+                        "fen":  "9/3k5/5a3/9/9/9/4bp3/3AC4/5A3/3K5 w - - 0 1",
+                        "solution":  [
+                                         "d3e2"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 87, Move 174"
+                    },
+                    {
+                        "id":  "m1_209",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #187",
+                        "fen":  "4ka2R/3a5/3ccb3/bN7/6pp1/1P3p3/3B2PP1/3r5/3A5/3KC4 b - - 0 1",
+                        "solution":  [
+                                         "d3d2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 93, Move 93"
+                    },
+                    {
+                        "id":  "m1_210",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #188",
+                        "fen":  "8R/4ak3/3acc3/b4R3/1p1P5/4r4/4B4/9/4AA3/3C1K3 w - - 0 1",
+                        "solution":  [
+                                         "e4h6"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 96, Move 88"
+                    },
+                    {
+                        "id":  "m1_212",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #189",
+                        "fen":  "5k3/4a2b1/B4a3/3P2B2/5Nc2/9/9/4C4/3AA4/4KC3 w - - 0 1",
+                        "solution":  [
+                                         "f6g8"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 22, Move 104"
+                    },
+                    {
+                        "id":  "m1_213",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #190",
+                        "fen":  "9/5k1N1/3aa4/2B1PP3/9/6b2/9/4AA3/9/5Kc2 w - - 0 1",
+                        "solution":  [
+                                         "f7f8"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 26, Move 124"
+                    },
+                    {
+                        "id":  "m1_214",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #191",
+                        "fen":  "3ack3/1b1a5/6R2/2Bb5/7P1/9/2PPB4/4C4/4A4/3AK4 w - - 0 1",
+                        "solution":  [
+                                         "g8f8"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 28, Move 84"
+                    },
+                    {
+                        "id":  "m1_215",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #192",
+                        "fen":  "3a1a3/4k4/4c3R/3n1pp2/9/2r4P1/4B2P1/9/3KC4/6B2 b - - 0 1",
+                        "solution":  [
+                                         "c5d5"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 33, Move 81"
+                    },
+                    {
+                        "id":  "m1_216",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #193",
+                        "fen":  "9/5k3/9/9/6b2/9/2B6/3p2n2/9/4KC3 b - - 0 1",
+                        "solution":  [
+                                         "d3e2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 44, Move 131"
+                    },
+                    {
+                        "id":  "m1_217",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #194",
+                        "fen":  "3ck4/4a4/9/5P3/9/6R2/5n3/4p4/9/5K3 b - - 0 1",
+                        "solution":  [
+                                         "e3e2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 49, Move 169"
+                    },
+                    {
+                        "id":  "m1_218",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #195",
+                        "fen":  "2b1k4/4aa3/4r4/p8/3p5/2P6/3P2b2/4NC3/3AAKcn1/3C5 b - - 0 1",
+                        "solution":  [
+                                         "g2i2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 61, Move 107"
+                    },
+                    {
+                        "id":  "m1_219",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #196",
+                        "fen":  "3R5/5k3/3a5/9/9/1r3P3/9/1b7/3CA4/4CK3 w - - 0 1",
+                        "solution":  [
+                                         "d2f2"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 73, Move 174"
+                    },
+                    {
+                        "id":  "m1_220",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #197",
+                        "fen":  "4k4/3aa4/3cc4/2n6/3Rb4/3b5/9/3A1B3/3A5/3K1C3 b - - 0 1",
+                        "solution":  [
+                                         "d5a3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 76, Move 115"
+                    },
+                    {
+                        "id":  "m1_221",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #198",
+                        "fen":  "4kn3/5b3/9/P8/4p4/1P2r2P1/9/9/2r1Ac3/3CKC3 b - - 0 1",
+                        "solution":  [
+                                         "c2e2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 81, Move 139"
+                    },
+                    {
+                        "id":  "m1_222",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #199",
+                        "fen":  "4kc3/4aaN2/2n1c4/9/4P4/9/4n4/3CK4/6C2/9 b - - 0 1",
+                        "solution":  [
+                                         "e8e5"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 34, Move 119"
+                    },
+                    {
+                        "id":  "m1_223",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #200",
+                        "fen":  "3cka2R/3bc4/4R4/4pp3/9/3r5/9/4C4/4A4/5K3 w - - 0 1",
+                        "solution":  [
+                                         "e8e9"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 82, Move 120"
+                    },
+                    {
+                        "id":  "m1_224",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #201",
+                        "fen":  "4kaR2/4a4/2C1c4/9/7p1/3p5/2P1P4/3c5/r3AB3/r2AKC3 b - - 0 1",
+                        "solution":  [
+                                         "a2e2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 89, Move 85"
+                    },
+                    {
+                        "id":  "m1_225",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #202",
+                        "fen":  "3k5/8R/3a1a3/p6r1/2R1bp3/9/1p7/2p6/1c2AA3/5K3 b - - 0 1",
+                        "solution":  [
+                                         "h7h1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 7, Move 145"
+                    },
+                    {
+                        "id":  "m1_226",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #203",
+                        "fen":  "3k5/9/3c1PN2/4P4/2bpp4/9/4b4/9/4A4/4K4 w - - 0 1",
+                        "solution":  [
+                                         "f8e9"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 13, Move 154"
+                    },
+                    {
+                        "id":  "m1_227",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #204",
+                        "fen":  "3a1k3/R8/5r3/6N2/9/3PP4/4Cn3/9/3KA4/5N3 w - - 0 1",
+                        "solution":  [
+                                         "g7h9"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 17, Move 114"
+                    },
+                    {
+                        "id":  "m1_228",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #205",
+                        "fen":  "2bk5/1R7/2r1P4/8b/p8/3n4p/9/2cB1A3/3AK4/4CN3 w - - 0 1",
+                        "solution":  [
+                                         "e8e9"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 20, Move 108"
+                    },
+                    {
+                        "id":  "m1_229",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #206",
+                        "fen":  "4k4/1c1a5/4ca3/b4N3/5B3/5n3/9/9/4AA3/3CCK3 b - - 0 1",
+                        "solution":  [
+                                         "f5g3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 37, Move 127"
+                    },
+                    {
+                        "id":  "m1_230",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #207",
+                        "fen":  "3ck4/4a4/3bc4/2p6/9/4C4/3P3R1/9/3KA4/5r3 b - - 0 1",
+                        "solution":  [
+                                         "d8b5"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 52, Move 153"
+                    },
+                    {
+                        "id":  "m1_231",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #208",
+                        "fen":  "3c1k3/4aa3/9/9/1B7/P3B4/3p5/4C4/2bA5/3CK4 w - - 0 1",
+                        "solution":  [
+                                         "e5h7"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 70, Move 140"
+                    },
+                    {
+                        "id":  "m1_233",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #209",
+                        "fen":  "4ka3/4a4/3bcb3/9/1pp6/7n1/3P5/3B5/4AA3/r2C1K2C b - - 0 1",
+                        "solution":  [
+                                         "h5g3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 85, Move 105"
+                    },
+                    {
+                        "id":  "m1_234",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #210",
+                        "fen":  "4k4/9/5a3/9/9/9/3B5/3A5/9/3AK4 w - - 0 1",
+                        "solution":  [
+                                         "e1e1"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 94, Move 134"
+                    },
+                    {
+                        "id":  "m1_235",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #211",
+                        "fen":  "2Rak4/5a3/4c4/9/9/1P2BP3/9/9/3A5/3KA2r1 b - - 0 1",
+                        "solution":  [
+                                         "h1e1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 1, Move 83"
+                    },
+                    {
+                        "id":  "m1_237",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #212",
+                        "fen":  "9/4kc3/4cb3/1p1p4R/9/3PP4/9/3B5/4A4/4KNr2 b - - 0 1",
+                        "solution":  [
+                                         "g1f1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 15, Move 135"
+                    },
+                    {
+                        "id":  "m1_238",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #213",
+                        "fen":  "2N6/3k5/5r3/4p1p2/9/4P1P2/4c2R1/4N4/4A4/4KA3 b - - 0 1",
+                        "solution":  [
+                                         "f8b1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 46, Move 141"
+                    },
+                    {
+                        "id":  "m1_240",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #214",
+                        "fen":  "4ck3/5a3/2R2c3/9/2P5r/9/6n2/4A4/5C3/5K3 b - - 0 1",
+                        "solution":  [
+                                         "i6i1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 53, Move 177"
+                    },
+                    {
+                        "id":  "m1_241",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #215",
+                        "fen":  "2r1kcR2/3R1a3/1C3C3/1p1pc1B2/9/3P5/5p3/2N6/9/4K4 w - - 0 1",
+                        "solution":  [
+                                         "g10f10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 66, Move 118"
+                    },
+                    {
+                        "id":  "m1_242",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #216",
+                        "fen":  "4kc3/9/3ca4/4b4/5N2C/P4b3/8R/R8/2rB3r1/3AAK3 b - - 0 1",
+                        "solution":  [
+                                         "f5c3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 81, Move 95"
+                    },
+                    {
+                        "id":  "m1_244",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #217",
+                        "fen":  "4c4/3rk4/9/6R2/9/9/9/5K3/5C3/9 b - - 0 1",
+                        "solution":  [
+                                         "d9d3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 12, Move 197"
+                    },
+                    {
+                        "id":  "m1_245",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #218",
+                        "fen":  "5a3/3ka4/5R3/1p1N5/9/c1r6/BP1P5/3CK4/4A4/9 w - - 0 1",
+                        "solution":  [
+                                         "d7b8"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 22, Move 84"
+                    },
+                    {
+                        "id":  "m1_246",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #219",
+                        "fen":  "5N3/9/3k1P3/2n1N4/9/9/4b4/b4p3/9/4K4 w - - 0 1",
+                        "solution":  [
+                                         "e7f9"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 25, Move 160"
+                    },
+                    {
+                        "id":  "m1_247",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #220",
+                        "fen":  "3R5/5k3/9/1p1N2p2/9/9/9/3A5/5K3/4r4 w - - 0 1",
+                        "solution":  [
+                                         "f2f2"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 30, Move 116"
+                    },
+                    {
+                        "id":  "m1_248",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #221",
+                        "fen":  "1r1kc4/2Raab3/6B2/3R2p2/p1p3p2/9/4P1P2/3CC4/3A1N3/B3KA2r w - - 0 1",
+                        "solution":  [
+                                         "d7d9"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 38, Move 96"
+                    },
+                    {
+                        "id":  "m1_249",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #222",
+                        "fen":  "3k5/3r5/2P6/9/9/9/3p1p3/4R4/4K4/4C4 w - - 0 1",
+                        "solution":  [
+                                         "e3e10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 71, Move 154"
+                    },
+                    {
+                        "id":  "m1_250",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #223",
+                        "fen":  "B2k5/3a5/3a5/2N6/6p2/9/1P2p1b2/1B2C4/3K1An2/3A5 w - - 0 1",
+                        "solution":  [
+                                         "c7b9"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 72, Move 86"
+                    },
+                    {
+                        "id":  "m1_251",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #224",
+                        "fen":  "CR3a3/5k3/4c4/1p1cp1p2/9/9/NPP3b2/9/3r1A3/5K3 b - - 0 1",
+                        "solution":  [
+                                         "d2d1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 78, Move 111"
+                    },
+                    {
+                        "id":  "m1_252",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #225",
+                        "fen":  "4ck3/4aa3/2R2b3/9/9/3p3p1/9/4rA3/9/3K1C3 b - - 0 1",
+                        "solution":  [
+                                         "e3d3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 81, Move 139"
+                    },
+                    {
+                        "id":  "m1_253",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #226",
+                        "fen":  "3k5/2R1a4/3P5/5P3/4r2b1/9/9/5A3/9/5K3 w - - 0 1",
+                        "solution":  [
+                                         "c9c10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 85, Move 156"
+                    },
+                    {
+                        "id":  "m1_254",
+                        "difficulty":  1,
+                        "mateIn":  1,
+                        "title":  "1수 외통 #227",
+                        "fen":  "9/4a2C1/3akc3/3pp4/9/4R4/9/2r2B3/4A4/5K3 w - - 0 1",
+                        "solution":  [
+                                         "f3h6"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 100, Move 138"
+                    },
+                    {
+                        "id":  "m2_01",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #1",
+                        "fen":  "3aka1nR/6R2/2n1c4/3pb4/2r2p3/P8/2b1Bc2P/2N1CCr2/4AK3/3A3N1 b - - 0 1",
+                        "solution":  [
+                                         "g3f3",
+                                         "f2f3",
+                                         "f4f7"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 1, Move 43"
+                    },
+                    {
+                        "id":  "m2_02",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #2",
+                        "fen":  "3ck4/4a2R1/3bca3/3pp1CN1/8r/2P6/2b3PP1/3B1K3/3AA3C/rn6R b - - 0 1",
+                        "solution":  [
+                                         "i6i3",
+                                         "g7g3",
+                                         "i3g3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 23, Move 75"
+                    },
+                    {
+                        "id":  "m2_03",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #3",
+                        "fen":  "2ba5/4ak3/1C4P2/2ppnN2R/5r3/4c4/2PN5/4C4/3AK4/5A3 w - - 0 1",
+                        "solution":  [
+                                         "g8g9",
+                                         "f9f8",
+                                         "i7i8"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 45, Move 70"
+                    },
+                    {
+                        "id":  "m2_04",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #4",
+                        "fen":  "2R1c4/4ak3/5C1c1/3N1np2/6r2/9/1PPP4p/5B3/4A4/3A1K1n1 b - - 0 1",
+                        "solution":  [
+                                         "g6g1",
+                                         "f1f2",
+                                         "g1d1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 83, Move 65"
+                    },
+                    {
+                        "id":  "m2_05",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #5",
+                        "fen":  "5a3/4ka1R1/4ccr2/p4r1p1/2pP5/9/4B3P/2R2A3/4A4/5K3 b - - 0 1",
+                        "solution":  [
+                                         "f7f3",
+                                         "f1e1",
+                                         "g8g1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 89, Move 65"
+                    },
+                    {
+                        "id":  "m2_06",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #6",
+                        "fen":  "3kc4/3aa4/9/9/9/2P3P2/8r/N2p5/2B2A3/3K1C3 b - - 0 1",
+                        "solution":  [
+                                         "d3d2",
+                                         "d1d2",
+                                         "i4d4"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 41, Move 153"
+                    },
+                    {
+                        "id":  "m2_07",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #7",
+                        "fen":  "9/3ka1R2/4C4/2B6/2r6/6R2/P3p2P1/9/4A4/c3KA3 w - - 0 1",
+                        "solution":  [
+                                         "g5d5",
+                                         "c6d6",
+                                         "d5d6"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 58, Move 110"
+                    },
+                    {
+                        "id":  "m2_08",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #8",
+                        "fen":  "2rk1a3/4n3r/4B4/6pp1/9/p2b5/1R1n2P1P/9/3C5/4CK3 b - - 0 1",
+                        "solution":  [
+                                         "i9f9",
+                                         "g4f4",
+                                         "f9f4"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 61, Move 93"
+                    },
+                    {
+                        "id":  "m2_09",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #9",
+                        "fen":  "5k1r1/2C1a3R/4ca3/2B6/5p1p1/9/3PB1P2/3A5/4A4/4KC3 w - - 0 1",
+                        "solution":  [
+                                         "f1f7",
+                                         "e9f9",
+                                         "i9f9"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 64, Move 106"
+                    },
+                    {
+                        "id":  "m2_12",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #10",
+                        "fen":  "1C1ac1b2/5k3/9/3b1pp2/3B1p3/1P1c5/7P1/3p2r2/5A3/4K4 b - - 0 1",
+                        "solution":  [
+                                         "f6e6",
+                                         "e1f1",
+                                         "g3g1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 92, Move 117"
+                    },
+                    {
+                        "id":  "m2_13",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #11",
+                        "fen":  "1C1ab4/3a3rC/3k1cR2/N2ppn1p1/4c4/2B2p3/8R/2N6/4AA3/3K5 w - - 0 1",
+                        "solution":  [
+                                         "g8f8",
+                                         "e6e8",
+                                         "a7b9"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 1, Move 82"
+                    },
+                    {
+                        "id":  "m2_15",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #12",
+                        "fen":  "R2ck4/3aa2n1/9/1p2rN3/5PP2/2B6/2P3b2/9/4AA1c1/3CK4 b - - 0 1",
+                        "solution":  [
+                                         "e7e2",
+                                         "e1f1",
+                                         "e2d1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 16, Move 115"
+                    },
+                    {
+                        "id":  "m2_16",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #13",
+                        "fen":  "4k4/4a4/5a3/2B6/9/9/4p2b1/3p5/9/3CK4 b - - 0 1",
+                        "solution":  [
+                                         "e9d9",
+                                         "d1f1",
+                                         "d3e2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 42, Move 147"
+                    },
+                    {
+                        "id":  "m2_17",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #14",
+                        "fen":  "9/3ka4/3c5/1r2c1R2/9/3P4n/n8/3A5/3KA4/4C4 b - - 0 1",
+                        "solution":  [
+                                         "b7b2",
+                                         "d2d1",
+                                         "a4c3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 46, Move 103"
+                    },
+                    {
+                        "id":  "m2_18",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #15",
+                        "fen":  "3k5/4a1R2/3rc2c1/1pp4r1/9/9/P4P1P1/5R3/5K2N/3A1A3 b - - 0 1",
+                        "solution":  [
+                                         "d8h2",
+                                         "g9g2",
+                                         "h2g2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 51, Move 71"
+                    },
+                    {
+                        "id":  "m2_19",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #16",
+                        "fen":  "4k4/5c3/9/3Nb4/5p3/9/1P1N3P1/3r2r2/3C5/3AK4 b - - 0 1",
+                        "solution":  [
+                                         "d3e3",
+                                         "d4e2",
+                                         "g3g1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 59, Move 93"
+                    },
+                    {
+                        "id":  "m2_21",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #17",
+                        "fen":  "3k1c2R/4aa3/5b3/b8/6p2/9/3r5/4R4/3B5/3KCr3 b - - 0 1",
+                        "solution":  [
+                                         "d4d2",
+                                         "d1d2",
+                                         "d10d10"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 99, Move 109"
+                    },
+                    {
+                        "id":  "m2_22",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #18",
+                        "fen":  "4kc3/4a4/3ac4/8b/9/9/2P1P4/C4A3/4A1r2/3CK1p2 b - - 0 1",
+                        "solution":  [
+                                         "g2e2",
+                                         "f3e2",
+                                         "i7g4"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 100, Move 97"
+                    },
+                    {
+                        "id":  "m2_23",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #19",
+                        "fen":  "4kaR2/3C5/9/5n3/5pp2/4p4/1PPP2b2/9/3KA4/r3C2r1 b - - 0 1",
+                        "solution":  [
+                                         "h1e1",
+                                         "d2d3",
+                                         "a1a3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 17, Move 121"
+                    },
+                    {
+                        "id":  "m2_24",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #20",
+                        "fen":  "1r1ck4/4cR3/2n2P1r1/3pb2B1/9/2pp5/4P4/9/3NAA3/4KC3 w - - 0 1",
+                        "solution":  [
+                                         "f8e9",
+                                         "c8e9",
+                                         "f9e9"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 21, Move 116"
+                    },
+                    {
+                        "id":  "m2_25",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #21",
+                        "fen":  "4c4/4k4/8R/1p1p2pp1/5B3/P1b2C1n1/5P3/4p4/3K5/9 b - - 0 1",
+                        "solution":  [
+                                         "e3e2",
+                                         "d2d3",
+                                         "h5f4"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 33, Move 89"
+                    },
+                    {
+                        "id":  "m2_26",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #22",
+                        "fen":  "4kc3/2C1a4/5r3/1pp6/3r5/5npp1/1PP3b2/R8/4A1N2/4CK3 b - - 0 1",
+                        "solution":  [
+                                         "f5e3",
+                                         "g2f4",
+                                         "f8f4"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 55, Move 89"
+                    },
+                    {
+                        "id":  "m2_27",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #23",
+                        "fen":  "9/9/4k4/3P5/2B1P2p1/5P3/1Nn6/9/4A4/2cC1K3 w - - 0 1",
+                        "solution":  [
+                                         "e6e7",
+                                         "e8f8",
+                                         "d1f3"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 63, Move 128"
+                    },
+                    {
+                        "id":  "m2_28",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #24",
+                        "fen":  "4ck3/4a4/9/6r2/B8/5n3/5B3/3A5/4AK3/8r b - - 0 1",
+                        "solution":  [
+                                         "g7g2",
+                                         "f2f3",
+                                         "i1i3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 74, Move 119"
+                    },
+                    {
+                        "id":  "m2_29",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #25",
+                        "fen":  "4kc2R/3na4/4c4/b3r4/9/1PP6/9/1b3R3/3r1A3/3N1KC2 b - - 0 1",
+                        "solution":  [
+                                         "d2d1",
+                                         "g1e1",
+                                         "d1e1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 75, Move 93"
+                    },
+                    {
+                        "id":  "m2_30",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #26",
+                        "fen":  "5c3/5k3/9/9/9/4R4/9/4p3r/4A4/4K4 b - - 0 1",
+                        "solution":  [
+                                         "i3i1",
+                                         "e2f1",
+                                         "i1f1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 87, Move 155"
+                    },
+                    {
+                        "id":  "m2_32",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #27",
+                        "fen":  "3k5/4aa3/9/1pp2R3/9/9/3rrCb2/3B5/3K1A3/9 b - - 0 1",
+                        "solution":  [
+                                         "d4d3",
+                                         "d2d3",
+                                         "d10d10"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 9, Move 93"
+                    },
+                    {
+                        "id":  "m2_33",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #28",
+                        "fen":  "2R2ar2/4kc3/3ac4/pp1pp4/9/9/1P4PP1/3C5/3KCr3/9 b - - 0 1",
+                        "solution":  [
+                                         "f2e2",
+                                         "d2d1",
+                                         "e2d3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 26, Move 103"
+                    },
+                    {
+                        "id":  "m2_34",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #29",
+                        "fen":  "4k4/4a4/2N2a3/3C5/9/9/3p5/4p4/5K3/9 b - - 0 1",
+                        "solution":  [
+                                         "d4d3",
+                                         "d7d1",
+                                         "d3e2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 27, Move 165"
+                    },
+                    {
+                        "id":  "m2_35",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #30",
+                        "fen":  "9/9/3k5/b2p2pp1/2Rn5/9/1PP1B3P/9/3KN4/2n2rB2 b - - 0 1",
+                        "solution":  [
+                                         "c1b3",
+                                         "d2d3",
+                                         "f1f3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 28, Move 81"
+                    },
+                    {
+                        "id":  "m2_38",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #31",
+                        "fen":  "4c4/3R5/3bk4/3C5/2p3r2/8P/3PP3N/9/2r6/2BAK1p2 b - - 0 1",
+                        "solution":  [
+                                         "g1f1",
+                                         "e1f1",
+                                         "g6g1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 95, Move 79"
+                    },
+                    {
+                        "id":  "m2_39",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #32",
+                        "fen":  "3ak4/4a4/2n1c4/2ppp1pp1/9/2r6/9/2nB3R1/4AN3/3K1C3 b - - 0 1",
+                        "solution":  [
+                                         "c5e5",
+                                         "d1d2",
+                                         "e5e2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 47, Move 73"
+                    },
+                    {
+                        "id":  "m2_40",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #33",
+                        "fen":  "R2bk4/4aa3/4P4/4r4/9/2p6/2c6/3AC4/3C5/3K1A3 w - - 0 1",
+                        "solution":  [
+                                         "e8e9",
+                                         "f9e9",
+                                         "a10d10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 58, Move 104"
+                    },
+                    {
+                        "id":  "m2_42",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #34",
+                        "fen":  "4k1c2/9/3Pr4/p6c1/9/7p1/9/5C3/4AK3/3AC4 w - - 0 1",
+                        "solution":  [
+                                         "d8e8",
+                                         "h7h1",
+                                         "e8e9"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 66, Move 100"
+                    },
+                    {
+                        "id":  "m2_44",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #35",
+                        "fen":  "7n1/3k5/9/7pb/5P3/1pp1N4/8B/4C4/3CK4/9 w - - 0 1",
+                        "solution":  [
+                                         "e5d7",
+                                         "c5d5",
+                                         "d2d6"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 83, Move 120"
+                    },
+                    {
+                        "id":  "m2_45",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #36",
+                        "fen":  "3a1a3/4k4/4c4/1pp2C1p1/9/2R3N2/9/4A4/4AK1n1/2B3r2 b - - 0 1",
+                        "solution":  [
+                                         "g1g2",
+                                         "f2f1",
+                                         "g2e2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 5, Move 87"
+                    },
+                    {
+                        "id":  "m2_46",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #37",
+                        "fen":  "5a3/3ak4/9/4b1p1p/5R3/1P7/2c3b2/4AB3/3KAC3/r8 b - - 0 1",
+                        "solution":  [
+                                         "e7b5",
+                                         "d2d3",
+                                         "a1a3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 13, Move 111"
+                    },
+                    {
+                        "id":  "m2_48",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #38",
+                        "fen":  "4kc3/4a4/2n1c3R/b3p2C1/6n2/1r7/9/2CN5/4AA3/4K4 b - - 0 1",
+                        "solution":  [
+                                         "b5b1",
+                                         "d3c1",
+                                         "b1c1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 25, Move 95"
+                    },
+                    {
+                        "id":  "m2_49",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #39",
+                        "fen":  "CP7/3Pk4/3aa4/9/9/6n2/6b2/3pp4/9/3b1K3 b - - 0 1",
+                        "solution":  [
+                                         "e9d9",
+                                         "a10c10",
+                                         "d3e2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 27, Move 127"
+                    },
+                    {
+                        "id":  "m2_50",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #40",
+                        "fen":  "4k4/4aa3/4c4/bp2p4/6R2/1PP6/9/5A3/3c1K3/3r5 b - - 0 1",
+                        "solution":  [
+                                         "d1e2",
+                                         "f2f1",
+                                         "e2f3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 28, Move 95"
+                    },
+                    {
+                        "id":  "m2_52",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #41",
+                        "fen":  "1c2k4/2raa4/R3c4/4p1pp1/1r7/9/4P4/9/3BA4/3K1C3 b - - 0 1",
+                        "solution":  [
+                                         "b6b1",
+                                         "f1b1",
+                                         "c9c1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 69, Move 87"
+                    },
+                    {
+                        "id":  "m2_53",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #42",
+                        "fen":  "5k3/4aB3/5b3/7p1/5R3/2C1P4/2PPPP3/4K4/4R4/4rr3 b - - 0 1",
+                        "solution":  [
+                                         "f1e2",
+                                         "e3f3",
+                                         "e2f1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 70, Move 101"
+                    },
+                    {
+                        "id":  "m2_54",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #43",
+                        "fen":  "3kc4/3ca4/2R6/1pp1p4/5bpp1/9/4r4/4C4/3BA4/4KC3 b - - 0 1",
+                        "solution":  [
+                                         "f6h3",
+                                         "e2f2",
+                                         "e4e3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 4, Move 143"
+                    },
+                    {
+                        "id":  "m2_55",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #44",
+                        "fen":  "4k4/4a4/4c4/9/6pp1/9/2b2NPP1/3AR4/5C3/r2A1K3 b - - 0 1",
+                        "solution":  [
+                                         "a1d1",
+                                         "e3e1",
+                                         "d1e1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 10, Move 129"
+                    },
+                    {
+                        "id":  "m2_56",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #45",
+                        "fen":  "3c1kb2/3aa4/6R2/5p1p1/1p3P3/N8/6b1r/4A4/4K4/5C3 b - - 0 1",
+                        "solution":  [
+                                         "i4i2",
+                                         "e2f3",
+                                         "g4d6"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 32, Move 83"
+                    },
+                    {
+                        "id":  "m2_58",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #46",
+                        "fen":  "4c4/4aa3/4k4/3RC2p1/1p4P2/P2b1P3/3rB4/6N2/3A1Abc1/3K5 w - - 0 1",
+                        "solution":  [
+                                         "e7e2",
+                                         "e8f8",
+                                         "d7f7"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 61, Move 76"
+                    },
+                    {
+                        "id":  "m2_59",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #47",
+                        "fen":  "2Rck4/3aa4/9/7pp/3Nc4/4p2P1/6b2/6R2/4N4/r2AKC2r b - - 0 1",
+                        "solution":  [
+                                         "a1d1",
+                                         "e1d1",
+                                         "i1f1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 76, Move 121"
+                    },
+                    {
+                        "id":  "m2_60",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #48",
+                        "fen":  "2b2k3/4aa3/3bc4/9/7p1/4r4/7P1/6B2/2r1A4/R2K5 b - - 0 1",
+                        "solution":  [
+                                         "e5e2",
+                                         "a1b1",
+                                         "c2d2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 18, Move 119"
+                    },
+                    {
+                        "id":  "m2_63",
+                        "difficulty":  2,
+                        "mateIn":  2,
+                        "title":  "2수 외통 #49",
+                        "fen":  "4k4/4a4/6P2/4PP3/9/9/9/2p6/5r3/4KC3 b - - 0 1",
+                        "solution":  [
+                                         "c3d3",
+                                         "f1a1",
+                                         "d3e2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 22, Move 145"
+                    },
+                    {
+                        "id":  "m3_01",
+                        "difficulty":  3,
+                        "mateIn":  3,
+                        "title":  "3수 외통 #1",
+                        "fen":  "3ck1b2/9/4c3C/5r2p/2p2p3/P2P5/2b3P2/4K3C/6r2/3A1AB2 b - - 0 1",
+                        "solution":  [
+                                         "f6e6",
+                                         "d5e5",
+                                         "e6e5",
+                                         "e3d3",
+                                         "c4a1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 69, Move 75"
+                    },
+                    {
+                        "id":  "m3_02",
+                        "difficulty":  3,
+                        "mateIn":  3,
+                        "title":  "3수 외통 #2",
+                        "fen":  "4ck3/4aa3/9/9/1p5p1/3R5/3P1r3/9/4C4/3K5 b - - 0 1",
+                        "solution":  [
+                                         "f4f1",
+                                         "d1d2",
+                                         "f1e2",
+                                         "d2d1",
+                                         "e2d3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 4, Move 97"
+                    },
+                    {
+                        "id":  "m3_03",
+                        "difficulty":  3,
+                        "mateIn":  3,
+                        "title":  "3수 외통 #3",
+                        "fen":  "3kcc3/3naa3/9/2PP5/5p3/9/n1r4R1/3A1B3/4A4/3KC4 b - - 0 1",
+                        "solution":  [
+                                         "a4b2",
+                                         "d1d2",
+                                         "c4c2",
+                                         "d2d1",
+                                         "c2e2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 14, Move 123"
+                    },
+                    {
+                        "id":  "m3_04",
+                        "difficulty":  3,
+                        "mateIn":  3,
+                        "title":  "3수 외통 #4",
+                        "fen":  "3c5/4k4/9/9/9/9/P1rR5/3A5/9/3KC4 w - - 0 1",
+                        "solution":  [
+                                         "d1e2",
+                                         "e9f8",
+                                         "d4c4",
+                                         "d10d1",
+                                         "c4f4"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 11, Move 164"
+                    },
+                    {
+                        "id":  "m3_10",
+                        "difficulty":  3,
+                        "mateIn":  3,
+                        "title":  "3수 외통 #5",
+                        "fen":  "4kc3/4a4/4b4/4pp3/9/R8/4N4/6R2/2r2A1r1/4K4 b - - 0 1",
+                        "solution":  [
+                                         "h2h1",
+                                         "g3g1",
+                                         "h1g1",
+                                         "f2f1",
+                                         "g1f1"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 59, Move 119"
+                    },
+                    {
+                        "id":  "m3_11",
+                        "difficulty":  3,
+                        "mateIn":  3,
+                        "title":  "3수 외통 #6",
+                        "fen":  "3r1a3/3kc3R/3r5/2B2P3/9/9/1P7/3N5/4A4/R2KA4 w - - 0 1",
+                        "solution":  [
+                                         "a1a9",
+                                         "d8b9",
+                                         "a9b9",
+                                         "d9d8",
+                                         "i9i8"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 76, Move 118"
+                    },
+                    {
+                        "id":  "m3_12",
+                        "difficulty":  3,
+                        "mateIn":  3,
+                        "title":  "3수 외통 #7",
+                        "fen":  "c2k5/n3a4/3a5/1N2cN2C/9/1B3P1P1/1r7/9/4AA3/n2K5 b - - 0 1",
+                        "solution":  [
+                                         "b4b1",
+                                         "d1d2",
+                                         "a1b3",
+                                         "d2d3",
+                                         "a10a3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 82, Move 89"
+                    },
+                    {
+                        "id":  "m3_14",
+                        "difficulty":  3,
+                        "mateIn":  3,
+                        "title":  "3수 외통 #8",
+                        "fen":  "9/3a1kN2/4a4/6p1p/3N5/6P2/2P4P1/9/4KC3/3A1A3 w - - 0 1",
+                        "solution":  [
+                                         "g9f7",
+                                         "e8f8",
+                                         "f7d8",
+                                         "f9e9",
+                                         "e2e2"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 92, Move 84"
+                    },
+                    {
+                        "id":  "m3_15",
+                        "difficulty":  3,
+                        "mateIn":  3,
+                        "title":  "3수 외통 #9",
+                        "fen":  "9/3k5/4cP3/p3P4/1p7/9/9/9/1r2AK3/5C3 w - - 0 1",
+                        "solution":  [
+                                         "e7e8",
+                                         "b2e2",
+                                         "f2e2",
+                                         "b6b5",
+                                         "f8e9"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 50, Move 118"
+                    },
+                    {
+                        "id":  "m3_16",
+                        "difficulty":  3,
+                        "mateIn":  3,
+                        "title":  "3수 외통 #10",
+                        "fen":  "5a2R/5k3/3Rc4/p1p6/4r4/9/6r2/9/3A1A3/3CCK3 w - - 0 1",
+                        "solution":  [
+                                         "d8i9",
+                                         "g4g9",
+                                         "i9g9",
+                                         "f9f8",
+                                         "i10f10"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 71, Move 100"
+                    },
+                    {
+                        "id":  "m3_17",
+                        "difficulty":  3,
+                        "mateIn":  3,
+                        "title":  "3수 외통 #11",
+                        "fen":  "4c4/4k4/5a3/9/7p1/9/9/3K5/9/6C2 b - - 0 1",
+                        "solution":  [
+                                         "e9e8",
+                                         "d3d2",
+                                         "f8e9",
+                                         "d2d1",
+                                         "e8d8"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 38, Move 167"
+                    },
+                    {
+                        "id":  "m3_20",
+                        "difficulty":  3,
+                        "mateIn":  3,
+                        "title":  "3수 외통 #12",
+                        "fen":  "3akc1R1/4a4/5R3/9/2p6/5C3/1r3r3/9/4K4/3A5 b - - 0 1",
+                        "solution":  [
+                                         "e9f8",
+                                         "e2d2",
+                                         "b4b2",
+                                         "d2d3",
+                                         "f4f3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 56, Move 117"
+                    },
+                    {
+                        "id":  "m3_22",
+                        "difficulty":  3,
+                        "mateIn":  3,
+                        "title":  "3수 외통 #13",
+                        "fen":  "4k4/4a1P2/5a3/1pp3RB1/9/3r5/2b6/4A4/1b1cK4/9 b - - 0 1",
+                        "solution":  [
+                                         "d2a2",
+                                         "e2f3",
+                                         "d5f5",
+                                         "h7f4",
+                                         "f5f4"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 86, Move 133"
+                    },
+                    {
+                        "id":  "m3_25",
+                        "difficulty":  3,
+                        "mateIn":  3,
+                        "title":  "3수 외통 #14",
+                        "fen":  "3kc4/3a5/3c5/3ppr3/2R6/9/6R2/5A3/4A4/1r1C1K3 b - - 0 1",
+                        "solution":  [
+                                         "b1d1",
+                                         "f1f2",
+                                         "d1e2",
+                                         "f2f1",
+                                         "e2f3"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 27, Move 137"
+                    },
+                    {
+                        "id":  "m3_26",
+                        "difficulty":  3,
+                        "mateIn":  3,
+                        "title":  "3수 외통 #15",
+                        "fen":  "3c5/4c4/4k4/3PC4/4N4/9/9/9/4K4/9 w - - 0 1",
+                        "solution":  [
+                                         "e6g7",
+                                         "e8f8",
+                                         "d7d8",
+                                         "d10d1",
+                                         "d8e8"
+                                     ],
+                        "toMove":  "blue",
+                        "source":  "Game 60, Move 196"
+                    },
+                    {
+                        "id":  "m3_28",
+                        "difficulty":  3,
+                        "mateIn":  3,
+                        "title":  "3수 외통 #16",
+                        "fen":  "1c1k5/3a5/9/9/9/5PP2/6Rb1/5C3/4AK3/3AC2r1 b - - 0 1",
+                        "solution":  [
+                                         "h1h2",
+                                         "g4g2",
+                                         "h2g2",
+                                         "f2f1",
+                                         "g2h2"
+                                     ],
+                        "toMove":  "red",
+                        "source":  "Game 93, Move 121"
+                    }
+                ]
+}

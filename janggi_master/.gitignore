@@ -43,3 +43,16 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Local debug/verification artifacts
+/device_screen*.png
+/device_screen*.jpg
+/_verify_menu*.png
+/_verify_menu*.jpg
+/jm_*.png
+/verify_titles*.png
+/verify_titles*.jpg
+/_diff_*.txt
+/tmpclaude-*-cwd
+/tmp_gib_test/
+/*.exe

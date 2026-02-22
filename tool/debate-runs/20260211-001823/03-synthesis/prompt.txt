@@ -1,0 +1,12 @@
+﻿아래 두 입장을 통합해서 최종 결론을 작성해라.
+형식:
+- 결론
+- 찬성 근거
+- 반대 근거
+- 권장 액션(즉시 실행 3개)
+
+[찬성]
+(timeout after 20 sec, retries: 0)
+
+[반대]
+(timeout after 20 sec, retries: 0)

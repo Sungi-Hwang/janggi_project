@@ -1,0 +1,29 @@
+﻿{
+    "topic":  "합성 재시도 안정화 검증",
+    "request":  "합성 재시도 안정화 검증에 대해 토론해봐",
+    "runDir":  "d:\\Project\\janggi-master\\tool\\debate-runs\\20260211-010433",
+    "pro":  {
+                "agent":  "janggi",
+                "step":  "01b-pro-retry",
+                "elapsedSec":  36.45,
+                "text":  "`2026-02-11 01:05 (GMT+9)` 기준 검증 결과입니다.\r\n\r\n- `tool/debate-runs/20260211-010433/timeline.log`:\r\n  - `01-pro`, `02-con` 모두 `timeout` 종료\r\n  - 재시도(`01b-pro-retry`, `02b-con-retry`) 시작까지만 기록\r\n- `tool/debate-runs/20260211-010433/summary.json` 없음\r\n- `03-synthesis`/`03b-synthesis-retry`/`03c-synthesis-fallback` 디렉터리도 아직 없음\r\n\r\n판정:\r\n- 이번 런(`20260211-010433`) 기준으로는 `합성 재시도 안정화 검증` **미완료/불합격**입니다.  \r\n  이유는 재시도 후 합성 단계까지 도달하지 못했고 최종 요약 파일이 생성되지 않았기 때문입니다.\r\n\r\n직전 참고 런 `tool/debate-runs/20260211-010253/summary.json`은 `synthesis.parse=local_fallback`까지는 완료됐지만, 재시도 자체는 안정적이지 않았습니다.",
+                "usage":  null,
+                "parse":  "plain_text"
+            },
+    "con":  {
+                "agent":  "debate",
+                "step":  "02b-con-retry",
+                "elapsedSec":  36.37,
+                "text":  "`2026-02-11 01:05 (GMT+9)` 기준 `합성 재시도 안정화 검증` 실행안입니다.\r\n\r\n1. 목표\r\n- `03-synthesis`의 `timeout`/`blocked_missing_inputs` 감소\r\n- 재시도 후 최종 성공률 증가\r\n- 전체 지연시간 급증 없이 안정화\r\n\r\n2. 테스트 케이스\r\n- `pro/con` 둘 다 성공 → 합성 1회 성공\r\n- 한쪽만 성공 → 축약 합성 fallback 성공\r\n- 둘 다 실패 → 합성 재시도 1~2회 후 종료 일관성\r\n- JSON 파싱 실패 → `plain_text` fallback 합성 성공\r\n\r\n3. 파라미터 기준\r\n- `synthesis timeout`: 35초\r\n- `synthesis retry`: 2회\r\n- backoff: `800ms -\u003e 1600ms` + jitter `100~300ms`\r\n- 재시도 프롬프트: 6~8줄 강제 형식\r\n\r\n4. 합격 기준\r\n- `blocked_missing_inputs \u003c= 5%`\r\n- `synthesis timeout \u003c= 10%`\r\n- `retry_success_rate \u003e= 60%`\r\n- `p95 total latency` 기존 대비 `+20%` 이내\r\n\r\n5. 기록 필드(요약 파일)\r\n- `synth_attempts`\r\n- `synth_final_parse`\r\n- `fallback_used`\r\n- `retry_delays_ms`\r\n- `end_to_end_elapsed_sec`\r\n\r\n원하면 이 기준으로 바로 체크리스트 형태의 검증 템플릿(`runbook`)까지 만들어드리겠습니다.",
+                "usage":  null,
+                "parse":  "plain_text"
+            },
+    "synthesis":  {
+                      "agent":  "main",
+                      "step":  "03c-synthesis-fallback",
+                      "elapsedSec":  0,
+                      "text":  "결론\n- 주제 \u0027합성 재시도 안정화 검증\u0027는 성능 품질을 유지하면서 지연을 낮추기 위해, 병렬 실행 + 단계별 타임아웃 정책 + 실패 허용 폴백을 함께 적용하는 전략이 최적이다.\n\n찬성 근거\n- `2026-02-11 01:05 (GMT+9)` 기준 검증 결과입니다. / - `tool/debate-runs/20260211-010433/timeline.log`:\n- 병렬 처리와 짧은 응답 형식은 체감 속도를 개선한다.\n\n반대 근거\n- `2026-02-11 01:05 (GMT+9)` 기준 `합성 재시도 안정화 검증` 실행안입니다. / 1. 목표\n- 타임아웃과 합성 실패를 방치하면 완료율이 떨어져 운영 신뢰성이 낮아진다.\n\n권장 액션(즉시 실행 3개)\n- 1) pro/con/synthesis 타임아웃을 단계별로 분리하고 timeout 비율을 측정한다.\n- 2) synthesis 품질 검증 실패 시 1회 재합성 후 로컬 폴백 합성을 사용한다.\n- 3) run별 timeline/summary를 집계해 p95 지연과 blocked 비율을 매일 확인한다.",
+                      "usage":  null,
+                      "parse":  "local_fallback"
+                  }
+}

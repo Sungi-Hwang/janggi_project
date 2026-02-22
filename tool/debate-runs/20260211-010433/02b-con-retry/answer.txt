@@ -1,0 +1,33 @@
+﻿`2026-02-11 01:05 (GMT+9)` 기준 `합성 재시도 안정화 검증` 실행안입니다.
+
+1. 목표
+- `03-synthesis`의 `timeout`/`blocked_missing_inputs` 감소
+- 재시도 후 최종 성공률 증가
+- 전체 지연시간 급증 없이 안정화
+
+2. 테스트 케이스
+- `pro/con` 둘 다 성공 → 합성 1회 성공
+- 한쪽만 성공 → 축약 합성 fallback 성공
+- 둘 다 실패 → 합성 재시도 1~2회 후 종료 일관성
+- JSON 파싱 실패 → `plain_text` fallback 합성 성공
+
+3. 파라미터 기준
+- `synthesis timeout`: 35초
+- `synthesis retry`: 2회
+- backoff: `800ms -> 1600ms` + jitter `100~300ms`
+- 재시도 프롬프트: 6~8줄 강제 형식
+
+4. 합격 기준
+- `blocked_missing_inputs <= 5%`
+- `synthesis timeout <= 10%`
+- `retry_success_rate >= 60%`
+- `p95 total latency` 기존 대비 `+20%` 이내
+
+5. 기록 필드(요약 파일)
+- `synth_attempts`
+- `synth_final_parse`
+- `fallback_used`
+- `retry_delays_ms`
+- `end_to_end_elapsed_sec`
+
+원하면 이 기준으로 바로 체크리스트 형태의 검증 템플릿(`runbook`)까지 만들어드리겠습니다.

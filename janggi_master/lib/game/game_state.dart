@@ -649,8 +649,6 @@ class GameState extends ChangeNotifier {
 
     try {
       debugPrint('_getAIMove: Starting AI move calculation');
-      // Ensure engine is ready even if caller forgot to initialize it.
-      StockfishFFI.init();
 
       // Generate FEN from current board state
       // This avoids "invalid move" errors from move history
@@ -658,20 +656,14 @@ class GameState extends ChangeNotifier {
       debugPrint('_getAIMove: Current FEN: $fen');
       debugPrint('_getAIMove: Current player: $_currentPlayer');
 
-      // Set position using FEN (no move history needed)
-      debugPrint('_getAIMove: Setting position...');
-      StockfishFFI.setPosition(fen: fen);
-
-      // Get best move with timeout
+      // Get best move in a worker isolate to keep UI responsive.
       final movetimeMs = _aiThinkingTimeSec * 1000;
       debugPrint(
           '_getAIMove: Requesting best move depth=$_aiDepth movetime=${_aiThinkingTimeSec}s...');
-      final bestMoveUCI = await Future.delayed(
-        Duration.zero,
-        () => StockfishFFI.getBestMove(
-          depth: _aiDepth,
-          movetime: movetimeMs,
-        ),
+      final bestMoveUCI = await StockfishFFI.getBestMoveIsolated(
+        fen: fen,
+        depth: _aiDepth,
+        movetime: movetimeMs,
       ).timeout(
         Duration(seconds: _aiThinkingTimeSec + 2),
         onTimeout: () {
@@ -1797,18 +1789,15 @@ class GameState extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Hint can be used in non-AI modes too, so initialize lazily here.
-      StockfishFFI.init();
-
       // Get current position as FEN
       final fen = StockfishConverter.boardToFEN(_board, _currentPlayer);
 
-      // Use the same stable command path as AI move selection.
+      // Use isolated best-move path to avoid blocking the UI thread.
       // Native analyze() path currently crashes on some devices.
-      StockfishFFI.setPosition(fen: fen);
-      final bestMoveUCI = await Future.delayed(
-        Duration.zero,
-        () => StockfishFFI.getBestMove(depth: 12, movetime: 1500),
+      final bestMoveUCI = await StockfishFFI.getBestMoveIsolated(
+        fen: fen,
+        depth: 12,
+        movetime: 1500,
       ).timeout(
         const Duration(seconds: 8),
         onTimeout: () {

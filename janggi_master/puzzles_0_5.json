@@ -1,0 +1,18 @@
+[
+  {
+    "game": 1,
+    "move": 37,
+    "mateIn": 1,
+    "fen": "3aka1n1/2R6/2ncc4/3pb3R/2r2p3/P8/2bPB3P/2N1CCr2/5K3/3A1A1N1 b - - 0 1",
+    "best": "g3g2",
+    "player": "red"
+  },
+  {
+    "game": 3,
+    "move": 59,
+    "mateIn": 1,
+    "fen": "5ar2/5k2R/5b1c1/1p3b1p1/6p2/5P1P1/7r1/4C4/4AA3/R1BCK1B2 b - - 0 1",
+    "best": "g10g9",
+    "player": "red"
+  }
+]

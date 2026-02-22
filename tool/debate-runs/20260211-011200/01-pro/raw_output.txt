@@ -1,0 +1,35 @@
+﻿`2026-02-11 01:12 (GMT+9)` 기준 실전 운영 방안(최종안)입니다.
+
+1. 운영 상태 등급
+- `GREEN`: `synthesis.parse=ok|plain_text`
+- `YELLOW`: `synthesis.parse=local_fallback`
+- `RED`: `summary.json` 미생성 또는 `blocked_missing_inputs`
+
+2. 단계별 SLA
+- `pro/con`: 45초
+- `retry`: 35초
+- `synthesis`: 45초
+- 공통 타임아웃 1개로 운영하지 말고 단계별로 분리
+
+3. 재시도 규칙
+- 최대 2회
+- `800ms -> 1600ms` + jitter `100~300ms`
+- 재시도 프롬프트는 6~8줄 고정 포맷(불필요 문장 제거)
+
+4. 합성 안정화 체인
+- `03-synthesis` 실패 -> `03b-synthesis-retry` -> 실패 시 `03c-synthesis-fallback`
+- `03c`를 실패가 아닌 “가용성 보호 모드”로 정의
+
+5. 필수 운영 지표
+- `timeout_rate`
+- `fallback_rate`
+- `retry_success_rate`
+- `p95_end_to_end_latency`
+- 런별 `failure_reason(timeout|quality_fail|arg_error)` 기록
+
+6. 일일 운영 루틴
+- 모든 런 종료 시 `timeline.log` + `summary.json` 자동 점검
+- 3일 연속 SLO 미달 시 SLA/재시도 파라미터 재조정
+- 최근 런(`tool/debate-runs/20260211-010433/summary.json`)처럼 `local_fallback`이면 품질개선 액션 트리거
+
+원하면 이 방안을 바로 `RUNBOOK.md` 체크리스트 형식으로 정리해드리겠습니다.

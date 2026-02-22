@@ -81,7 +81,8 @@ class _GameScreenState extends State<GameScreen> {
 
   Future<void> _initEngine() async {
     try {
-      StockfishFFI.init();
+      await StockfishFFI.warmupIsolated();
+      if (!mounted) return;
       setState(() {
         _engineInitialized = true;
       });
@@ -965,11 +966,5 @@ class _GameScreenState extends State<GameScreen> {
         );
       },
     );
-  }
-
-  @override
-  void dispose() {
-    StockfishFFI.cleanup();
-    super.dispose();
   }
 }

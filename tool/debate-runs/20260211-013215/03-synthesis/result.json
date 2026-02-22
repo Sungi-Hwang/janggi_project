@@ -1,0 +1,8 @@
+﻿{
+    "agent":  "main",
+    "step":  "03-synthesis",
+    "elapsedSec":  10.47,
+    "text":  "심사를 진행하려면 `Pro 의견`과 `Con 의견` 본문이 필요합니다.  \r\n두 내용을 그대로 붙여주시면, 다음 형식으로 바로 최종 결론을 작성하겠습니다:\r\n\r\n1. 결론  \r\n2. 찬성 근거  \r\n3. 반대 근거  \r\n4. 권장 액션",
+    "usage":  null,
+    "parse":  "plain_text"
+}

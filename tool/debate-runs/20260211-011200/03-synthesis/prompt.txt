@@ -1,0 +1,77 @@
+﻿아래 두 입장을 통합해서 최종 결론을 작성해라.
+형식:
+- 결론
+- 찬성 근거
+- 반대 근거
+- 권장 액션(즉시 실행 3개)
+
+[찬성]
+`2026-02-11 01:12 (GMT+9)` 기준 실전 운영 방안(최종안)입니다.
+
+1. 운영 상태 등급
+- `GREEN`: `synthesis.parse=ok|plain_text`
+- `YELLOW`: `synthesis.parse=local_fallback`
+- `RED`: `summary.json` 미생성 또는 `blocked_missing_inputs`
+
+2. 단계별 SLA
+- `pro/con`: 45초
+- `retry`: 35초
+- `synthesis`: 45초
+- 공통 타임아웃 1개로 운영하지 말고 단계별로 분리
+
+3. 재시도 규칙
+- 최대 2회
+- `800ms -> 1600ms` + jitter `100~300ms`
+- 재시도 프롬프트는 6~8줄 고정 포맷(불필요 문장 제거)
+
+4. 합성 안정화 체인
+- `03-synthesis` 실패 -> `03b-synthesis-retry` -> 실패 시 `03c-synthesis-fallback`
+- `03c`를 실패가 아닌 “가용성 보호 모드”로 정의
+
+5. 필수 운영 지표
+- `timeout_rate`
+- `fallback_rate`
+- `retry_success_rate`
+- `p95_end_to_end_latency`
+- 런별 `failure_reason(timeout|quality_fail|arg_error)` 기록
+
+6. 일일 운영 루틴
+- 모든 런 종료 시 `timeline.log` + `summary.json` 자동 점검
+- 3일 연속 SLO 미달 시 SLA/재시도 파라미터 재조정
+- 최근 런(`tool/debate-runs/20260211-010433/summary.json`)처럼 `local_fallback`이면 품질개선 액션 트리거
+
+원하면 이 방안을 바로 `RUNBOOK.md` 체크리스트 형식으로 정리해드리겠습니다.
+
+[반대]
+`2026-02-11 01:12 (GMT+9)` 기준 실전 운영안은 아래처럼 고정하면 됩니다.
+
+1. 운영 모드 2개
+- `Fast`: 지연 최소화 (`pro/con` 짧은 timeout, retry 1회)
+- `Safe`: 안정성 우선 (timeout 상향, retry 2회, fallback synthesis 강제)
+
+2. 단계별 정책
+- `pro/con`: 병렬 유지, 실패 시 짧은 형식 프롬프트로 1회 재시도
+- `synthesis`: 한쪽 입력만 있어도 축약 합성 수행
+- 완전 실패 시: 최소 결론 템플릿 반환(서비스 공백 방지)
+
+3. 재시도 표준
+- 고정 지연 금지, `exponential backoff + jitter`
+- 재시도 대상: `timeout` 중심
+- 포맷 오류: 프롬프트 축약 후 1회만
+
+4. 관측 지표(필수)
+- `p50/p95 end-to-end latency`
+- `timeout rate`
+- `retry success rate`
+- `blocked_missing_inputs rate`
+
+5. 운영 자동화
+- 연속 실패 임계치 초과 시 `degraded mode` 전환
+- 특정 에이전트 불안정 시 단일 에이전트 우회
+- 일 단위 추이 보고서로 파라미터 자동 튜닝 후보 산출
+
+6. 배포 방식
+- 파라미터 변경은 A/B(20%→50%→100%)
+- 승격 조건: `blocked rate` 개선 + `p95` 악화 허용치 이내
+
+원하면 다음으로 `Fast/Safe` 각각의 권장 기본 파라미터 값(초 단위)까지 바로 고정해드리겠습니다.

@@ -205,45 +205,28 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
                   ),
                 )
               else
-                Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: _startRecording,
-                        icon: const Icon(Icons.play_arrow),
-                        label: const Text('퍼즐 기록 시작'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF0A4D1A),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 13),
-                        ),
-                      ),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: _startRecording,
+                    icon: const Icon(Icons.play_arrow),
+                    label: const Text('퍼즐 기록 시작'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF0A4D1A),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 13),
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: _startContinueWithAi,
-                        icon: const Icon(Icons.smart_toy),
-                        label: const Text('이어하기(AI)'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF1A237E),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 13),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               const SizedBox(height: 8),
-              Text(
-                _isAiContinueMode
-                    ? '현재 배치에서 바로 AI 대국을 시작합니다.'
-                    : '이어하기(AI): 현재 배치에서 바로 AI 대국을 시작합니다.',
-                style: TextStyle(
-                  color: Colors.grey.shade700,
-                  fontSize: 12,
+              if (_isAiContinueMode)
+                Text(
+                  '현재 배치에서 바로 AI 대국을 시작합니다.',
+                  style: TextStyle(
+                    color: Colors.grey.shade700,
+                    fontSize: 12,
+                  ),
                 ),
-              ),
               const SizedBox(height: 10),
               Text(
                 _isAiContinueMode
@@ -437,66 +420,68 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
   }) {
     final tapRadius = gridSpacing * 0.52;
 
-    return DragTarget<_DragPiece>(
-      key: _boardDropKey,
-      onWillAcceptWithDetails: (_) => true,
-      onAcceptWithDetails: (details) {
-        final target = _snapDropToBoard(
-          details.offset,
-          gridSpacing: gridSpacing,
-        );
-        if (target == null) return;
+    return Positioned(
+      left: startX - tapRadius,
+      top: startY - tapRadius,
+      width: boardWidth + tapRadius * 2,
+      height: boardHeight + tapRadius * 2,
+      child: SizedBox.expand(
+        key: _boardDropKey,
+        child: DragTarget<_DragPiece>(
+          onWillAcceptWithDetails: (_) => true,
+          onAcceptWithDetails: (details) {
+            final target = _snapDropToBoard(
+              details.offset,
+              gridSpacing: gridSpacing,
+            );
+            if (target == null) return;
 
-        final dropped = details.data;
-        final targetPiece = _board.getPiece(target);
-        final errorMessage = _validateDropRule(
-          dropped: dropped,
-          target: target,
-          targetPiece: targetPiece,
-        );
-        if (errorMessage != null) {
-          _showSnack(errorMessage);
-          return;
-        }
+            final dropped = details.data;
+            final targetPiece = _board.getPiece(target);
+            final errorMessage = _validateDropRule(
+              dropped: dropped,
+              target: target,
+              targetPiece: targetPiece,
+            );
+            if (errorMessage != null) {
+              _showSnack(errorMessage);
+              return;
+            }
 
-        setState(() {
-          final source = dropped.from;
+            setState(() {
+              final source = dropped.from;
 
-          if (source != null && source != target && targetPiece != null) {
-            _board.setPiece(source, targetPiece);
-            _board.setPiece(target, dropped.piece);
-            return;
-          }
+              if (source != null && source != target && targetPiece != null) {
+                _board.setPiece(source, targetPiece);
+                _board.setPiece(target, dropped.piece);
+                return;
+              }
 
-          if (source != null && source != target) {
-            _board.setPiece(source, null);
-          }
-          _board.setPiece(target, dropped.piece);
-        });
-      },
-      builder: (context, candidateData, rejectedData) {
-        final hovering = candidateData.isNotEmpty;
-        return Positioned(
-          left: startX - tapRadius,
-          top: startY - tapRadius,
-          width: boardWidth + tapRadius * 2,
-          height: boardHeight + tapRadius * 2,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 100),
-            decoration: BoxDecoration(
-              color: hovering
-                  ? Colors.yellow.withValues(alpha: 0.08)
-                  : Colors.transparent,
-              border: hovering
-                  ? Border.all(
-                      color: Colors.yellow.withValues(alpha: 0.45),
-                      width: 2,
-                    )
-                  : null,
-            ),
-          ),
-        );
-      },
+              if (source != null && source != target) {
+                _board.setPiece(source, null);
+              }
+              _board.setPiece(target, dropped.piece);
+            });
+          },
+          builder: (context, candidateData, rejectedData) {
+            final hovering = candidateData.isNotEmpty;
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 100),
+              decoration: BoxDecoration(
+                color: hovering
+                    ? Colors.yellow.withValues(alpha: 0.08)
+                    : Colors.transparent,
+                border: hovering
+                    ? Border.all(
+                        color: Colors.yellow.withValues(alpha: 0.45),
+                        width: 2,
+                      )
+                    : null,
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 

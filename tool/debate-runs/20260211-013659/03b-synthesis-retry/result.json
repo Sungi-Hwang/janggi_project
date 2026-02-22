@@ -1,0 +1,8 @@
+﻿{
+    "agent":  "main",
+    "step":  "03b-synthesis-retry",
+    "elapsedSec":  10.15,
+    "text":  "현재 메시지에는 `Pro/Con` 본문이 아직 붙지 않았습니다.  \r\n이어서 아래 형식으로 원문을 보내주시면 바로 심사해 최종 결론을 작성하겠습니다.\r\n\r\n- `Pro: ...`\r\n- `Con: ...`",
+    "usage":  null,
+    "parse":  "plain_text"
+}

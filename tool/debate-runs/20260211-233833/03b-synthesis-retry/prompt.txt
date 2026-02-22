@@ -1,0 +1,14 @@
+﻿다음은 이미 확보된 Pro/Con 원문이다.
+원문 없음 같은 표현을 쓰지 말고 반드시 최종 판정 결론을 작성해라.
+출력 형식(반드시 준수):
+- Pro 의견 요약
+- Con 의견 요약
+- 최종 결론
+- 결론 이유
+- 즉시 액션 3개
+
+[Pro 원문]
+핵심 3가지입니다. 1. 타임아웃/재시도 예산을 단계별로 분리 pro/con, retry, synthesis 각각 별도 timeout 재시도 상한(예: 2회) 고정, 초과 시 즉시 다음 단계 2. 합성 품질 게이트 + 로컬 폴백 강제 필수 섹션 미충족/헛응답이면 qualityfail 재시도 1회 후에도 실패하면 deterministic fallback으로 종료 보장 3. 실패 코드 표준화와 지표 자동집계 timeout|inputinvalid|toolerror|qualityfail|unknown 통일 런마다 timeoutrate, retrysuccessrate, fallbackrate, p95latency 기록 최근 로그처럼 pro 단계 타임아웃이 반복될 때는 1번(예산 분리)이 가장 즉시 효과가 큽니다.
+
+[Con 원문]
+20260211 23:40 (GMT+9) 기준 토론 결론은 아래 3가지가 핵심입니다. 1. 단계별 타임아웃/재시도 분리 pro/con/retry/synthesis를 같은 정책으로 두지 말고 분리해야 안정성이 올라갑니다. 반대 포인트는 운영 복잡도 증가지만, 효과가 더 큽니다. 2. 합성 품질 게이트 + 부분 성공 폴백 입력이 timeout/empty면 합성 전에 차단하고, 한쪽만 살아도 축약 합성으로 종료해야 blocked를 줄일 수 있습니다. 반대 포인트는 구현 난이도지만, 헛응답 방지에 가장 직접적입니다. 3. 관측 지표 + 자동 완화(degraded mode) timeoutrate, retrysuccessrate, fallbackrate, p95 latency를 상시 기록하고 임계치 초과 시 자동 완화 모드로 전환해야 합니다. 반대 포인트는 초기 세팅 비용이지만, 장기 운영 안정성에 필수입니다. 즉시 적용 우선순위는 1 2 3입니다.

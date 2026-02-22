@@ -1,0 +1,32 @@
+﻿{
+    "summary":  {
+                    "generatedAt":  "2026-02-13 00:31:52",
+                    "gibFileCount":  1,
+                    "gameCount":  0,
+                    "errorCount":  0,
+                    "total":  0,
+                    "mate1Count":  0,
+                    "mate2Count":  0,
+                    "mate3Count":  0
+                },
+    "byFile":  [
+                   {
+                       "file":  "puzzle_001.gib",
+                       "games":  0,
+                       "puzzles":  0,
+                       "errors":  0
+                   }
+               ],
+    "mate1":  [
+
+              ],
+    "mate2":  [
+
+              ],
+    "mate3":  [
+
+              ],
+    "puzzles":  [
+
+                ]
+}

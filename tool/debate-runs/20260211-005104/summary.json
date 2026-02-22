@@ -1,0 +1,29 @@
+﻿{
+    "topic":  "인코딩 고정 검증",
+    "request":  "인코딩 고정 검증에 대해 토론해봐",
+    "runDir":  "d:\\Project\\janggi-master\\tool\\debate-runs\\20260211-005104",
+    "pro":  {
+                "agent":  "janggi",
+                "step":  "01-pro",
+                "elapsedSec":  34.25,
+                "text":  "(timeout after 30 sec, retries: 0)",
+                "usage":  null,
+                "parse":  "timeout"
+            },
+    "con":  {
+                "agent":  "debate",
+                "step":  "02-con",
+                "elapsedSec":  37.65,
+                "text":  "(timeout after 30 sec, retries: 0)",
+                "usage":  null,
+                "parse":  "timeout"
+            },
+    "synthesis":  {
+                      "agent":  "main",
+                      "step":  "03-synthesis",
+                      "elapsedSec":  0,
+                      "text":  "SKIPPED: missing debate bodies (proOk=False, conOk=False).",
+                      "usage":  null,
+                      "parse":  "blocked_missing_inputs"
+                  }
+}

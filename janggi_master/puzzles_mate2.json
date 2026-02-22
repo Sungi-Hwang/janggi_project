@@ -1,0 +1,62 @@
+﻿[
+    {
+        "game":  1,
+        "move":  43,
+        "mateIn":  2,
+        "fen":  "3aka1nR/6R2/2n1c4/3pb4/2r2p3/P8/2b1Bc2P/2N1CCr2/4AK3/3A3N1 b - - 0 1",
+        "solution":  [
+                         "g3f3",
+                         "f2f3",
+                         "f4f7"
+                     ],
+        "player":  "red"
+    },
+    {
+        "game":  23,
+        "move":  75,
+        "mateIn":  2,
+        "fen":  "3ck4/4a2R1/3bca3/3pp1CN1/8r/2P6/2b3PP1/3B1K3/3AA3C/rn6R b - - 0 1",
+        "solution":  [
+                         "i6i3",
+                         "g7g3",
+                         "i3g3"
+                     ],
+        "player":  "red"
+    },
+    {
+        "game":  45,
+        "move":  70,
+        "mateIn":  2,
+        "fen":  "2ba5/4ak3/1C4P2/2ppnN2R/5r3/4c4/2PN5/4C4/3AK4/5A3 w - - 0 1",
+        "solution":  [
+                         "g8g9",
+                         "f9f8",
+                         "i7i8"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "game":  83,
+        "move":  65,
+        "mateIn":  2,
+        "fen":  "2R1c4/4ak3/5C1c1/3N1np2/6r2/9/1PPP4p/5B3/4A4/3A1K1n1 b - - 0 1",
+        "solution":  [
+                         "g6g1",
+                         "f1f2",
+                         "g1d1"
+                     ],
+        "player":  "red"
+    },
+    {
+        "game":  89,
+        "move":  65,
+        "mateIn":  2,
+        "fen":  "5a3/4ka1R1/4ccr2/p4r1p1/2pP5/9/4B3P/2R2A3/4A4/5K3 b - - 0 1",
+        "solution":  [
+                         "f7f3",
+                         "f1e1",
+                         "g8g1"
+                     ],
+        "player":  "red"
+    }
+]

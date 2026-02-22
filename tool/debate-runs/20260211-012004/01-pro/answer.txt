@@ -1,0 +1,27 @@
+﻿`2026-02-11 01:20 (GMT+9)` 기준 실전 협업 설계안입니다.
+
+1. 단일 에러 분류 체계
+- 모든 실패를 `timeout | input_invalid | tool_error | quality_fail | unknown`로 강제 분류
+- 자유서술 금지, 반드시 `error_code + evidence_path` 기록
+
+2. 역할 고정
+- `Codex`: 원인분석, 코드/프롬프트 수정, 검증 결과 작성
+- `OpenClaw`: 실행, 병렬화, 재시도/타임아웃/폴백 제어
+
+3. 상태머신 고정
+- `RUN -> RETRY(최대2회) -> FALLBACK -> END`
+- 무한 재시도 금지, 예산 초과 시 즉시 FALLBACK
+
+4. 단계별 예산
+- `pro/con`, `retry`, `synthesis` 타임아웃 분리
+- 백오프+jitter 표준화 (`0.8s -> 1.6s + 100~300ms`)
+
+5. 헛응답 방지 게이트
+- 합성 결과 필수 섹션(`결론/찬성근거/반대근거/권장액션`) 검사
+- “원문 붙여달라/입력 없음” 류 응답은 `quality_fail`로 재시도
+
+6. 운영 지표와 개입 기준
+- 지표: `timeout_rate`, `retry_success_rate`, `fallback_rate`, `p95_latency`, `unknown_error_rate`
+- 개입: `unknown` 2회 연속 또는 fallback 급증 시 운영자 점검 자동 트리거
+
+원하면 이걸 바로 `RUNBOOK.md` + `summary.json 스키마` 형태로 정리해드리겠습니다.

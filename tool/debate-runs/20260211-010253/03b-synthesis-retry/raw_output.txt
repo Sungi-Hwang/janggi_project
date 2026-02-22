@@ -1,0 +1,6 @@
+﻿openclaw.cmd : error: too many arguments for 'agent'. Expected 0 arguments but got 1.
+위치 줄:7 문자:7
++       & $cmd --no-color agent --agent $agent --channel $channel --to  ...
++       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: too many...ents but got 1.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError

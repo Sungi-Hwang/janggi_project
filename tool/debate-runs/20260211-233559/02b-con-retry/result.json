@@ -1,0 +1,8 @@
+﻿{
+    "agent":  "debate",
+    "step":  "02b-con-retry",
+    "elapsedSec":  31.04,
+    "text":  "(timeout after 25 sec, retries: 0)",
+    "usage":  null,
+    "parse":  "timeout"
+}

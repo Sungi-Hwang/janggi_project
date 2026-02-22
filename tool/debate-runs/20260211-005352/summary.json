@@ -1,0 +1,29 @@
+﻿{
+    "topic":  "Codex AI와 OpenClaw AI 오케스트레이션을 성능 유지하면서 속도 최적화하는 방법",
+    "request":  "Codex AI와 OpenClaw AI 오케스트레이션을 성능 유지하면서 속도 최적화하는 방법에 대해 토론해봐",
+    "runDir":  "d:\\Project\\janggi-master\\tool\\debate-runs\\20260211-005352",
+    "pro":  {
+                "agent":  "janggi",
+                "step":  "01-pro",
+                "elapsedSec":  150.14,
+                "text":  "핵심은 이미 코드에서 병렬 실행을 하고 있는데, 실제 병목이 `병렬성`이 아니라 `타임아웃/재시도 설계`에 있다는 점입니다.\r\n\r\n- 근거: `tool/debate-runs/20260211-005104/timeline.log`에서 `01-pro`, `02-con`, `01b-pro-retry`, `02b-con-retry`가 모두 `timeout`으로 끝나고 `blocked_missing_inputs`로 종료됨.\r\n- 현재 요청도 `2026-02-11 00:53`에 `tool/debate-runs/20260211-005352/timeline.log`에서 시작만 기록된 상태라, 같은 패턴 재발 가능성이 큼.\r\n\r\n속도 최적화 우선순위(성능 유지 기준):\r\n\r\n1. 타임아웃 정책 분리\r\n- `tool/ai_debate.ps1`의 `StepTimeoutSec`를 단계별로 다르게.\r\n- `pro/con`: 짧게(예: 15~25s), `retry`: 더 짧게(예: 8~12s), `synthesis`: 중간(예: 20~30s).\r\n- 지금처럼 동일 타임아웃이면 실패 시 전체 런 지연이 크게 누적됨.\r\n\r\n2. 재시도 전략 개선\r\n- 고정 지연(`RetryDelaySec`) 대신 짧은 지수 백오프 + jitter.\r\n- 예: `0.5s -\u003e 1s`(+랜덤 100~300ms), 최대 2회.\r\n- 실패 시 즉시 같은 프롬프트 재전송보다 “초간결 포맷 강제 프롬프트”로 전환.\r\n\r\n3. 프로세스 스폰 오버헤드 축소\r\n- `Start-Job`(별도 PowerShell 프로세스) 대신 `ThreadJob`/Runspace Pool 전환.\r\n- 현재 `Invoke-AgentTurn`, `Invoke-AgentTurnsParallel`에서 매 턴 프로세스를 띄우는 구조가 tail latency를 키움 (`tool/ai_debate.ps1`).\r\n\r\n4. 실패 허용(fallback) 경로 추가\r\n- `pro` 또는 `con` 한쪽만 성공해도 synthesis를 “축약 모드”로 진행.\r\n- 지금은 둘 다 성공해야 해서 `blocked_missing_inputs` 비율이 높아짐.\r\n\r\n5. 파싱 실패를 속도 저하로 연결하지 않기\r\n- 과거 `no_json` 이력이 있으므로 JSON 파싱 실패 시 즉시 `plain_text` 수용(재시도 최소화).\r\n- `Convert-RawToResult` 경로를 “엄격 JSON 우선”이 아니라 “텍스트 우선, JSON 있으면 usage 추출”로 변경.\r\n\r\n운영 지표(필수):\r\n- `total_latency_p50/p95`\r\n- `timeout_rate` (`parse=timeout`)\r\n- `blocked_rate` (`parse=blocked_missing_inputs`)\r\n- `retry_success_rate`\r\n- 이 4개를 `summary.json`에서 집계해서 튜닝 전/후 비교.\r\n\r\n원하면 다음 단계로 `tool/ai_debate.ps1`에 위 1~4를 바로 반영하는 패치안(최소 변경 버전)으로 작성해드리겠습니다.",
+                "usage":  null,
+                "parse":  "plain_text"
+            },
+    "con":  {
+                "agent":  "debate",
+                "step":  "02b-con-retry",
+                "elapsedSec":  67.28,
+                "text":  "`2026-02-11 00:56 (GMT+9)` 기준으로, 현재 구조에서 성능 유지 + 속도 최적화의 핵심은 `병렬 실행 유지` + `타임아웃/재시도 설계 개선`입니다.\r\n\r\n1. 단계별 SLA 분리  \r\n`tool/ai_debate.ps1:7`의 단일 `StepTimeoutSec`을 단계별로 분리하세요.  \r\n`pro/con=25s`, `retry=12s`, `synthesis=35s`로 시작.\r\n\r\n2. 재시도 정책을 고정 지연에서 백오프로 변경  \r\n`tool/ai_debate.ps1:8`, `tool/ai_debate.ps1:9`, `tool/ai_debate.ps1:169`  \r\n`0.6s -\u003e 1.2s` + `jitter(100~300ms)`, 최대 2회.\r\n\r\n3. 프로세스 생성 비용 축소  \r\n`Start-Job` 반복(`tool/ai_debate.ps1:170`, `tool/ai_debate.ps1:211`)은 tail latency를 키웁니다.  \r\nRunspace Pool 또는 `ThreadJob`으로 전환해 spawn 오버헤드를 줄이세요.\r\n\r\n4. 합성 단계의 실패 허용 모드 추가  \r\n현재는 `pro/con` 둘 다 실패하면 skip됩니다(`tool/ai_debate.ps1:348` 이후).  \r\n한쪽만 성공해도 축약 synthesis를 수행하면 `blocked_missing_inputs`를 크게 줄일 수 있습니다.\r\n\r\n5. 파싱 정책 완화  \r\n`plain_text`를 정상 결과로 즉시 수용하고(`tool/ai_debate.ps1:121`, `tool/ai_debate.ps1:129`), JSON usage 추출은 보너스 처리로 두세요.\r\n\r\n6. 측정 지표 고정  \r\n튜닝 전/후를 `tool/debate-runs/*/summary.json`으로 비교:  \r\n`p50/p95 latency`, `timeout rate`, `retry success rate`, `blocked_missing_inputs rate`.\r\n\r\n현재 로그 패턴상(여러 런에서 timeout 다수), 위 1~4만 적용해도 체감 속도와 완료율이 같이 개선될 가능성이 큽니다.",
+                "usage":  null,
+                "parse":  "plain_text"
+            },
+    "synthesis":  {
+                      "agent":  "main",
+                      "step":  "03-synthesis",
+                      "elapsedSec":  58.84,
+                      "text":  "두 입장 원문이 현재 메시지에 없습니다.  \r\n통합할 `입장 A`와 `입장 B`를 붙여주시면, 핵심 쟁점을 정리해 하나의 최종 결론으로 바로 작성하겠습니다.",
+                      "usage":  null,
+                      "parse":  "plain_text"
+                  }
+}

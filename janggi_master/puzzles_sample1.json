@@ -1,0 +1,17 @@
+﻿{
+    "puzzles":  [
+                    {
+                        "file":  "기보.gib",
+                        "game":  1,
+                        "move":  43,
+                        "mateIn":  2,
+                        "fen":  "3aka1nR/6R2/2n1c4/3pb4/2r2p3/P8/2b1Bc2P/2N1CCr2/4AK3/3A3N1 b - - 0 1",
+                        "solution":  [
+                                         "g3f3",
+                                         "f2f3",
+                                         "f4f7"
+                                     ],
+                        "player":  "red"
+                    }
+                ]
+}

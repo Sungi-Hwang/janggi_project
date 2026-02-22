@@ -1,0 +1,8 @@
+﻿{
+    "agent":  "debate",
+    "step":  "02-con",
+    "elapsedSec":  49.64,
+    "text":  "`2026-02-11 01:09 (GMT+9)` 기준 실전 운영 방안은 아래처럼 가져가면 됩니다.\r\n\r\n1. 운영 모드 분리\r\n- `Normal`: 빠른 응답 우선 (`pro/con` 짧은 timeout, retry 1회)\r\n- `Safe`: 안정성 우선 (timeout 상향, retry 2회, fallback synthesis 강제)\r\n\r\n2. 단계별 SLO 설정\r\n- `pro/con`: 성공률, timeout률\r\n- `synthesis`: `blocked_missing_inputs` 비율, 최종 완료율\r\n- 전체: `p50/p95 end-to-end latency`\r\n\r\n3. 재시도 정책 표준화\r\n- 고정 딜레이 금지, `exponential backoff + jitter`\r\n- 실패 유형별 분기: `timeout`만 재시도, 포맷 오류는 프롬프트 축약 후 1회만 재시도\r\n\r\n4. 부분 성공 허용\r\n- `pro` 또는 `con` 한쪽만 성공해도 축약 synthesis 실행\r\n- 완전 실패 시에도 최소 결론 템플릿 출력(운영 공백 방지)\r\n\r\n5. 관측성(Observability) 강화\r\n- 런마다 `summary.json`에 `attempt_count`, `fallback_used`, `final_parse`, `elapsed_sec` 저장\r\n- 일 단위로 `timeout rate`, `blocked rate` 추이 모니터링\r\n\r\n6. 장애 대응 Runbook\r\n- 1차: timeout 급증 시 timeout 상향 대신 프롬프트 길이 축소\r\n- 2차: 특정 agent 불안정 시 단일-agent degraded 모드 전환\r\n- 3차: 연속 실패 임계치 초과 시 자동 circuit breaker(일시 우회)\r\n\r\n7. 배포 전략\r\n- 파라미터 변경은 A/B(예: 20% 트래픽) 후 전면 반영\r\n- 승인 기준: `blocked rate` 개선 + `p95` 악화 허용치 내\r\n\r\n원하면 이걸 바로 `운영 체크리스트 + 장애 대응 표준절차(SOP)` 형식으로 정리해드리겠습니다.",
+    "usage":  null,
+    "parse":  "plain_text"
+}

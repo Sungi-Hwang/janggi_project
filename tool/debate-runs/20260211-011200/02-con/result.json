@@ -1,0 +1,8 @@
+﻿{
+    "agent":  "debate",
+    "step":  "02-con",
+    "elapsedSec":  24.77,
+    "text":  "`2026-02-11 01:12 (GMT+9)` 기준 실전 운영안은 아래처럼 고정하면 됩니다.\r\n\r\n1. 운영 모드 2개\r\n- `Fast`: 지연 최소화 (`pro/con` 짧은 timeout, retry 1회)\r\n- `Safe`: 안정성 우선 (timeout 상향, retry 2회, fallback synthesis 강제)\r\n\r\n2. 단계별 정책\r\n- `pro/con`: 병렬 유지, 실패 시 짧은 형식 프롬프트로 1회 재시도\r\n- `synthesis`: 한쪽 입력만 있어도 축약 합성 수행\r\n- 완전 실패 시: 최소 결론 템플릿 반환(서비스 공백 방지)\r\n\r\n3. 재시도 표준\r\n- 고정 지연 금지, `exponential backoff + jitter`\r\n- 재시도 대상: `timeout` 중심\r\n- 포맷 오류: 프롬프트 축약 후 1회만\r\n\r\n4. 관측 지표(필수)\r\n- `p50/p95 end-to-end latency`\r\n- `timeout rate`\r\n- `retry success rate`\r\n- `blocked_missing_inputs rate`\r\n\r\n5. 운영 자동화\r\n- 연속 실패 임계치 초과 시 `degraded mode` 전환\r\n- 특정 에이전트 불안정 시 단일 에이전트 우회\r\n- 일 단위 추이 보고서로 파라미터 자동 튜닝 후보 산출\r\n\r\n6. 배포 방식\r\n- 파라미터 변경은 A/B(20%→50%→100%)\r\n- 승격 조건: `blocked rate` 개선 + `p95` 악화 허용치 이내\r\n\r\n원하면 다음으로 `Fast/Safe` 각각의 권장 기본 파라미터 값(초 단위)까지 바로 고정해드리겠습니다.",
+    "usage":  null,
+    "parse":  "plain_text"
+}

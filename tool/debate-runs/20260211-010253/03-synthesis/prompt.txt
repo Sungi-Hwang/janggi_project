@@ -1,0 +1,62 @@
+﻿아래 두 입장을 통합해서 최종 결론을 작성해라.
+형식:
+- 결론
+- 찬성 근거
+- 반대 근거
+- 권장 액션(즉시 실행 3개)
+
+[찬성]
+`Codex + OpenClaw` 오케스트레이션 안정화는 지금 로그 기준으로 `타임아웃 연쇄`를 끊는 게 1순위입니다.
+
+1. 단계별 타임아웃 분리
+- `tool/ai_debate.ps1:1` 파라미터를 단일 `StepTimeoutSec` 대신 단계별(`pro/con`, `retry`, `synthesis`)로 분리.
+- `pro/con` 짧게, `retry` 더 짧게, `synthesis` 중간으로 두면 실패 시 총 지연이 크게 줄어듭니다.
+
+2. 재시도 정책 고도화
+- `RetryCount`, `RetryDelaySec`(`tool/ai_debate.ps1:8-9`)를 고정값 대신 `지수 백오프 + jitter`로.
+- 재시도 프롬프트는 “같은 요청 반복”이 아니라 더 짧고 강제 포맷으로 전환.
+
+3. 부분 성공 허용
+- 현재는 `pro+con` 둘 다 실패하면 synthesis 차단(`blocked_missing_inputs`) 구조.
+- 한쪽만 성공해도 “partial synthesis”를 수행해 전체 실패율을 낮추세요.
+
+4. 병렬 실행 안정성
+- `Start-Job` 기반 병렬(`tool/ai_debate.ps1:199`)은 프로세스 오버헤드가 큼.
+- 가능하면 runspace/thread 기반 풀로 전환해 tail latency를 줄입니다.
+
+5. 파서 내구성
+- `Convert-RawToResult`에서 JSON 실패 시 즉시 `plain_text` 허용(재시도 최소화).
+- 파싱 엄격성보다 “응답 확보”를 우선순위로 두는 게 안정화에 유리합니다.
+
+6. 관측 지표 표준화
+- `timeout_rate`, `blocked_rate`, `retry_success_rate`, `p95_latency`를 `summary.json`에서 자동 집계.
+- 튜닝은 이 4개 지표 전/후 비교로만 판단하세요.
+
+즉시 적용 순서:
+1. 타임아웃/재시도 정책 분리  
+2. partial synthesis 추가  
+3. 실행기(`Start-Job`) 경량화  
+4. 지표 대시보드화
+
+[반대]
+`2026-02-11 01:03 (GMT+9)` 기준으로 안정화 전략은 아래 6개로 정리됩니다.
+
+1. 타임아웃을 단계별로 분리  
+`pro/con`, `retry`, `synthesis`를 같은 제한으로 두지 말고 각각 SLA를 설정.
+
+2. 재시도 정책 고도화  
+고정 지연 대신 `exponential backoff + jitter`, 최대 재시도 횟수 제한, 실패 유형별 재시도 여부 분리.
+
+3. 부분 성공 허용  
+한쪽 에이전트만 성공해도 축약 합성 경로로 진행해 `blocked` 종료를 줄임.
+
+4. 병렬 실행은 유지, 프로세스 스폰 비용은 축소  
+`Start-Job` 남발 대신 Runspace Pool/Thread 기반으로 전환해 tail latency 완화.
+
+5. 파싱 강건성 강화  
+JSON 실패 시 즉시 `plain_text` fallback으로 수용하고 후처리에서 정규화.
+
+6. 운영 지표 고정  
+`p50/p95 latency`, `timeout rate`, `retry success rate`, `blocked rate`를 런마다 저장해 튜닝 전후 비교.
+
+원하면 다음 단계로 `tool/ai_debate.ps1` 기준 최소 변경 안정화 패치안을 바로 줄게요.

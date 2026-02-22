@@ -1,0 +1,8 @@
+﻿{
+    "agent":  "janggi",
+    "step":  "01-pro",
+    "elapsedSec":  24.8,
+    "text":  "`2026-02-11 01:12 (GMT+9)` 기준 실전 운영 방안(최종안)입니다.\r\n\r\n1. 운영 상태 등급\r\n- `GREEN`: `synthesis.parse=ok|plain_text`\r\n- `YELLOW`: `synthesis.parse=local_fallback`\r\n- `RED`: `summary.json` 미생성 또는 `blocked_missing_inputs`\r\n\r\n2. 단계별 SLA\r\n- `pro/con`: 45초\r\n- `retry`: 35초\r\n- `synthesis`: 45초\r\n- 공통 타임아웃 1개로 운영하지 말고 단계별로 분리\r\n\r\n3. 재시도 규칙\r\n- 최대 2회\r\n- `800ms -\u003e 1600ms` + jitter `100~300ms`\r\n- 재시도 프롬프트는 6~8줄 고정 포맷(불필요 문장 제거)\r\n\r\n4. 합성 안정화 체인\r\n- `03-synthesis` 실패 -\u003e `03b-synthesis-retry` -\u003e 실패 시 `03c-synthesis-fallback`\r\n- `03c`를 실패가 아닌 “가용성 보호 모드”로 정의\r\n\r\n5. 필수 운영 지표\r\n- `timeout_rate`\r\n- `fallback_rate`\r\n- `retry_success_rate`\r\n- `p95_end_to_end_latency`\r\n- 런별 `failure_reason(timeout|quality_fail|arg_error)` 기록\r\n\r\n6. 일일 운영 루틴\r\n- 모든 런 종료 시 `timeline.log` + `summary.json` 자동 점검\r\n- 3일 연속 SLO 미달 시 SLA/재시도 파라미터 재조정\r\n- 최근 런(`tool/debate-runs/20260211-010433/summary.json`)처럼 `local_fallback`이면 품질개선 액션 트리거\r\n\r\n원하면 이 방안을 바로 `RUNBOOK.md` 체크리스트 형식으로 정리해드리겠습니다.",
+    "usage":  null,
+    "parse":  "plain_text"
+}

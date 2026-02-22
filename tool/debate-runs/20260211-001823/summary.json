@@ -1,0 +1,28 @@
+﻿{
+    "topic":  "응답 안정화 검증",
+    "runDir":  "d:\\Project\\janggi-master\\tool\\debate-runs\\20260211-001823",
+    "pro":  {
+                "agent":  "janggi",
+                "step":  "01-pro",
+                "elapsedSec":  27.87,
+                "text":  "(timeout after 20 sec, retries: 0)",
+                "usage":  null,
+                "parse":  "timeout"
+            },
+    "con":  {
+                "agent":  "debate",
+                "step":  "02-con",
+                "elapsedSec":  26.61,
+                "text":  "(timeout after 20 sec, retries: 0)",
+                "usage":  null,
+                "parse":  "timeout"
+            },
+    "synthesis":  {
+                      "agent":  "main",
+                      "step":  "03-synthesis",
+                      "elapsedSec":  26.67,
+                      "text":  "(timeout after 20 sec, retries: 0)",
+                      "usage":  null,
+                      "parse":  "timeout"
+                  }
+}

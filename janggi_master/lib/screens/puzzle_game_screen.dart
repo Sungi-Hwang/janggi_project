@@ -7,7 +7,6 @@ import '../models/piece.dart';
 import '../models/position.dart';
 import '../providers/settings_provider.dart';
 import '../screens/game_screen.dart' show GameMode;
-import '../stockfish_ffi.dart';
 import '../utils/gib_parser.dart';
 import '../widgets/evaluation_bar.dart';
 import '../widgets/game_notification_overlay.dart';
@@ -48,7 +47,6 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
   @override
   void initState() {
     super.initState();
-    StockfishFFI.init();
     _gameState = GameState(gameMode: GameMode.twoPlayer);
     _gameState.addListener(_onGameStateChanged);
     _initializePuzzle();

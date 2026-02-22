@@ -1,0 +1,8 @@
+﻿{
+    "agent":  "janggi",
+    "step":  "01-pro",
+    "elapsedSec":  16.14,
+    "text":  "`2026-02-11 01:32 (GMT+9)` 기준 디스코드 기반 다중 AI 토론 운영정책(실무형)입니다.\r\n\r\n1. 역할 분리\r\n- `Pro Agent`: 실행안 제시(근거 3, 액션 3)\r\n- `Con Agent`: 리스크/반례 제시(위험 3, 완화 3)\r\n- `Synth Agent`: 최종 결론 통합(결론/찬성근거/반대근거/즉시액션)\r\n\r\n2. 출력 표준\r\n- 모든 에이전트는 고정 템플릿 사용\r\n- 필수 섹션 누락 시 `quality_fail` 처리\r\n- 길이 제한(예: 12줄)으로 지연과 잡담 방지\r\n\r\n3. 실패 코드 표준\r\n- `timeout`, `input_invalid`, `tool_error`, `quality_fail`, `unknown`\r\n- 모든 런에서 `error_code + evidence_path` 기록 필수\r\n\r\n4. 재시도/폴백\r\n- 재시도 최대 2회\r\n- backoff+jitter 적용\r\n- 합성 실패 시 `retry -\u003e local_fallback`으로 종료 보장\r\n\r\n5. Discord 채널 정책\r\n- 운영 채널: 사용자용 결과만 출력\r\n- 로그 채널: 타임라인/에러코드/런ID만 출력\r\n- 멘션 스팸 방지(실패 반복 시 묶음 알림)\r\n\r\n6. 운영 지표(SLO)\r\n- `timeout_rate`, `retry_success_rate`, `fallback_rate`, `p95_latency`\r\n- 임계치 초과 3회 연속 시 자동 “운영자 점검 필요” 발행\r\n\r\n7. 거버넌스\r\n- 프롬프트/타임아웃 변경은 버전 관리\r\n- 정책 변경 시 A/B 런으로 성능 비교 후 반영\r\n- 민감 주제는 안전 필터 + 인간 승인 단계 추가\r\n\r\n원하면 이 정책을 바로 `Discord 운영용 SOP 체크리스트` 형식으로 변환해드리겠습니다.",
+    "usage":  null,
+    "parse":  "plain_text"
+}

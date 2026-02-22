@@ -1,0 +1,34 @@
+{
+  "summary": {
+    "generatedAt": "2026-02-14T00:57:45.245642",
+    "input": ".\\puzzles_sample1.json",
+    "depth": 12,
+    "checked": 1,
+    "valid": 1,
+    "invalid": 0
+  },
+  "details": [
+    {
+      "file": "기보.gib",
+      "game": 1,
+      "mateIn": 2,
+      "solutionLength": 3,
+      "startEval": {
+        "type": "mate",
+        "value": 2,
+        "bestmove": "g3f3"
+      },
+      "finalEval": {
+        "type": "mate",
+        "value": 0,
+        "bestmove": null
+      },
+      "startIsMate": true,
+      "finalIsMate": true,
+      "linePerfect": true,
+      "matchedMoves": 3,
+      "failedReason": null,
+      "ok": true
+    }
+  ]
+}

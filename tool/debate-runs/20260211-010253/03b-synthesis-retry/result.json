@@ -1,0 +1,8 @@
+﻿{
+    "agent":  "main",
+    "step":  "03b-synthesis-retry",
+    "elapsedSec":  5.8,
+    "text":  "openclaw.cmd : error: too many arguments for \u0027agent\u0027. Expected 0 arguments but got 1.\r\n위치 줄:7 문자:7\r\n+       \u0026 $cmd --no-color agent --agent $agent --channel $channel --to  ...\r\n+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n    + CategoryInfo          : NotSpecified: (error: too many...ents but got 1.:String) [], RemoteException\r\n    + FullyQualifiedErrorId : NativeCommandError",
+    "usage":  null,
+    "parse":  "plain_text"
+}

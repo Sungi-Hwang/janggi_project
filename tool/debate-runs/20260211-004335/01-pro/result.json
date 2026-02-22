@@ -1,0 +1,8 @@
+﻿{
+    "agent":  "janggi",
+    "step":  "01-pro",
+    "elapsedSec":  26.59,
+    "text":  "(timeout after 20 sec, retries: 0)",
+    "usage":  null,
+    "parse":  "timeout"
+}

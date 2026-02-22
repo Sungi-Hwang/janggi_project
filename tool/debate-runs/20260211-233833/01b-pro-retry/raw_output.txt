@@ -1,0 +1,15 @@
+﻿핵심 3가지입니다.
+
+1. `타임아웃/재시도 예산`을 단계별로 분리  
+- `pro/con`, `retry`, `synthesis` 각각 별도 timeout  
+- 재시도 상한(예: 2회) 고정, 초과 시 즉시 다음 단계
+
+2. `합성 품질 게이트` + `로컬 폴백` 강제  
+- 필수 섹션 미충족/헛응답이면 `quality_fail`  
+- 재시도 1회 후에도 실패하면 deterministic fallback으로 종료 보장
+
+3. `실패 코드 표준화`와 `지표 자동집계`  
+- `timeout|input_invalid|tool_error|quality_fail|unknown` 통일  
+- 런마다 `timeout_rate`, `retry_success_rate`, `fallback_rate`, `p95_latency` 기록
+
+최근 로그처럼 pro 단계 타임아웃이 반복될 때는 1번(예산 분리)이 가장 즉시 효과가 큽니다.

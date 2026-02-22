@@ -1,0 +1,832 @@
+﻿[
+    {
+        "file":  "기보11.gib",
+        "game":  98,
+        "move":  79,
+        "mateIn":  1,
+        "fen":  "3aka2R/9/4c4/3r5/1p5P1/1br2b3/8B/3n1C3/4A4/4CK3 b - - 0 1",
+        "solution":  [
+                         "f5i3"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보11.gib",
+        "game":  99,
+        "move":  109,
+        "mateIn":  2,
+        "fen":  "3k1c2R/4aa3/5b3/b8/6p2/9/3r5/4R4/3B5/3KCr3 b - - 0 1",
+        "solution":  [
+                         "d4d2",
+                         "d1d2",
+                         "d10d10"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보11.gib",
+        "game":  100,
+        "move":  97,
+        "mateIn":  2,
+        "fen":  "4kc3/4a4/3ac4/8b/9/9/2P1P4/C4A3/4A1r2/3CK1p2 b - - 0 1",
+        "solution":  [
+                         "g2e2",
+                         "f3e2",
+                         "i7g4"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보12.gib",
+        "game":  2,
+        "move":  119,
+        "mateIn":  1,
+        "fen":  "4kc3/5a3/9/9/9/2PP4r/9/2R6/9/3AKA3 b - - 0 1",
+        "solution":  [
+                         "e10e10"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보12.gib",
+        "game":  11,
+        "move":  164,
+        "mateIn":  3,
+        "fen":  "3c5/4k4/9/9/9/9/P1rR5/3A5/9/3KC4 w - - 0 1",
+        "solution":  [
+                         "d1e2",
+                         "e9f8",
+                         "d4c4",
+                         "d10d1",
+                         "c4f4"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보12.gib",
+        "game":  17,
+        "move":  121,
+        "mateIn":  2,
+        "fen":  "4kaR2/3C5/9/5n3/5pp2/4p4/1PPP2b2/9/3KA4/r3C2r1 b - - 0 1",
+        "solution":  [
+                         "h1e1",
+                         "d2d3",
+                         "a1a3"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보12.gib",
+        "game":  19,
+        "move":  102,
+        "mateIn":  1,
+        "fen":  "2b1k4/4r4/9/1pr2R3/9/9/5PP1P/9/3bA4/4KC3 w - - 0 1",
+        "solution":  [
+                         "f7f10"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보12.gib",
+        "game":  21,
+        "move":  116,
+        "mateIn":  2,
+        "fen":  "1r1ck4/4cR3/2n2P1r1/3pb2B1/9/2pp5/4P4/9/3NAA3/4KC3 w - - 0 1",
+        "solution":  [
+                         "f8e9",
+                         "c8e9",
+                         "f9e9"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보12.gib",
+        "game":  23,
+        "move":  87,
+        "mateIn":  1,
+        "fen":  "3k1c3/3aa4/3bc4/9/1pp3bB1/9/4N4/2N6/3AAB3/1R2KC1r1 b - - 0 1",
+        "solution":  [
+                         "h1f1"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보12.gib",
+        "game":  29,
+        "move":  91,
+        "mateIn":  1,
+        "fen":  "9/3aka3/9/1c1p2p2/2R2P3/1p7/6r2/9/3AK4/5A3 b - - 0 1",
+        "solution":  [
+                         "e9e9"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보12.gib",
+        "game":  33,
+        "move":  89,
+        "mateIn":  2,
+        "fen":  "4c4/4k4/8R/1p1p2pp1/5B3/P1b2C1n1/5P3/4p4/3K5/9 b - - 0 1",
+        "solution":  [
+                         "e3e2",
+                         "d2d3",
+                         "h5f4"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보12.gib",
+        "game":  39,
+        "move":  81,
+        "mateIn":  1,
+        "fen":  "4ck3/3C5/R1R6/6p1p/2Ncn4/9/3r2b2/9/3NA4/3K1A3 b - - 0 1",
+        "solution":  [
+                         "d4d2"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보12.gib",
+        "game":  42,
+        "move":  173,
+        "mateIn":  1,
+        "fen":  "4k2C1/4aa1R1/9/9/9/4r4/5p3/4p4/5c3/3K4b b - - 0 1",
+        "solution":  [
+                         "e3e2"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보12.gib",
+        "game":  44,
+        "move":  118,
+        "mateIn":  1,
+        "fen":  "4k4/2R1a4/3ac4/2B6/9/1P7/5p3/2r6/4AA3/5K1C1 w - - 0 1",
+        "solution":  [
+                         "c9c10"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보12.gib",
+        "game":  52,
+        "move":  87,
+        "mateIn":  1,
+        "fen":  "3kc4/3aa4/9/1R7/9/2PP1PP2/9/5A3/3r1B3/3C1K3 b - - 0 1",
+        "solution":  [
+                         "d2d1"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보12.gib",
+        "game":  53,
+        "move":  78,
+        "mateIn":  1,
+        "fen":  "4ck3/4aa3/1R7/7p1/8r/2b1B4/2P2PP2/4C4/2c1AA3/3C1K3 w - - 0 1",
+        "solution":  [
+                         "e5h7"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보12.gib",
+        "game":  55,
+        "move":  89,
+        "mateIn":  2,
+        "fen":  "4kc3/2C1a4/5r3/1pp6/3r5/5npp1/1PP3b2/R8/4A1N2/4CK3 b - - 0 1",
+        "solution":  [
+                         "f5e3",
+                         "g2f4",
+                         "f8f4"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보12.gib",
+        "game":  58,
+        "move":  130,
+        "mateIn":  3,
+        "fen":  "3k5/4a2c1/3ba2n1/3P5/9/9/B3r1P2/3CC4/4A4/2R1KA3 w - - 0 1",
+        "solution":  [
+                         "d7d8",
+                         "d10e10",
+                         "c1c10",
+                         "h9d9",
+                         "d8d9"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보12.gib",
+        "game":  61,
+        "move":  85,
+        "mateIn":  1,
+        "fen":  "4kc3/4a3R/3ac1r2/1pr6/9/N8/P1PPN1nB1/5A3/5A3/3C1K3 b - - 0 1",
+        "solution":  [
+                         "g4h2"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보12.gib",
+        "game":  63,
+        "move":  128,
+        "mateIn":  2,
+        "fen":  "9/9/4k4/3P5/2B1P2p1/5P3/1Nn6/9/4A4/2cC1K3 w - - 0 1",
+        "solution":  [
+                         "e6e7",
+                         "e8f8",
+                         "d1f3"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보12.gib",
+        "game":  71,
+        "move":  116,
+        "mateIn":  1,
+        "fen":  "4k4/5R3/9/1p7/9/P8/2R6/4K3r/3r1A3/3C5 w - - 0 1",
+        "solution":  [
+                         "e3e3"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보12.gib",
+        "game":  73,
+        "move":  113,
+        "mateIn":  1,
+        "fen":  "3C5/4ak3/9/9/3P5/3c2p2/PP1n5/2R1Cr3/9/4KA3 b - - 0 1",
+        "solution":  [
+                         "f3d1"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보12.gib",
+        "game":  74,
+        "move":  119,
+        "mateIn":  2,
+        "fen":  "4ck3/4a4/9/6r2/B8/5n3/5B3/3A5/4AK3/8r b - - 0 1",
+        "solution":  [
+                         "g7g2",
+                         "f2f3",
+                         "i1i3"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보12.gib",
+        "game":  75,
+        "move":  93,
+        "mateIn":  2,
+        "fen":  "4kc2R/3na4/4c4/b3r4/9/1PP6/9/1b3R3/3r1A3/3N1KC2 b - - 0 1",
+        "solution":  [
+                         "d2d1",
+                         "g1e1",
+                         "d1e1"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보12.gib",
+        "game":  79,
+        "move":  128,
+        "mateIn":  1,
+        "fen":  "3kc4/R8/3P1a3/9/3r5/6P2/9/4C4/4A4/4KA3 w - - 0 1",
+        "solution":  [
+                         "a9d9"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보12.gib",
+        "game":  81,
+        "move":  140,
+        "mateIn":  1,
+        "fen":  "3c1k3/r2a5/4RP3/9/9/9/3P5/3B5/3AK4/4C4 w - - 0 1",
+        "solution":  [
+                         "e8e10"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보12.gib",
+        "game":  82,
+        "move":  117,
+        "mateIn":  1,
+        "fen":  "3ak4/4a4/2Rcc4/3p4r/2p6/5P3/4PP3/9/4A4/4K4 b - - 0 1",
+        "solution":  [
+                         "i7i1"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보12.gib",
+        "game":  87,
+        "move":  155,
+        "mateIn":  2,
+        "fen":  "5c3/5k3/9/9/9/4R4/9/4p3r/4A4/4K4 b - - 0 1",
+        "solution":  [
+                         "i3i1",
+                         "e2f1",
+                         "i1f1"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보12.gib",
+        "game":  90,
+        "move":  62,
+        "mateIn":  1,
+        "fen":  "5a3/1c1C3R1/Rc1bk4/1pp3B1p/9/2n6/6PP1/1b4N2/2rAK4/5A3 w - - 0 1",
+        "solution":  [
+                         "e2e2"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보12.gib",
+        "game":  92,
+        "move":  126,
+        "mateIn":  2,
+        "fen":  "R8/3a1a3/5k3/7pp/1P7/5B3/5n3/9/4AC3/3KC4 w - - 0 1",
+        "solution":  [
+                         "a10a8",
+                         "f9e9",
+                         "a10a8"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보12.gib",
+        "game":  97,
+        "move":  128,
+        "mateIn":  1,
+        "fen":  "4ck3/2R6/3b2c2/9/3N5/6P2/1PP6/3Cb4/4A4/r2AK4 w - - 0 1",
+        "solution":  [
+                         "d6e8"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보13.gib",
+        "game":  4,
+        "move":  129,
+        "mateIn":  1,
+        "fen":  "4k4/3baa3/4cc3/5R3/9/2N2nPP1/9/4CK3/4A4/9 b - - 0 1",
+        "solution":  [
+                         "f5d4"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보13.gib",
+        "game":  9,
+        "move":  93,
+        "mateIn":  2,
+        "fen":  "3k5/4aa3/9/1pp2R3/9/9/3rrCb2/3B5/3K1A3/9 b - - 0 1",
+        "solution":  [
+                         "d4d3",
+                         "d2d3",
+                         "d10d10"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보13.gib",
+        "game":  26,
+        "move":  103,
+        "mateIn":  2,
+        "fen":  "2R2ar2/4kc3/3ac4/pp1pp4/9/9/1P4PP1/3C5/3KCr3/9 b - - 0 1",
+        "solution":  [
+                         "f2e2",
+                         "d2d1",
+                         "e2d3"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보13.gib",
+        "game":  27,
+        "move":  165,
+        "mateIn":  2,
+        "fen":  "4k4/4a4/2N2a3/3C5/9/9/3p5/4p4/5K3/9 b - - 0 1",
+        "solution":  [
+                         "d4d3",
+                         "d7d1",
+                         "d3e2"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보13.gib",
+        "game":  28,
+        "move":  81,
+        "mateIn":  2,
+        "fen":  "9/9/3k5/b2p2pp1/2Rn5/9/1PP1B3P/9/3KN4/2n2rB2 b - - 0 1",
+        "solution":  [
+                         "c1b3",
+                         "d2d3",
+                         "f1f3"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보13.gib",
+        "game":  29,
+        "move":  115,
+        "mateIn":  1,
+        "fen":  "5a3/1N1ck4/3R5/4pcpp1/9/4P4/6rb1/9/9/3AK4 b - - 0 1",
+        "solution":  [
+                         "g4g1"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보13.gib",
+        "game":  31,
+        "move":  68,
+        "mateIn":  2,
+        "fen":  "2b1k4/3aa4/9/1p7/9/P1P3R2/3n4r/1C1A5/9/R2AK4 w - - 0 1",
+        "solution":  [
+                         "g5g10",
+                         "i4e4",
+                         "b3e3"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보13.gib",
+        "game":  35,
+        "move":  134,
+        "mateIn":  1,
+        "fen":  "3ak4/6R2/9/5p3/9/9/2P6/9/3r5/3CK4 w - - 0 1",
+        "solution":  [
+                         "e1e1"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보13.gib",
+        "game":  40,
+        "move":  103,
+        "mateIn":  1,
+        "fen":  "2c1k4/4aa1R1/4Bb3/1Nr6/5n3/3p1b3/1P7/4C4/3CA4/3K1AB2 b - - 0 1",
+        "solution":  [
+                         "c7c1"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보13.gib",
+        "game":  53,
+        "move":  116,
+        "mateIn":  1,
+        "fen":  "1c7/5k3/9/1p4B1r/3B4p/1b7/5PPP1/r8/3AKA3/4CC2R w - - 0 1",
+        "solution":  [
+                         "f1f3"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보13.gib",
+        "game":  55,
+        "move":  96,
+        "mateIn":  2,
+        "fen":  "5k3/3a1b3/9/R4c3/3pp4/1P1P1P3/9/2B1C4/4K4/6r2 w - - 0 1",
+        "solution":  [
+                         "a7a10",
+                         "g1a1",
+                         "d5d6"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보13.gib",
+        "game":  56,
+        "move":  83,
+        "mateIn":  1,
+        "fen":  "2r1ck3/R1Na5/3R1a3/2r6/5pp2/1N7/P2P2b2/9/4A4/3K1A3 b - - 0 1",
+        "solution":  [
+                         "c7c1"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보13.gib",
+        "game":  67,
+        "move":  153,
+        "mateIn":  1,
+        "fen":  "9/4k4/4c1P2/4p4/9/3P5/6b2/5A3/3r1B3/3C1K3 b - - 0 1",
+        "solution":  [
+                         "d2d1"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보13.gib",
+        "game":  69,
+        "move":  102,
+        "mateIn":  1,
+        "fen":  "3a5/8R/3b1k3/6N2/9/5n3/9/5A1r1/4AK3/4C4 w - - 0 1",
+        "solution":  [
+                         "i9f9"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보13.gib",
+        "game":  76,
+        "move":  114,
+        "mateIn":  1,
+        "fen":  "4c4/4kaR2/9/9/3P5/6PP1/7C1/3C1B3/3AK4/6r2 w - - 0 1",
+        "solution":  [
+                         "e2e2"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보13.gib",
+        "game":  88,
+        "move":  93,
+        "mateIn":  1,
+        "fen":  "4kcR2/3b5/9/3pp4/2r6/4n2b1/R3B1P2/4NK3/4A3r/3A1C3 b - - 0 1",
+        "solution":  [
+                         "i2i3"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보13.gib",
+        "game":  92,
+        "move":  112,
+        "mateIn":  1,
+        "fen":  "4k4/5a3/3b1C3/1pp6/3P5/9/1PP2N3/9/4K2c1/3A1A3 w - - 0 1",
+        "solution":  [
+                         "e2e2"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보13.gib",
+        "game":  95,
+        "move":  79,
+        "mateIn":  2,
+        "fen":  "4c4/3R5/3bk4/3C5/2p3r2/8P/3PP3N/9/2r6/2BAK1p2 b - - 0 1",
+        "solution":  [
+                         "g1f1",
+                         "e1f1",
+                         "g6g1"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보13.gib",
+        "game":  98,
+        "move":  121,
+        "mateIn":  1,
+        "fen":  "3cck3/4a4/5a3/2pp5/9/5R3/4n4/9/5A3/5K3 b - - 0 1",
+        "solution":  [
+                         "e4g3"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보14.gib",
+        "game":  2,
+        "move":  108,
+        "mateIn":  1,
+        "fen":  "5c3/4k4/9/9/9/5P3/9/3R1p3/3B5/r2AKA3 w - - 0 1",
+        "solution":  [
+                         "e1e1"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보14.gib",
+        "game":  3,
+        "move":  82,
+        "mateIn":  1,
+        "fen":  "9/2R1a4/3kac3/1N2B3r/3p5/9/n3PP3/4C4/3AA4/3K5 w - - 0 1",
+        "solution":  [
+                         "d2d3"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보14.gib",
+        "game":  13,
+        "move":  95,
+        "mateIn":  1,
+        "fen":  "3ack3/2Rn1a2R/5b3/3P2pp1/3c5/3r5/5p3/9/2rNAA3/3KCC3 b - - 0 1",
+        "solution":  [
+                         "d5d2"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보14.gib",
+        "game":  17,
+        "move":  145,
+        "mateIn":  1,
+        "fen":  "3aka3/9/9/2R6/7p1/4p4/4n1b2/9/2N3r2/R2K1B3 b - - 0 1",
+        "solution":  [
+                         "g2d2"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보14.gib",
+        "game":  24,
+        "move":  93,
+        "mateIn":  1,
+        "fen":  "9/4ka3/3acc3/3P2R2/1p3C3/9/5p3/9/r3AK1n1/4C1B2 b - - 0 1",
+        "solution":  [
+                         "f4f3"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보14.gib",
+        "game":  25,
+        "move":  137,
+        "mateIn":  1,
+        "fen":  "4ck3/1R2a4/5c3/5pp2/9/5N3/3C5/N8/5A3/2r1nK3 b - - 0 1",
+        "solution":  [
+                         "e1c2"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보14.gib",
+        "game":  26,
+        "move":  180,
+        "mateIn":  1,
+        "fen":  "3b1k3/4a4/6P2/2N1b4/3B5/9/9/9/4A4/5K3 w - - 0 1",
+        "solution":  [
+                         "f1f1"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보14.gib",
+        "game":  27,
+        "move":  124,
+        "mateIn":  3,
+        "fen":  "3Rck3/9/c4P3/9/P8/9/9/b8/3KAB3/6r2 w - - 0 1",
+        "solution":  [
+                         "d10d9",
+                         "a3c6",
+                         "f8f9",
+                         "f10f9",
+                         "d10d9"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보14.gib",
+        "game":  29,
+        "move":  94,
+        "mateIn":  3,
+        "fen":  "3a1k3/4a4/9/2B4pp/4R4/5BPP1/1N7/1r7/4K4/9 w - - 0 1",
+        "solution":  [
+                         "e6f6",
+                         "e9f8",
+                         "f6f8",
+                         "f10e9",
+                         "f8f9"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보14.gib",
+        "game":  37,
+        "move":  106,
+        "mateIn":  1,
+        "fen":  "4ck3/6R2/3r5/7p1/3B5/9/9/9/9/3KA4 w - - 0 1",
+        "solution":  [
+                         "g9f9"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보14.gib",
+        "game":  41,
+        "move":  132,
+        "mateIn":  1,
+        "fen":  "9/5R1B1/3kc2N1/9/9/9/4p2PP/4C4/2r1AK3/6B2 w - - 0 1",
+        "solution":  [
+                         "h8f7"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보14.gib",
+        "game":  44,
+        "move":  87,
+        "mateIn":  1,
+        "fen":  "2bk3r1/3aa1R2/3c5/2B1p4/1P7/7P1/3n5/3AC1N2/6r2/4KC3 b - - 0 1",
+        "solution":  [
+                         "d4f3"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보14.gib",
+        "game":  45,
+        "move":  196,
+        "mateIn":  1,
+        "fen":  "3c1k3/9/5P2c/9/9/4B4/6b2/4CA3/4K1p2/9 w - - 0 1",
+        "solution":  [
+                         "f8e9"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보14.gib",
+        "game":  47,
+        "move":  73,
+        "mateIn":  2,
+        "fen":  "3ak4/4a4/2n1c4/2ppp1pp1/9/2r6/9/2nB3R1/4AN3/3K1C3 b - - 0 1",
+        "solution":  [
+                         "c5e5",
+                         "d1d2",
+                         "e5e2"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보14.gib",
+        "game":  58,
+        "move":  104,
+        "mateIn":  2,
+        "fen":  "R2bk4/4aa3/4P4/4r4/9/2p6/2c6/3AC4/3C5/3K1A3 w - - 0 1",
+        "solution":  [
+                         "e8e9",
+                         "f9e9",
+                         "a10d10"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보14.gib",
+        "game":  59,
+        "move":  95,
+        "mateIn":  2,
+        "fen":  "5a3/5k2n/2N6/7R1/4r4/9/BPP3P2/2N3b2/4cK3/3C5 b - - 0 1",
+        "solution":  [
+                         "e6f6",
+                         "d1f3",
+                         "f6f3"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보14.gib",
+        "game":  61,
+        "move":  89,
+        "mateIn":  1,
+        "fen":  "5R3/5r3/4ck3/3r5/4B4/9/2P6/9/4AK3/9 b - - 0 1",
+        "solution":  [
+                         "f8f8"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보14.gib",
+        "game":  62,
+        "move":  123,
+        "mateIn":  1,
+        "fen":  "9/2B1k4/9/9/1pp4p1/9/6PP1/3A1r3/9/4K4 b - - 0 1",
+        "solution":  [
+                         "e9e9"
+                     ],
+        "player":  "red"
+    },
+    {
+        "file":  "기보14.gib",
+        "game":  66,
+        "move":  100,
+        "mateIn":  2,
+        "fen":  "4k1c2/9/3Pr4/p6c1/9/7p1/9/5C3/4AK3/3AC4 w - - 0 1",
+        "solution":  [
+                         "d8e8",
+                         "h7h1",
+                         "e8e9"
+                     ],
+        "player":  "blue"
+    },
+    {
+        "file":  "기보14.gib",
+        "game":  68,
+        "move":  107,
+        "mateIn":  1,
+        "fen":  "3ck4/4aa3/4c4/5p1p1/4b4/1P4PP1/9/3C5/3AA4/3K1B2R b - - 0 1",
+        "solution":  [
+                         "e6b4"
+                     ],
+        "player":  "red"
+    }
+]
