@@ -1,12 +1,17 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../game/game_state.dart';
+import '../monetization/monetization_config.dart';
 import '../models/board.dart';
 import '../models/piece.dart';
+import '../providers/monetization_provider.dart';
 import '../providers/settings_provider.dart';
 import '../screens/settings_screen.dart';
 import '../stockfish_ffi.dart';
+import '../widgets/ad_banner_slot.dart';
 import '../widgets/captured_pieces_panel.dart';
 import '../widgets/evaluation_bar.dart';
 import '../widgets/game_notification_overlay.dart';
@@ -112,6 +117,14 @@ class _GameScreenState extends State<GameScreen> {
           child: Consumer<GameState>(
             builder: (context, gameState, child) {
               final settings = context.watch<SettingsProvider>();
+              final monetization = context.watch<MonetizationProvider>();
+
+              if (gameState.isGameOver && !_gameOverDialogShown) {
+                _gameOverDialogShown = true;
+                unawaited(context
+                    .read<MonetizationProvider>()
+                    .registerGameCompleted());
+              }
 
               if (!gameState.isGameOver && _gameOverDialogShown) {
                 _gameOverDialogShown = false;
@@ -148,8 +161,13 @@ class _GameScreenState extends State<GameScreen> {
                 children: [
                   Column(
                     children: [
+                      if (MonetizationConfig.enableInGameTopBanner)
+                        const Padding(
+                          padding: EdgeInsets.only(top: 4, bottom: 4),
+                          child: Center(child: AdBannerSlot()),
+                        ),
                       setupMode
-                          ? _buildSetupInfoBar(gameState)
+                          ? _buildSetupInfoBar(gameState, monetization)
                           : Container(
                               width: double.infinity,
                               padding: const EdgeInsets.symmetric(
@@ -181,6 +199,7 @@ class _GameScreenState extends State<GameScreen> {
                         isTop: true,
                         capturedPieces: aiCaptured,
                         pieceColor: aiIsRed ? PieceColor.blue : PieceColor.red,
+                        pieceSkin: settings.pieceSkin,
                         onTap: () => _showCapturedPiecesOverlay(
                           context,
                           aiCaptured,
@@ -194,8 +213,8 @@ class _GameScreenState extends State<GameScreen> {
                             children: [
                               Padding(
                                 padding: const EdgeInsets.symmetric(
-                                  vertical: 20,
-                                  horizontal: 4,
+                                  vertical: 18,
+                                  horizontal: 2,
                                 ),
                                 child: EvaluationBar(
                                   score: gameState.evaluationScore,
@@ -271,6 +290,7 @@ class _GameScreenState extends State<GameScreen> {
                         isTop: false,
                         capturedPieces: playerCaptured,
                         pieceColor: aiIsRed ? PieceColor.red : PieceColor.blue,
+                        pieceSkin: settings.pieceSkin,
                         onTap: () => _showCapturedPiecesOverlay(
                           context,
                           playerCaptured,
@@ -372,8 +392,16 @@ class _GameScreenState extends State<GameScreen> {
                     GameNotificationOverlay(
                       type: _getGameOverNotificationType(
                           gameState.gameOverReason),
-                      onMainMenu: () => Navigator.of(context).pop(),
-                      onRestart: () => _restartGame(gameState),
+                      onMainMenu: () {
+                        unawaited(_runGameOverAction(() {
+                          Navigator.of(context).pop();
+                        }));
+                      },
+                      onRestart: () {
+                        unawaited(_runGameOverAction(() {
+                          _restartGame(gameState);
+                        }));
+                      },
                     ),
                 ],
               );
@@ -389,6 +417,7 @@ class _GameScreenState extends State<GameScreen> {
     List<Piece> pieces,
     String title,
   ) {
+    final pieceSkin = context.read<SettingsProvider>().pieceSkin;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -401,6 +430,7 @@ class _GameScreenState extends State<GameScreen> {
             backgroundImage: '',
             boardWidth: 300,
             isOverlay: true,
+            pieceSkin: pieceSkin,
           ),
         ),
         actions: [
@@ -441,7 +471,20 @@ class _GameScreenState extends State<GameScreen> {
     return null;
   }
 
-  Widget _buildSetupInfoBar(GameState gameState) {
+  Widget _buildSetupInfoBar(
+    GameState gameState,
+    MonetizationProvider monetization,
+  ) {
+    const difficultyValues = [1, 3, 5, 7, 9, 11, 13, 15];
+    final effectiveDepth =
+        monetization.enforceDifficultyLimit(gameState.aiDepth);
+
+    if (effectiveDepth != gameState.aiDepth) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        gameState.setAIDifficulty(effectiveDepth);
+      });
+    }
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
@@ -449,7 +492,7 @@ class _GameScreenState extends State<GameScreen> {
       child: Row(
         children: [
           const Text(
-            'AI \uB09C\uC774\uB3C4',
+            'AI 난이도',
             style: TextStyle(
               color: Colors.white,
               fontSize: 14,
@@ -459,7 +502,7 @@ class _GameScreenState extends State<GameScreen> {
           const SizedBox(width: 10),
           DropdownButtonHideUnderline(
             child: DropdownButton<int>(
-              value: gameState.aiDepth,
+              value: effectiveDepth,
               dropdownColor: const Color(0xFF1F1F1F),
               style: const TextStyle(
                 color: Colors.white,
@@ -468,32 +511,15 @@ class _GameScreenState extends State<GameScreen> {
               ),
               iconEnabledColor: Colors.white,
               iconDisabledColor: Colors.white54,
-              items: const [
-                DropdownMenuItem(
-                    value: 1,
-                    child: Text('1', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(
-                    value: 3,
-                    child: Text('3', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(
-                    value: 5,
-                    child: Text('5', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(
-                    value: 7,
-                    child: Text('7', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(
-                    value: 9,
-                    child: Text('9', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(
-                    value: 11,
-                    child: Text('11', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(
-                    value: 13,
-                    child: Text('13', style: TextStyle(color: Colors.white))),
-                DropdownMenuItem(
-                    value: 15,
-                    child: Text('15', style: TextStyle(color: Colors.white))),
-              ],
+              items: difficultyValues.map((value) {
+                return DropdownMenuItem<int>(
+                  value: value,
+                  child: Text(
+                    '$value',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                );
+              }).toList(),
               onChanged: widget.gameMode == GameMode.vsAI && _engineInitialized
                   ? (value) {
                       if (value == null) return;
@@ -504,9 +530,7 @@ class _GameScreenState extends State<GameScreen> {
           ),
           const SizedBox(width: 10),
           Text(
-            _pendingPlayerColor == PieceColor.blue
-                ? '\uB0B4 \uC9C4\uC601: \uCD08'
-                : '\uB0B4 \uC9C4\uC601: \uD55C',
+            _pendingPlayerColor == PieceColor.blue ? '내 진영: 초' : '내 진영: 한',
             style: const TextStyle(
               color: Colors.white70,
               fontSize: 12,
@@ -518,6 +542,13 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
+  Future<void> _runGameOverAction(VoidCallback action) async {
+    final monetization = context.read<MonetizationProvider>();
+    await monetization.maybeShowEndGameInterstitial();
+    if (!mounted) return;
+    action();
+  }
+
   Widget _buildBoardSetupOverlay(GameState gameState) {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -526,9 +557,9 @@ class _GameScreenState extends State<GameScreen> {
         final gridSpacing = innerWidth / 8;
         final boardLeft = margin;
         final boardTop = margin;
-        final flipBoard = _effectiveAiColor == PieceColor.blue;
-        final topSide = flipBoard ? PieceColor.blue : PieceColor.red;
-        final bottomSide = flipBoard ? PieceColor.red : PieceColor.blue;
+        final topSide = _effectiveAiColor;
+        final bottomSide =
+            topSide == PieceColor.blue ? PieceColor.red : PieceColor.blue;
 
         const controlWidth = 78.0;
         const controlHeight = 34.0;
@@ -548,7 +579,7 @@ class _GameScreenState extends State<GameScreen> {
             Positioned.fill(
               child: IgnorePointer(
                 child: Container(
-                  color: Colors.black.withValues(alpha: 0.08),
+                  color: Colors.black.withValues(alpha: 0.06),
                 ),
               ),
             ),
@@ -619,7 +650,7 @@ class _GameScreenState extends State<GameScreen> {
                 width: controlWidth,
                 height: controlHeight,
                 icon: null,
-                label: '\uC9C4\uD615\uBCC0\uACBD',
+                label: '진형변경',
                 onPressed: _togglePlayerSide,
               ),
             ),
@@ -630,7 +661,7 @@ class _GameScreenState extends State<GameScreen> {
                 width: controlWidth,
                 height: controlHeight,
                 icon: null,
-                label: '\uC2DC\uC791',
+                label: '시작',
                 onPressed: _engineInitialized
                     ? () => _applySetupAndStart(gameState)
                     : null,
@@ -651,6 +682,7 @@ class _GameScreenState extends State<GameScreen> {
   }) {
     final enabled = onPressed != null;
     final radius = BorderRadius.circular(height / 2);
+    final isTextButton = label != null;
 
     return Opacity(
       opacity: enabled ? 1.0 : 0.55,
@@ -663,69 +695,33 @@ class _GameScreenState extends State<GameScreen> {
           child: InkWell(
             borderRadius: radius,
             onTap: onPressed,
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      borderRadius: radius,
-                      gradient: const LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Color(0xFFDFC096),
-                          Color(0xFFB78956),
-                          Color(0xFF7D5634),
-                        ],
-                      ),
-                      border: Border.all(
-                        color: const Color(0xFFECD9B9).withValues(alpha: 0.95),
-                        width: 1.1,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.44),
-                          blurRadius: 8,
-                          offset: const Offset(1.3, 2.3),
-                        ),
-                        BoxShadow(
-                          color:
-                              const Color(0xFFFFEFD2).withValues(alpha: 0.24),
-                          blurRadius: 3,
-                          offset: const Offset(-0.8, -0.8),
-                        ),
-                      ],
-                    ),
-                  ),
+            child: Ink(
+              decoration: BoxDecoration(
+                borderRadius: radius,
+                color: isTextButton
+                    ? const Color(0xFFC59B63)
+                    : const Color(0xFF7B5A37).withValues(alpha: 0.9),
+                border: Border.all(
+                  color: isTextButton
+                      ? const Color(0xFFF3E1BF)
+                      : const Color(0xFFE8D5B5).withValues(alpha: 0.8),
+                  width: 1.0,
                 ),
-                Positioned.fill(
-                  child: Container(
-                    margin: const EdgeInsets.all(1.6),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular((height / 2) - 2),
-                      border: Border.all(
-                        color: const Color(0xFF5B3D26).withValues(alpha: 0.42),
-                        width: 0.9,
-                      ),
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.white.withValues(alpha: 0.15),
-                          Colors.transparent,
-                        ],
-                      ),
-                    ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.22),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
                   ),
+                ],
+              ),
+              child: Center(
+                child: _buildSetupButtonContent(
+                  icon: icon,
+                  label: label,
+                  isTextButton: isTextButton,
                 ),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                  child: Center(
-                    child: _buildSetupButtonContent(icon: icon, label: label),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),
@@ -736,66 +732,45 @@ class _GameScreenState extends State<GameScreen> {
   Widget _buildSetupButtonContent({
     required IconData? icon,
     required String? label,
+    required bool isTextButton,
   }) {
-    Widget buildIcon(IconData data) {
-      return Stack(
-        alignment: Alignment.center,
-        children: [
-          Transform.translate(
-            offset: const Offset(0, 0.8),
-            child: Icon(
-              data,
-              size: 15,
-              color: Colors.black.withValues(alpha: 0.52),
-            ),
-          ),
-          Transform.translate(
-            offset: const Offset(0, -0.5),
-            child: Icon(
-              data,
-              size: 15,
-              color: Colors.white.withValues(alpha: 0.35),
-            ),
-          ),
-          Icon(
-            data,
-            size: 14.5,
-            color: const Color(0xFF2E1D11).withValues(alpha: 0.9),
-          ),
-        ],
-      );
-    }
-
     if (label != null && icon == null) {
       return Text(
         label,
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: 12.6,
+          fontSize: 12.5,
           fontWeight: FontWeight.w800,
-          color: const Color(0xFF2E1D11).withValues(alpha: 0.92),
+          color: isTextButton ? const Color(0xFF2E1D11) : Colors.white,
           letterSpacing: 0.05,
         ),
       );
     }
 
     if (icon != null && label == null) {
-      return buildIcon(icon);
+      return Icon(
+        icon,
+        size: 16,
+        color: Colors.white,
+      );
     }
 
     if (icon != null && label != null) {
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          buildIcon(icon),
+          Icon(
+            icon,
+            size: 15,
+            color: isTextButton ? const Color(0xFF2E1D11) : Colors.white,
+          ),
           const SizedBox(width: 6),
           Text(
             label,
             style: TextStyle(
-              fontSize: 13.2,
+              fontSize: 13,
               fontWeight: FontWeight.w800,
-              color: const Color(0xFF2E1D11).withValues(alpha: 0.92),
-              letterSpacing: 0.1,
+              color: isTextButton ? const Color(0xFF2E1D11) : Colors.white,
             ),
             overflow: TextOverflow.ellipsis,
           ),

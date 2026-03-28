@@ -219,6 +219,7 @@ class _CustomPuzzleRecordScreenState extends State<CustomPuzzleRecordScreen> {
                         pieceColor: topColor == PieceColor.red
                             ? PieceColor.blue
                             : PieceColor.red,
+                        pieceSkin: settings.pieceSkin,
                         onTap: () {},
                       ),
                       Expanded(
@@ -293,6 +294,7 @@ class _CustomPuzzleRecordScreenState extends State<CustomPuzzleRecordScreen> {
                         pieceColor: _bottomColor == PieceColor.red
                             ? PieceColor.blue
                             : PieceColor.red,
+                        pieceSkin: settings.pieceSkin,
                         onTap: () {},
                       ),
                       Container(

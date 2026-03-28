@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'monetization/monetization_config.dart';
 import 'models/piece.dart' show PieceColor;
+import 'providers/monetization_provider.dart';
 import 'providers/settings_provider.dart';
 import 'screens/custom_puzzle_editor_screen.dart';
 import 'screens/game_screen.dart' show GameMode, GameScreen;
 import 'screens/puzzle_list_screen.dart';
 import 'screens/settings_screen.dart';
+import 'services/monetization_service.dart';
 import 'services/settings_service.dart';
 import 'services/sound_manager.dart';
+import 'theme/janggi_skin.dart';
+import 'widgets/ad_banner_slot.dart';
 
 const bool kAutoAiTest =
     bool.fromEnvironment('AUTO_AI_TEST', defaultValue: false);
@@ -27,6 +32,9 @@ Future<void> main() async {
       providers: [
         ChangeNotifierProvider(
           create: (_) => SettingsProvider(settingsService),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => MonetizationProvider(MonetizationService())..init(),
         ),
       ],
       child: const MyApp(),
@@ -51,6 +59,15 @@ class MyApp extends StatelessWidget {
           seedColor: const Color(0xFF3E2723),
           brightness: Brightness.light,
         ),
+        fontFamily: JanggiSkin.displayFontFamily,
+        appBarTheme: const AppBarTheme(
+          titleTextStyle: TextStyle(
+            fontFamily: JanggiSkin.displayFontFamily,
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+          ),
+        ),
         useMaterial3: true,
       ),
       home: kAutoAiTest
@@ -70,6 +87,15 @@ class MainMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: MonetizationConfig.enableMainMenuBanner
+          ? const SafeArea(
+              top: false,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(0, 4, 0, 8),
+                child: Center(child: AdBannerSlot()),
+              ),
+            )
+          : null,
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -140,13 +166,18 @@ class MainMenu extends StatelessWidget {
                       neonColor: const Color(0xFF00D9FF),
                       onTap: () {
                         final settings = context.read<SettingsProvider>();
+                        final monetization =
+                            context.read<MonetizationProvider>();
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => GameScreen(
                               gameMode: GameMode.vsAI,
-                              aiDifficulty: settings.aiDifficulty,
-                              aiThinkingTimeSec: settings.aiThinkingTime,
+                              aiDifficulty: monetization.enforceDifficultyLimit(
+                                  settings.aiDifficulty),
+                              aiThinkingTimeSec:
+                                  monetization.enforceThinkingTimeLimit(
+                                      settings.aiThinkingTime),
                               aiColor: PieceColor.red,
                             ),
                           ),

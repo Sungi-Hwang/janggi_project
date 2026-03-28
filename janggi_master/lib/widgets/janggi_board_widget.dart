@@ -4,6 +4,7 @@ import '../models/board.dart';
 import '../models/piece.dart';
 import '../models/position.dart';
 import '../models/move.dart';
+import '../theme/janggi_skin.dart';
 import 'traditional_piece_widget.dart';
 
 /// Widget that renders the Janggi board
@@ -32,8 +33,8 @@ class JanggiBoardWidget extends StatefulWidget {
     this.isAnimating = false,
     this.animatingPiece,
     this.hintMove,
-    this.boardSkin = 'wood',
-    this.pieceSkin = 'traditional',
+    this.boardSkin = JanggiSkin.boardKoreanWood,
+    this.pieceSkin = JanggiSkin.pieceTraditional,
     this.showCoordinates = true,
   });
 
@@ -116,9 +117,9 @@ class _JanggiBoardWidgetState extends State<JanggiBoardWidget> {
               // Background image - rotated 90 degrees clockwise
               Positioned.fill(
                 child: RotatedBox(
-                  quarterTurns: 1, // 90 degrees clockwise
+                  quarterTurns: _getBoardTextureQuarterTurns(),
                   child: Image.asset(
-                    'assets/images/janggi_pan.png',
+                    _getBoardTextureAsset(),
                     fit: BoxFit.fill,
                     opacity: AlwaysStoppedAnimation(boardTextureOpacity),
                   ),
@@ -228,8 +229,8 @@ class _JanggiBoardWidgetState extends State<JanggiBoardWidget> {
         // Check if this piece is selected
         final isSelected = widget.selectedPosition == boardPos;
         final scale = isSelected
-            ? 1.35
-            : 1.0; // 35% larger when selected (picked up effect)
+            ? 1.25
+            : 1.0; // Slight lift without overwhelming neighboring pieces
         final effectiveSize = pieceSize * scale;
         // Offset to lift the piece up and to the left when selected (picked up)
         final liftOffsetX = isSelected ? -gridSpacing * 0.15 : 0.0;
@@ -252,7 +253,7 @@ class _JanggiBoardWidgetState extends State<JanggiBoardWidget> {
               width: effectiveSize,
               height: effectiveSize,
               child: IgnorePointer(
-                child: _buildPiece(piece, pieceSize),
+                child: _buildPiece(piece, effectiveSize),
               ),
             ),
           );
@@ -264,7 +265,7 @@ class _JanggiBoardWidgetState extends State<JanggiBoardWidget> {
               width: effectiveSize,
               height: effectiveSize,
               child: IgnorePointer(
-                child: _buildPiece(piece, pieceSize),
+                child: _buildPiece(piece, effectiveSize),
               ),
             ),
           );
@@ -306,6 +307,7 @@ class _JanggiBoardWidgetState extends State<JanggiBoardWidget> {
     Color lineColor,
   ) {
     final labels = <Widget>[];
+    const fileLabels = <String>['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
     final textStyle = TextStyle(
       fontSize: 10,
       fontWeight: FontWeight.w700,
@@ -314,8 +316,8 @@ class _JanggiBoardWidgetState extends State<JanggiBoardWidget> {
 
     for (int screenFile = 0; screenFile < 9; screenFile++) {
       final label = widget.flipBoard
-          ? (9 - screenFile).toString()
-          : (screenFile + 1).toString();
+          ? fileLabels[8 - screenFile]
+          : fileLabels[screenFile];
       final left = margin + screenFile * gridSpacing - 4;
       labels.add(
         Positioned(
@@ -361,8 +363,10 @@ class _JanggiBoardWidgetState extends State<JanggiBoardWidget> {
     switch (widget.boardSkin) {
       case 'dark':
         return const Color(0xFF4A3A2A);
+      case JanggiSkin.boardKoreanWood:
+        return const Color(0xFFE6D8BE);
       case 'classic':
-        return const Color(0xFFDFC29B);
+        return const Color(0xFFD9C09A);
       case 'wood':
       default:
         return const Color(0xFFE6C8A0);
@@ -373,8 +377,10 @@ class _JanggiBoardWidgetState extends State<JanggiBoardWidget> {
     switch (widget.boardSkin) {
       case 'dark':
         return const Color(0xFFF2E9D8);
+      case JanggiSkin.boardKoreanWood:
+        return const Color(0xFF4C2F1B);
       case 'classic':
-        return const Color(0xFF2A211B);
+        return const Color(0xFF4D2F1C);
       case 'wood':
       default:
         return Colors.black;
@@ -385,8 +391,10 @@ class _JanggiBoardWidgetState extends State<JanggiBoardWidget> {
     switch (widget.boardSkin) {
       case 'dark':
         return 0.45;
+      case JanggiSkin.boardKoreanWood:
+        return 0.24;
       case 'classic':
-        return 0.75;
+        return 0.58;
       case 'wood':
       default:
         return 0.8;
@@ -397,7 +405,10 @@ class _JanggiBoardWidgetState extends State<JanggiBoardWidget> {
     switch (widget.boardSkin) {
       case 'dark':
         return const Color(0x66000000);
+      case JanggiSkin.boardKoreanWood:
+        return const Color(0x26FFF8EB);
       case 'classic':
+        return const Color(0x12FFFFFF);
       case 'wood':
       default:
         return null;
@@ -419,7 +430,32 @@ class _JanggiBoardWidgetState extends State<JanggiBoardWidget> {
     return TraditionalPieceWidget(
       piece: piece,
       size: size * 0.85,
+      skin: widget.pieceSkin,
     );
+  }
+
+  String _getBoardTextureAsset() {
+    switch (widget.boardSkin) {
+      case JanggiSkin.boardKoreanWood:
+        return 'assets/images/장기판.png';
+      case 'classic':
+      case 'dark':
+      case 'wood':
+      default:
+        return 'assets/images/janggi_pan.png';
+    }
+  }
+
+  int _getBoardTextureQuarterTurns() {
+    switch (widget.boardSkin) {
+      case JanggiSkin.boardKoreanWood:
+        return 0;
+      case 'classic':
+      case 'dark':
+      case 'wood':
+      default:
+        return 1;
+    }
   }
 
   Widget _buildModernPiece(Piece piece, double size) {

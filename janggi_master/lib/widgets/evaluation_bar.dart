@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 /// A widget that displays the evaluation bar (Chess.com style)
 class EvaluationBar extends StatelessWidget {
+  static const double _barWidth = 20;
+
   final int? score; // centipawn score or mate distance
   final String? type; // 'cp' or 'mate'
   final bool isBlueTurn;
@@ -17,14 +19,14 @@ class EvaluationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!visible || score == null) return const SizedBox.shrink();
+    final hasValue = visible && score != null;
 
     // Convert relative score (side to move) to absolute score (Blue perspective)
     // Blue win = Positive, Red win = Negative
-    double absoluteScore;
-    String displayValue;
+    double absoluteScore = 0.0;
+    String displayValue = '';
 
-    if (type == 'mate') {
+    if (hasValue && type == 'mate') {
       // Mate distance
       int distance = score!.abs();
       bool winning = score! > 0; // Relative to current player
@@ -32,7 +34,7 @@ class EvaluationBar extends StatelessWidget {
 
       absoluteScore = blueWinning ? 100.0 : -100.0;
       displayValue = 'M$distance';
-    } else {
+    } else if (hasValue) {
       // Centipawn score (100 cp = 1 point)
       double cp = score! / 100.0;
       double absCp = isBlueTurn ? cp : -cp;
@@ -51,57 +53,59 @@ class EvaluationBar extends StatelessWidget {
     double percentage = (clamped + 1.0) / 2.0;
 
     return SizedBox(
-      width: 30,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.black,
-          borderRadius: BorderRadius.circular(4),
-          border: Border.all(color: Colors.white24, width: 1),
-        ),
-        clipBehavior: Clip.hardEdge,
-        child: Stack(
-          alignment: Alignment.bottomCenter,
-          children: [
-            // Red part (background)
-            Positioned.fill(
-              child: ColoredBox(color: Colors.red.shade900),
-            ),
-
-            // Blue part (relative to actual bar height)
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: AnimatedFractionallySizedBox(
-                duration: const Duration(milliseconds: 500),
-                curve: Curves.easeOut,
-                heightFactor: percentage,
-                widthFactor: 1.0,
-                child: ColoredBox(color: Colors.blue.shade900),
+      width: _barWidth,
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOut,
+        opacity: hasValue ? 1.0 : 0.18,
+        child: Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFF161312),
+            borderRadius: BorderRadius.circular(3),
+            border: Border.all(color: Colors.white24, width: 0.8),
+          ),
+          clipBehavior: Clip.hardEdge,
+          child: Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              Positioned.fill(
+                child: ColoredBox(color: Colors.red.shade900),
               ),
-            ),
-
-            // Center mark
-            const Center(
-              child: Divider(color: Colors.white30, thickness: 1),
-            ),
-
-            // Value text
-            Positioned(
-              top: absoluteScore < 0 ? 10 : null,
-              bottom: absoluteScore >= 0 ? 10 : null,
-              left: 0,
-              right: 0,
-              child: Text(
-                displayValue,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  shadows: [Shadow(color: Colors.black, blurRadius: 2)],
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: AnimatedFractionallySizedBox(
+                  duration: const Duration(milliseconds: 220),
+                  curve: Curves.easeOutCubic,
+                  heightFactor: percentage,
+                  widthFactor: 1.0,
+                  child: ColoredBox(color: Colors.blue.shade900),
                 ),
               ),
-            ),
-          ],
+              const Center(
+                child: Divider(color: Colors.white24, thickness: 0.8),
+              ),
+              if (hasValue)
+                Positioned(
+                  top: absoluteScore < 0 ? 6 : null,
+                  bottom: absoluteScore >= 0 ? 6 : null,
+                  left: 1,
+                  right: 1,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      displayValue,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 8,
+                        fontWeight: FontWeight.w700,
+                        shadows: [Shadow(color: Colors.black, blurRadius: 2)],
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

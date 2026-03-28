@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/piece.dart';
+import '../theme/janggi_skin.dart';
 import 'traditional_piece_widget.dart';
 
 class PlayerInfoBar extends StatelessWidget {
@@ -7,6 +8,7 @@ class PlayerInfoBar extends StatelessWidget {
   final bool isTop; 
   final List<Piece> capturedPieces;
   final PieceColor pieceColor; 
+  final String pieceSkin;
   final VoidCallback? onTap;
 
   const PlayerInfoBar({
@@ -15,6 +17,7 @@ class PlayerInfoBar extends StatelessWidget {
     required this.isTop,
     required this.capturedPieces,
     required this.pieceColor,
+    this.pieceSkin = JanggiSkin.pieceTraditional,
     this.onTap,
   });
 
@@ -25,7 +28,7 @@ class PlayerInfoBar extends StatelessWidget {
       child: Container(
         height: 44,
         padding: const EdgeInsets.symmetric(horizontal: 8),
-        color: Colors.black.withOpacity(0.05),
+        color: Colors.black.withValues(alpha: 0.05),
         child: Row(
           children: isTop ? [
             _buildAvatar(),
@@ -110,6 +113,7 @@ class PlayerInfoBar extends StatelessWidget {
           child: TraditionalPieceWidget(
             piece: piece,
             size: 22,
+            skin: pieceSkin,
           ),
         ),
         const SizedBox(width: 1),

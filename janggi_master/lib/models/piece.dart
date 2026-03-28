@@ -1,38 +1,39 @@
-/// Represents piece types in Janggi
+/// Represents piece types in Janggi.
 enum PieceType {
-  general,  // 將(General/King)
-  guard,    // 士(Guard/Advisor)
-  horse,    // 馬(Horse/Knight)
-  elephant, // 象(Elephant)
-  chariot,  // 車(Chariot/Rook)
-  cannon,   // 包(Cannon)
-  soldier,  // 卒(Soldier/Pawn)
+  general,
+  guard,
+  horse,
+  elephant,
+  chariot,
+  cannon,
+  soldier,
 }
 
-/// Represents piece colors (players)
+/// Represents piece colors (players).
+///
+/// This app uses:
+/// - blue = 초 (楚), first move, bottom side
+/// - red = 한 (漢), second move, top side
 enum PieceColor {
-  red,   // Cho (Red/Han)
-  blue,  // Han (Blue/Chu)
+  red,
+  blue,
 }
 
-/// Represents initial piece setup configurations
-/// 외상 = Elephant outside (Chariot-Elephant-Horse)
-/// 내상 = Elephant inside (Chariot-Horse-Elephant)
+/// Represents initial piece setup configurations.
+///
+/// 외상 = 차-상-마
+/// 내상 = 차-마-상
 enum PieceSetup {
-  /// 상마마상 (Elephant-Horse-Horse-Elephant)
-  /// Left: 차상마, Right: 마상차
+  /// 상마마상
   elephantHorseHorseElephant,
 
-  /// 상마상마 (Elephant-Horse-Elephant-Horse)
-  /// Left: 차상마, Right: 상마차
+  /// 상마상마
   elephantHorseElephantHorse,
 
-  /// 마상상마 (Horse-Elephant-Elephant-Horse)
-  /// Left: 차마상, Right: 상마차
+  /// 마상상마
   horseElephantElephantHorse,
 
-  /// 마상마상 (Horse-Elephant-Horse-Elephant)
-  /// Left: 차마상, Right: 마상차
+  /// 마상마상
   horseElephantHorseElephant,
 }
 
@@ -53,18 +54,58 @@ extension PieceSetupExtension on PieceSetup {
   String get description {
     switch (this) {
       case PieceSetup.elephantHorseHorseElephant:
-        return '외상 배치 (차상마-마상차)';
+        return '외상 배치 (차상마 · 마상차)';
       case PieceSetup.elephantHorseElephantHorse:
-        return '차상마-상마차';
+        return '차상마 · 상마차';
       case PieceSetup.horseElephantElephantHorse:
-        return '차마상-상마차';
+        return '차마상 · 상마차';
       case PieceSetup.horseElephantHorseElephant:
-        return '내상 배치 (차마상-마상차)';
+        return '내상 배치 (차마상 · 마상차)';
     }
   }
 }
 
-/// Represents a Janggi piece
+extension PieceTypeVisualExtension on PieceType {
+  /// Visual size ratio for a more Korean Janggi-like hierarchy.
+  ///
+  /// 궁/차 are slightly larger, 사 is smaller, 졸/병 is the smallest.
+  double get faceScale {
+    switch (this) {
+      case PieceType.general:
+        return 1.08;
+      case PieceType.chariot:
+        return 1.03;
+      case PieceType.horse:
+      case PieceType.elephant:
+        return 0.98;
+      case PieceType.cannon:
+        return 0.96;
+      case PieceType.guard:
+        return 0.91;
+      case PieceType.soldier:
+        return 0.82;
+    }
+  }
+
+  double get glyphScale {
+    switch (this) {
+      case PieceType.general:
+        return 1.05;
+      case PieceType.chariot:
+        return 1.0;
+      case PieceType.horse:
+      case PieceType.elephant:
+      case PieceType.cannon:
+        return 0.98;
+      case PieceType.guard:
+        return 0.95;
+      case PieceType.soldier:
+        return 0.9;
+    }
+  }
+}
+
+/// Represents a Janggi piece.
 class Piece {
   final PieceType type;
   final PieceColor color;
@@ -74,14 +115,17 @@ class Piece {
     required this.color,
   });
 
-  /// Get Korean character representation
+  /// Korean Hanja used on a traditional Korean Janggi piece set.
+  ///
+  /// - blue (초): 楚, 士, 馬, 象, 車, 包, 卒
+  /// - red (한): 漢, 士, 馬, 象, 車, 包, 兵
   String get character {
     if (color == PieceColor.red) {
       switch (type) {
         case PieceType.general:
           return '漢';
         case PieceType.guard:
-          return '仕';
+          return '士';
         case PieceType.horse:
           return '馬';
         case PieceType.elephant:
@@ -91,7 +135,7 @@ class Piece {
         case PieceType.cannon:
           return '包';
         case PieceType.soldier:
-          return '卒';
+          return '兵';
       }
     } else {
       switch (type) {
@@ -106,18 +150,18 @@ class Piece {
         case PieceType.chariot:
           return '車';
         case PieceType.cannon:
-          return '砲';
+          return '包';
         case PieceType.soldier:
-          return '兵';
+          return '卒';
       }
     }
   }
 
-  /// Get English name
+  /// English name.
   String get name {
     switch (type) {
       case PieceType.general:
-        return color == PieceColor.red ? 'Han' : 'Chu';
+        return color == PieceColor.red ? 'Han' : 'Cho';
       case PieceType.guard:
         return 'Guard';
       case PieceType.horse:

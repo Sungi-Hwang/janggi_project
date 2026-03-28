@@ -56,3 +56,4 @@ app.*.map.json
 /tmpclaude-*-cwd
 /tmp_gib_test/
 /*.exe
+/test_tmp/

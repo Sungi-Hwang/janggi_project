@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../models/board.dart';
 import '../models/piece.dart';
 import '../models/position.dart';
+import '../providers/monetization_provider.dart';
 import '../providers/settings_provider.dart';
 import '../widgets/janggi_board_widget.dart' show BoardLinesPainter;
 import '../widgets/traditional_piece_widget.dart';
@@ -33,6 +34,11 @@ class _PreGameSetupScreenState extends State<PreGameSetupScreen> {
   @override
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsProvider>();
+    final monetization = context.watch<MonetizationProvider>();
+    final effectiveDifficulty =
+        monetization.enforceDifficultyLimit(settings.aiDifficulty);
+    final effectiveThinkingTime =
+        monetization.enforceThinkingTimeLimit(settings.aiThinkingTime);
 
     return Scaffold(
       body: Container(
@@ -69,7 +75,7 @@ class _PreGameSetupScreenState extends State<PreGameSetupScreen> {
                     ),
                     IconButton(
                       icon: const Icon(Icons.settings, color: Colors.white),
-                      tooltip: '설정',
+                      tooltip: '?ㅼ젙',
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -99,8 +105,8 @@ class _PreGameSetupScreenState extends State<PreGameSetupScreen> {
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
-                      Text('AI 난이도: depth ${settings.aiDifficulty}'),
-                      Text('AI 생각시간: 최대 ${settings.aiThinkingTime}초'),
+                      Text('AI 난이도: depth $effectiveDifficulty'),
+                      Text('AI 생각시간: 최대 $effectiveThinkingTime초'),
                       const SizedBox(height: 8),
                       Row(
                         children: [
@@ -137,7 +143,7 @@ class _PreGameSetupScreenState extends State<PreGameSetupScreen> {
                       const Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          '장기판 위에서 바로 배치 설정',
+                          '?κ린???꾩뿉??諛붾줈 諛곗튂 ?ㅼ젙',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 16,
@@ -149,12 +155,12 @@ class _PreGameSetupScreenState extends State<PreGameSetupScreen> {
                       Expanded(
                         child: AspectRatio(
                           aspectRatio: 9 / 10,
-                          child: _buildBoardSetupArea(settings),
+                          child: _buildBoardSetupArea(settings, monetization),
                         ),
                       ),
                       const SizedBox(height: 10),
                       const Text(
-                        '말/상 위치는 각 화살표(<->)로 변경하고, 가운데 ↑↓ 버튼으로 초/한 배치를 통째로 교환합니다.',
+                        '留????꾩튂??媛??붿궡??<->)濡?蹂寃쏀븯怨? 媛?대뜲 ?묅넃 踰꾪듉?쇰줈 珥???諛곗튂瑜??듭㎏濡?援먰솚?⑸땲??',
                         style: TextStyle(color: Colors.white, fontSize: 12),
                         textAlign: TextAlign.center,
                       ),
@@ -169,7 +175,10 @@ class _PreGameSetupScreenState extends State<PreGameSetupScreen> {
     );
   }
 
-  Widget _buildBoardSetupArea(SettingsProvider settings) {
+  Widget _buildBoardSetupArea(
+    SettingsProvider settings,
+    MonetizationProvider monetization,
+  ) {
     final board = _previewBoard();
 
     return Container(
@@ -218,7 +227,13 @@ class _PreGameSetupScreenState extends State<PreGameSetupScreen> {
                   ),
                 ),
               ),
-              ..._buildPreviewPieces(board, startX, startY, gridSpacing),
+              ..._buildPreviewPieces(
+                board,
+                startX,
+                startY,
+                gridSpacing,
+                settings.pieceSkin,
+              ),
               _buildFlankButton(
                 top: startY - gridSpacing * 0.55,
                 left: startX + gridSpacing * 1.5 - 18,
@@ -250,14 +265,14 @@ class _PreGameSetupScreenState extends State<PreGameSetupScreen> {
                       child: IconButton(
                         onPressed: _swapSides,
                         icon: const Icon(Icons.swap_vert, color: Colors.white),
-                        tooltip: '초/한 배치 교환',
+                        tooltip: '珥???諛곗튂 援먰솚',
                       ),
                     ),
                     const SizedBox(width: 8),
                     ElevatedButton.icon(
-                      onPressed: () => _startGame(settings),
+                      onPressed: () => _startGame(settings, monetization),
                       icon: const Icon(Icons.play_arrow),
-                      label: const Text('시작'),
+                      label: const Text('?쒖옉'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF0A4D1A),
                         foregroundColor: Colors.white,
@@ -278,6 +293,7 @@ class _PreGameSetupScreenState extends State<PreGameSetupScreen> {
     double startX,
     double startY,
     double gridSpacing,
+    String pieceSkin,
   ) {
     final widgets = <Widget>[];
 
@@ -297,7 +313,11 @@ class _PreGameSetupScreenState extends State<PreGameSetupScreen> {
             width: size,
             height: size,
             child: IgnorePointer(
-              child: TraditionalPieceWidget(piece: piece, size: size),
+              child: TraditionalPieceWidget(
+                piece: piece,
+                size: size,
+                skin: pieceSkin,
+              ),
             ),
           ),
         );
@@ -320,7 +340,7 @@ class _PreGameSetupScreenState extends State<PreGameSetupScreen> {
         child: IconButton(
           onPressed: onPressed,
           icon: const Icon(Icons.swap_horiz, color: Colors.white, size: 18),
-          tooltip: '마/상 위치 교환',
+          tooltip: '留????꾩튂 援먰솚',
         ),
       ),
     );
@@ -380,17 +400,26 @@ class _PreGameSetupScreenState extends State<PreGameSetupScreen> {
     return PieceSetup.horseElephantHorseElephant;
   }
 
-  void _startGame(SettingsProvider settings) {
+  void _startGame(
+    SettingsProvider settings,
+    MonetizationProvider monetization,
+  ) {
     final aiColor =
         _playerColor == PieceColor.blue ? PieceColor.red : PieceColor.blue;
+    final aiDifficulty = monetization.enforceDifficultyLimit(
+      settings.aiDifficulty,
+    );
+    final aiThinkingTime = monetization.enforceThinkingTimeLimit(
+      settings.aiThinkingTime,
+    );
 
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => GameScreen(
           gameMode: widget.gameMode,
-          aiDifficulty: settings.aiDifficulty,
-          aiThinkingTimeSec: settings.aiThinkingTime,
+          aiDifficulty: aiDifficulty,
+          aiThinkingTimeSec: aiThinkingTime,
           aiColor: widget.gameMode == GameMode.vsAI ? aiColor : PieceColor.red,
           blueSetup: _blueSetup,
           redSetup: _redSetup,

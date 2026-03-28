@@ -20,6 +20,8 @@ class StockfishFFI {
   static bool _initialized = false;
   static const int _defaultHashMb = 64;
   static const int _maxDefaultThreads = 4;
+  static final RegExp _uciMovePattern =
+      RegExp(r'^([a-i])(10|[1-9])([a-i])(10|[1-9])$', caseSensitive: false);
   static const int _minHashMb = 16;
   static const int _maxHashMb = 512;
   static const int _maxThreads = 64;
@@ -108,9 +110,9 @@ class StockfishFFI {
         print('Setting Hash to ${resolvedHashMb}MB...');
         _commandUnchecked('setoption name Hash value $resolvedHashMb');
 
-        // Set MultiPV for variety in moves (analyze top 3 moves)
-        print('Setting MultiPV to 3 for move variety...');
-        _commandUnchecked('setoption name MultiPV value 3');
+        // Keep MultiPV deterministic for game play.
+        print('Setting MultiPV to 1 for stable best-move parsing...');
+        _commandUnchecked('setoption name MultiPV value 1');
 
         // Send isready to confirm
         final result3 = _commandUnchecked('isready');
@@ -206,68 +208,91 @@ class StockfishFFI {
     debugPrint('StockfishFFI.getBestMove: Sending command: $cmd');
     final response = command(cmd);
     debugPrint('StockfishFFI.getBestMove: Full response:\n$response');
-
-    // Parse all PV lines to get top moves (for variety)
-    final lines = response.split('\n');
-    final topMoves = <String>[];
-
-    for (final line in lines) {
-      // Look for "info ... pv <move>" lines from MultiPV
-      // IMPORTANT: Use ' pv ' (with spaces) to avoid matching 'multipv'
-      if (line.contains('info') && line.contains(' pv ')) {
-        final pvIndex = line.indexOf(' pv ');
-        if (pvIndex != -1) {
-          final moveStart = pvIndex + 4; // +4 because ' pv ' is 4 characters
-          final moveEnd = line.indexOf(' ', moveStart);
-          final move = moveEnd == -1
-              ? line.substring(moveStart).trim()
-              : line.substring(moveStart, moveEnd).trim();
-          debugPrint('StockfishFFI.getBestMove: Parsing PV line: "$line"');
-          debugPrint('StockfishFFI.getBestMove: Extracted move: "$move"');
-          if (move.isNotEmpty && !topMoves.contains(move)) {
-            topMoves.add(move);
-          }
-        }
-      }
-    }
-
-    // If we have multiple top moves, randomly pick one (weighted towards better moves)
-    String? selectedMove;
-    if (topMoves.isNotEmpty) {
-      // 60% chance to pick best move, 30% for 2nd, 10% for 3rd
-      final random = DateTime.now().microsecond % 100;
-      if (random < 60 && topMoves.isNotEmpty) {
-        selectedMove = topMoves[0]; // Best move
-      } else if (random < 90 && topMoves.length > 1) {
-        selectedMove = topMoves[1]; // 2nd best move
-      } else if (topMoves.length > 2) {
-        selectedMove = topMoves[2]; // 3rd best move
-      } else {
-        selectedMove = topMoves[0]; // Fallback to best
-      }
-      debugPrint(
-          'StockfishFFI.getBestMove: Top moves: $topMoves, Selected: $selectedMove');
-    }
-
-    // Fallback: parse the bestmove from response
-    if (selectedMove == null) {
-      for (final line in lines) {
-        if (line.startsWith('bestmove')) {
-          final parts = line.split(' ');
-          if (parts.length >= 2) {
-            selectedMove = parts[1];
-            debugPrint(
-                'StockfishFFI.getBestMove: Using bestmove from response: $selectedMove');
-            break;
-          }
-        }
-      }
-    }
+    final selectedMove = selectBestMoveFromEngineResponse(response);
 
     if (selectedMove == null) {
       debugPrint('StockfishFFI.getBestMove: No bestmove found in response!');
+    } else {
+      debugPrint(
+          'StockfishFFI.getBestMove: Using validated move $selectedMove');
     }
     return selectedMove;
+  }
+
+  static bool isUsableUciMove(String move) {
+    final normalized = move.trim().toLowerCase();
+    if (normalized.isEmpty || normalized == '0000' || normalized == '(none)') {
+      return false;
+    }
+
+    final match = _uciMovePattern.firstMatch(normalized);
+    if (match == null) {
+      return false;
+    }
+
+    final from = '${match.group(1)}${match.group(2)}';
+    final to = '${match.group(3)}${match.group(4)}';
+    return from != to;
+  }
+
+  static String? _extractPvMove(String line) {
+    if (!line.contains('info') || !line.contains(' pv ')) {
+      return null;
+    }
+
+    final pvIndex = line.indexOf(' pv ');
+    if (pvIndex == -1) {
+      return null;
+    }
+
+    final pvMoves = line.substring(pvIndex + 4).trim().split(RegExp(r'\s+'));
+    if (pvMoves.isEmpty) {
+      return null;
+    }
+
+    final firstMove = pvMoves.first.trim();
+    if (!isUsableUciMove(firstMove)) {
+      debugPrint(
+          'StockfishFFI.selectBestMoveFromEngineResponse: Ignoring invalid PV move "$firstMove"');
+      return null;
+    }
+
+    return firstMove;
+  }
+
+  @visibleForTesting
+  static String? selectBestMoveFromEngineResponse(String response) {
+    final lines = response.split(RegExp(r'\r?\n'));
+
+    for (final rawLine in lines) {
+      final line = rawLine.trim();
+      if (!line.startsWith('bestmove')) {
+        continue;
+      }
+
+      final parts = line.split(RegExp(r'\s+'));
+      if (parts.length < 2) {
+        continue;
+      }
+
+      final move = parts[1].trim();
+      if (isUsableUciMove(move)) {
+        return move;
+      }
+
+      debugPrint(
+          'StockfishFFI.selectBestMoveFromEngineResponse: Ignoring invalid bestmove "$move"');
+    }
+
+    for (final rawLine in lines) {
+      final line = rawLine.trim();
+      final pvMove = _extractPvMove(line);
+      if (pvMove != null) {
+        return pvMove;
+      }
+    }
+
+    return null;
   }
 
   /// Analyze a position and return score + bestmove directly from engine.

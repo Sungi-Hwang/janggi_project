@@ -1,0 +1,357 @@
+{
+  "version": "1.1-strict-beta-quarantine",
+  "generated": "2026-03-21T18:42:21.427767",
+  "total": 10,
+  "categories": {
+    "mate1": {
+      "name": "1수 외통",
+      "description": "한 수 만에 외통을 잡는 묘수",
+      "count": 8
+    },
+    "mate2": {
+      "name": "2수 외통",
+      "description": "두 수 만에 외통을 잡는 묘수",
+      "count": 0
+    },
+    "mate3": {
+      "name": "3수 외통",
+      "description": "세 수 만에 외통을 잡는 묘수",
+      "count": 2
+    }
+  },
+  "puzzles": [
+    {
+      "id": "m1_62",
+      "difficulty": 1,
+      "mateIn": 1,
+      "title": "1수 외통 #55",
+      "fen": "3c1k3/r2a5/4RP3/9/9/9/3P5/3B5/3AK4/4C4 w - - 0 1",
+      "solution": [
+        "e8e10"
+      ],
+      "toMove": "blue",
+      "source": "Game 81, Move 140",
+      "validation": {
+        "strictPass": false,
+        "relaxedPass": false,
+        "forcedMateStart": true,
+        "exactMateLengthStart": true,
+        "solutionLengthMatches": true,
+        "firstMoveMatches": true,
+        "uniqueFirstMove": false,
+        "sameMateCandidates": [],
+        "linePerfect": false,
+        "finalMateResolved": false,
+        "depth": 8
+      }
+    },
+    {
+      "id": "m1_87",
+      "difficulty": 1,
+      "mateIn": 1,
+      "title": "1수 외통 #78",
+      "fen": "2bk3r1/3aa1R2/3c5/2B1p4/1P7/7P1/3n5/3AC1N2/6r2/4KC3 b - - 0 1",
+      "solution": [
+        "d4f3"
+      ],
+      "toMove": "red",
+      "source": "Game 44, Move 87",
+      "validation": {
+        "strictPass": false,
+        "relaxedPass": false,
+        "forcedMateStart": true,
+        "exactMateLengthStart": true,
+        "solutionLengthMatches": true,
+        "firstMoveMatches": true,
+        "uniqueFirstMove": false,
+        "sameMateCandidates": [],
+        "linePerfect": false,
+        "finalMateResolved": false,
+        "depth": 8
+      }
+    },
+    {
+      "id": "m1_112",
+      "difficulty": 1,
+      "mateIn": 1,
+      "title": "1수 외통 #99",
+      "fen": "4knR2/4a4/5a3/9/5P3/6P2/PPP1Rn3/4N4/5r3/2rAKC3 b - - 0 1",
+      "solution": [
+        "f2e2"
+      ],
+      "toMove": "red",
+      "source": "Game 2, Move 93",
+      "validation": {
+        "strictPass": false,
+        "relaxedPass": false,
+        "forcedMateStart": true,
+        "exactMateLengthStart": true,
+        "solutionLengthMatches": true,
+        "firstMoveMatches": true,
+        "uniqueFirstMove": false,
+        "sameMateCandidates": [],
+        "linePerfect": false,
+        "finalMateResolved": false,
+        "depth": 8
+      }
+    },
+    {
+      "id": "m1_127",
+      "difficulty": 1,
+      "mateIn": 1,
+      "title": "1수 외통 #113",
+      "fen": "5k3/4a4/5a3/2PP5/9/3b5/7n1/9/4AK3/4C4 b - - 0 1",
+      "solution": [
+        "f8e8"
+      ],
+      "toMove": "red",
+      "source": "Game 85, Move 173",
+      "validation": {
+        "strictPass": false,
+        "relaxedPass": false,
+        "forcedMateStart": true,
+        "exactMateLengthStart": true,
+        "solutionLengthMatches": true,
+        "firstMoveMatches": true,
+        "uniqueFirstMove": true,
+        "sameMateCandidates": [
+          "f8e8"
+        ],
+        "linePerfect": true,
+        "finalMateResolved": false,
+        "depth": 8
+      }
+    },
+    {
+      "id": "m1_168",
+      "difficulty": 1,
+      "mateIn": 1,
+      "title": "1수 외통 #150",
+      "fen": "4ca3/4k4/9/9/9/9/4n4/3A5/4AK3/3C5 b - - 0 1",
+      "solution": [
+        "e9f8"
+      ],
+      "toMove": "red",
+      "source": "Game 42, Move 115",
+      "validation": {
+        "strictPass": false,
+        "relaxedPass": false,
+        "forcedMateStart": true,
+        "exactMateLengthStart": true,
+        "solutionLengthMatches": true,
+        "firstMoveMatches": true,
+        "uniqueFirstMove": false,
+        "sameMateCandidates": [
+          "e9f8",
+          "e9f9"
+        ],
+        "linePerfect": true,
+        "finalMateResolved": false,
+        "depth": 8
+      }
+    },
+    {
+      "id": "m1_190",
+      "difficulty": 1,
+      "mateIn": 1,
+      "title": "1수 외통 #169",
+      "fen": "3kr4/9/4R4/9/9/9/9/4C4/4K4/3C5 w - - 0 1",
+      "solution": [
+        "e2d2"
+      ],
+      "toMove": "blue",
+      "source": "Game 100, Move 116",
+      "validation": {
+        "strictPass": false,
+        "relaxedPass": false,
+        "forcedMateStart": true,
+        "exactMateLengthStart": true,
+        "solutionLengthMatches": true,
+        "firstMoveMatches": true,
+        "uniqueFirstMove": false,
+        "sameMateCandidates": [
+          "e2d2",
+          "e2d3"
+        ],
+        "linePerfect": true,
+        "finalMateResolved": false,
+        "depth": 8
+      }
+    },
+    {
+      "id": "m1_192",
+      "difficulty": 1,
+      "mateIn": 1,
+      "title": "1수 외통 #171",
+      "fen": "9/4aC3/4k4/9/9/2p6/1P1PP2P1/5rn2/3C5/3AK4 b - - 0 1",
+      "solution": [
+        "f3f1"
+      ],
+      "toMove": "red",
+      "source": "Game 35, Move 137",
+      "validation": {
+        "strictPass": false,
+        "relaxedPass": false,
+        "forcedMateStart": true,
+        "exactMateLengthStart": true,
+        "solutionLengthMatches": true,
+        "firstMoveMatches": true,
+        "uniqueFirstMove": false,
+        "sameMateCandidates": [],
+        "linePerfect": false,
+        "finalMateResolved": false,
+        "depth": 8
+      }
+    },
+    {
+      "id": "m1_208",
+      "difficulty": 1,
+      "mateIn": 1,
+      "title": "1수 외통 #186",
+      "fen": "9/3k5/5a3/9/9/9/4bp3/3AC4/5A3/3K5 w - - 0 1",
+      "solution": [
+        "d3e2"
+      ],
+      "toMove": "blue",
+      "source": "Game 87, Move 174",
+      "validation": {
+        "strictPass": false,
+        "relaxedPass": false,
+        "forcedMateStart": true,
+        "exactMateLengthStart": true,
+        "solutionLengthMatches": true,
+        "firstMoveMatches": true,
+        "uniqueFirstMove": true,
+        "sameMateCandidates": [
+          "d3e2"
+        ],
+        "linePerfect": true,
+        "finalMateResolved": false,
+        "depth": 8
+      }
+    },
+    {
+      "id": "m3_03",
+      "difficulty": 3,
+      "mateIn": 3,
+      "title": "3수 외통 #3",
+      "fen": "3kcc3/3naa3/9/2PP5/5p3/9/n1r4R1/3A1B3/4A4/3KC4 b - - 0 1",
+      "solution": [
+        "a4b2",
+        "d1d2",
+        "c4c2",
+        "d2d1",
+        "c2e2"
+      ],
+      "toMove": "red",
+      "source": "Game 14, Move 123",
+      "validation": {
+        "strictPass": false,
+        "relaxedPass": false,
+        "forcedMateStart": false,
+        "exactMateLengthStart": false,
+        "solutionLengthMatches": true,
+        "firstMoveMatches": false,
+        "uniqueFirstMove": true,
+        "sameMateCandidates": [
+          "a4b2"
+        ],
+        "linePerfect": true,
+        "finalMateResolved": true,
+        "depth": 8
+      }
+    },
+    {
+      "id": "m3_17",
+      "difficulty": 3,
+      "mateIn": 3,
+      "title": "3수 외통 #11",
+      "fen": "4c4/4k4/5a3/9/7p1/9/9/3K5/9/6C2 b - - 0 1",
+      "solution": [
+        "e9e8",
+        "d3d2",
+        "f8e9",
+        "d2d3",
+        "e8d8"
+      ],
+      "toMove": "red",
+      "source": "Game 38, Move 167",
+      "validation": {
+        "strictPass": false,
+        "relaxedPass": false,
+        "forcedMateStart": false,
+        "exactMateLengthStart": false,
+        "solutionLengthMatches": true,
+        "firstMoveMatches": true,
+        "uniqueFirstMove": true,
+        "sameMateCandidates": [
+          "e9e8"
+        ],
+        "linePerfect": false,
+        "finalMateResolved": false,
+        "depth": 8
+      }
+    }
+  ],
+  "validationSummary": {
+    "generatedAt": "2026-03-21T18:24:54.595513",
+    "input": "assets/puzzles/puzzles.json",
+    "sourceTotal": 292,
+    "checked": 292,
+    "depth": 8,
+    "multiPv": 3,
+    "strictPass": 246,
+    "relaxedPass": 282,
+    "forcedMateStart": 290,
+    "exactMateLengthStart": 290,
+    "solutionLengthMatches": 292,
+    "firstMoveMatches": 291,
+    "uniqueFirstMove": 253,
+    "linePerfect": 279,
+    "finalMateResolved": 283,
+    "failReasons": [
+      {
+        "reason": "non_unique_first_move",
+        "count": 35
+      },
+      {
+        "reason": "line_not_engine_perfect",
+        "count": 9
+      },
+      {
+        "reason": "final_position_not_checkmate",
+        "count": 5
+      },
+      {
+        "reason": "multipv_timeout",
+        "count": 4
+      },
+      {
+        "reason": "first_move_uniqueness_unknown",
+        "count": 4
+      },
+      {
+        "reason": "line_analysis_timeout",
+        "count": 4
+      },
+      {
+        "reason": "final_analysis_timeout",
+        "count": 4
+      },
+      {
+        "reason": "start_not_forced_mate",
+        "count": 2
+      },
+      {
+        "reason": "start_mate_length_mismatch",
+        "count": 2
+      },
+      {
+        "reason": "first_move_mismatch",
+        "count": 1
+      }
+    ],
+    "bucket": "quarantine",
+    "bucketCount": 10
+  }
+}

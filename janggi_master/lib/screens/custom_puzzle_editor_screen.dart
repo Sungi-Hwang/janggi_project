@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../models/board.dart';
 import '../models/piece.dart';
 import '../models/position.dart';
+import '../providers/monetization_provider.dart';
 import '../providers/settings_provider.dart';
 import '../screens/game_screen.dart' show GameMode, GameScreen;
 import '../services/custom_puzzle_service.dart';
@@ -61,6 +62,7 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
 
   bool get _isAiContinueMode =>
       widget.mode == CustomPuzzleEditorMode.aiContinue;
+  bool get _showInlineAiContinueCta => false;
 
   @override
   void initState() {
@@ -80,13 +82,20 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFf5e6d3),
       appBar: AppBar(
-        title: Text(_isAiContinueMode ? '배치 이어하기 (AI)' : '나만의 묘수 생성'),
+        title: Text(_isAiContinueMode ? '배치 이어하기' : '나만의 묘수 생성'),
         backgroundColor: const Color(0xFF3e2723),
         foregroundColor: Colors.white,
       ),
+      bottomNavigationBar:
+          _isAiContinueMode ? _buildAiContinueBottomBar() : null,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.fromLTRB(
+            16,
+            16,
+            16,
+            _isAiContinueMode ? 108 : 16,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -190,7 +199,7 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
                 child: _buildEditorBoard(),
               ),
               const SizedBox(height: 14),
-              if (_isAiContinueMode)
+              if (_showInlineAiContinueCta)
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
@@ -203,8 +212,8 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 13),
                     ),
                   ),
-                )
-              else
+                ),
+              if (!_isAiContinueMode)
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
@@ -219,7 +228,7 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
                   ),
                 ),
               const SizedBox(height: 8),
-              if (_isAiContinueMode)
+              if (_showInlineAiContinueCta)
                 Text(
                   '현재 배치에서 바로 AI 대국을 시작합니다.',
                   style: TextStyle(
@@ -239,6 +248,59 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAiContinueBottomBar() {
+    return SafeArea(
+      top: false,
+      child: Container(
+        color: const Color(0xFFf5e6d3),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              '현재 배치에서 AI 대전이나 로컬 분석으로 바로 이어갈 수 있습니다.',
+              style: TextStyle(
+                color: Colors.grey.shade700,
+                fontSize: 12,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: _startContinueLocal,
+                    icon: const Icon(Icons.groups_2_outlined),
+                    label: const Text('로컬 분석'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFF4E342E),
+                      side: const BorderSide(color: Color(0xFF8D6E63)),
+                      padding: const EdgeInsets.symmetric(vertical: 13),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: _startContinueWithAi,
+                    icon: const Icon(Icons.smart_toy),
+                    label: const Text('이어하기(AI)'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF1A237E),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 13),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -619,7 +681,12 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
 
   Widget _buildPieceToken(Piece piece, {double size = 34}) {
     if (size >= 32) {
-      return TraditionalPieceWidget(piece: piece, size: size);
+      final pieceSkin = context.read<SettingsProvider>().pieceSkin;
+      return TraditionalPieceWidget(
+        piece: piece,
+        size: size,
+        skin: pieceSkin,
+      );
     }
     return _pieceChip(piece, size: size);
   }
@@ -1015,10 +1082,17 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
     }
 
     final settings = context.read<SettingsProvider>();
+    final monetization = context.read<MonetizationProvider>();
     final playerColor = _blueAtBottom ? PieceColor.blue : PieceColor.red;
     final aiColor =
         playerColor == PieceColor.blue ? PieceColor.red : PieceColor.blue;
     final engineBoard = _toEngineBoard(_board);
+    final aiDifficulty = monetization.enforceDifficultyLimit(
+      settings.aiDifficulty,
+    );
+    final aiThinkingTime = monetization.enforceThinkingTimeLimit(
+      settings.aiThinkingTime,
+    );
 
     if (!mounted) return;
     await Navigator.push(
@@ -1026,9 +1100,32 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
       MaterialPageRoute(
         builder: (context) => GameScreen(
           gameMode: GameMode.vsAI,
-          aiDifficulty: settings.aiDifficulty,
-          aiThinkingTimeSec: settings.aiThinkingTime,
+          aiDifficulty: aiDifficulty,
+          aiThinkingTimeSec: aiThinkingTime,
           aiColor: aiColor,
+          initialBoard: engineBoard,
+          initialStartingPlayer: playerColor,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _startContinueLocal() async {
+    final validationError = _validateBoardForStart();
+    if (validationError != null) {
+      _showSnack(validationError);
+      return;
+    }
+
+    final playerColor = _blueAtBottom ? PieceColor.blue : PieceColor.red;
+    final engineBoard = _toEngineBoard(_board);
+
+    if (!mounted) return;
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => GameScreen(
+          gameMode: GameMode.twoPlayer,
           initialBoard: engineBoard,
           initialStartingPlayer: playerColor,
         ),

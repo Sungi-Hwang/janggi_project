@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import '../theme/janggi_skin.dart';
 
 /// 앱의 설정을 관리하는 서비스
 class SettingsService {
@@ -32,12 +33,14 @@ class SettingsService {
       _prefs.setString(_keyLanguage, value);
 
   // 디자인 설정
-  String get boardSkin => _prefs.getString(_keyBoardSkin) ?? 'wood';
+  String get boardSkin =>
+      _prefs.getString(_keyBoardSkin) ?? JanggiSkin.boardKoreanWood;
 
   Future<void> setBoardSkinValue(String value) =>
       _prefs.setString(_keyBoardSkin, value);
 
-  String get pieceSkin => _prefs.getString(_keyPieceSkin) ?? 'traditional';
+  String get pieceSkin =>
+      _prefs.getString(_keyPieceSkin) ?? JanggiSkin.pieceTraditional;
   Future<void> setPieceSkin(String value) =>
       _prefs.setString(_keyPieceSkin, value);
 
@@ -48,7 +51,7 @@ class SettingsService {
 
   int get aiThinkingTime => _prefs.getInt(_keyAiThinkingTime) ?? 5; // 초 단위
   Future<void> setAiThinkingTime(int value) =>
-      _prefs.setInt(_keyAiThinkingTime, value);
+      _prefs.setInt(_keyAiThinkingTime, value.clamp(1, 30));
 
   int get aiDifficulty => _prefs.getInt(_keyAiDifficulty) ?? 5;
   Future<void> setAiDifficulty(int value) =>

@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+
 import '../models/piece.dart';
+import '../theme/janggi_skin.dart';
 import 'traditional_piece_widget.dart';
 
-/// Panel showing captured pieces for one side
+/// Panel showing captured pieces for one side.
 class CapturedPiecesPanel extends StatelessWidget {
   final List<Piece> capturedPieces;
-  final String backgroundImage; // "한_포로.png" or "초_포로.png"
-  final double boardWidth; // 장기판 폭 (gridSpacing 계산용)
+  final String backgroundImage;
+  final double boardWidth;
   final bool isOverlay;
+  final String pieceSkin;
 
   const CapturedPiecesPanel({
     super.key,
@@ -15,11 +18,11 @@ class CapturedPiecesPanel extends StatelessWidget {
     required this.backgroundImage,
     required this.boardWidth,
     this.isOverlay = false,
+    this.pieceSkin = JanggiSkin.pieceTraditional,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Group pieces by type and count them
     final Map<String, int> pieceCounts = {};
     final Map<String, Piece> pieceExamples = {};
 
@@ -31,8 +34,6 @@ class CapturedPiecesPanel extends StatelessWidget {
 
     final keys = pieceCounts.keys.toList();
 
-    // 장기판과 동일한 방식으로 기물 크기 계산
-    // In overlay mode, use a fixed larger size for better visibility
     const boardMargin = 35.0;
     final boardInnerWidth = boardWidth - (boardMargin * 2);
     final gridSpacing = boardInnerWidth / 8;
@@ -61,18 +62,16 @@ class CapturedPiecesPanel extends StatelessWidget {
       );
     }
 
-    // Legacy Side Panel Mode
-    // 한/초 구분
     final isHan = backgroundImage.contains('한');
     final title = isHan ? '漢' : '楚';
-    final titleColor = isHan ? const Color(0xFFCC0000) : const Color(0xFF0066CC); // 빨간색 / 짙은 파란색
+    final titleColor =
+        isHan ? const Color(0xFFCC0000) : const Color(0xFF0066CC);
 
     return Stack(
       children: [
-        // 배경 - 장기판과 동일한 이미지 사용
         Positioned.fill(
           child: RotatedBox(
-            quarterTurns: 1, // 장기판과 동일하게 90도 회전
+            quarterTurns: 1,
             child: Image.asset(
               'assets/images/janggi_pan.png',
               fit: BoxFit.cover,
@@ -80,7 +79,6 @@ class CapturedPiecesPanel extends StatelessWidget {
             ),
           ),
         ),
-        // 어두운 오버레이
         Positioned.fill(
           child: Container(
             decoration: BoxDecoration(
@@ -95,7 +93,6 @@ class CapturedPiecesPanel extends StatelessWidget {
             ),
           ),
         ),
-        // 내용물
         Container(
           decoration: BoxDecoration(
             border: Border(
@@ -107,7 +104,6 @@ class CapturedPiecesPanel extends StatelessWidget {
           ),
           child: Column(
             children: [
-              // 상단 제목 영역 (고정 높이)
               Container(
                 height: 60,
                 alignment: Alignment.center,
@@ -141,7 +137,6 @@ class CapturedPiecesPanel extends StatelessWidget {
                   ),
                 ),
               ),
-              // 포로 목록
               Expanded(
                 child: keys.isEmpty
                     ? const SizedBox.shrink()
@@ -153,8 +148,15 @@ class CapturedPiecesPanel extends StatelessWidget {
                           final piece = pieceExamples[key]!;
                           final count = pieceCounts[key]!;
                           return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
-                            child: _buildCapturedPieceIcon(piece, count, pieceSize),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 4,
+                              horizontal: 4,
+                            ),
+                            child: _buildCapturedPieceIcon(
+                              piece,
+                              count,
+                              pieceSize,
+                            ),
                           );
                         },
                       ),
@@ -173,6 +175,7 @@ class CapturedPiecesPanel extends StatelessWidget {
         TraditionalPieceWidget(
           piece: piece,
           size: pieceSize,
+          skin: pieceSkin,
         ),
         if (count > 1)
           Positioned(
@@ -183,10 +186,7 @@ class CapturedPiecesPanel extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.black.withValues(alpha: 0.85),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: Colors.white,
-                  width: 1,
-                ),
+                border: Border.all(color: Colors.white, width: 1),
               ),
               child: Text(
                 'x$count',

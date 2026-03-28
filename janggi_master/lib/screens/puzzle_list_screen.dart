@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../services/custom_puzzle_service.dart';
+import '../services/puzzle_progress_service.dart';
 import '../utils/puzzle_share_codec.dart';
 import 'custom_puzzle_editor_screen.dart';
 import 'puzzle_game_screen.dart';
@@ -18,6 +19,7 @@ class PuzzleListScreen extends StatefulWidget {
 class _PuzzleListScreenState extends State<PuzzleListScreen> {
   Map<String, dynamic>? _puzzleData;
   List<Map<String, dynamic>> _customPuzzles = <Map<String, dynamic>>[];
+  Set<String> _solvedPuzzleIds = <String>{};
   bool _isLoading = true;
 
   @override
@@ -36,10 +38,12 @@ class _PuzzleListScreenState extends State<PuzzleListScreen> {
           await rootBundle.loadString('assets/puzzles/puzzles.json');
       final data = json.decode(jsonString) as Map<String, dynamic>;
       final custom = await CustomPuzzleService.loadPuzzles();
+      final solvedPuzzleIds = await PuzzleProgressService.loadSolvedPuzzleIds();
       if (!mounted) return;
       setState(() {
         _puzzleData = data;
         _customPuzzles = custom;
+        _solvedPuzzleIds = solvedPuzzleIds;
         _isLoading = false;
       });
     } catch (e) {
@@ -53,9 +57,11 @@ class _PuzzleListScreenState extends State<PuzzleListScreen> {
 
   Future<void> _refreshCustomPuzzles() async {
     final custom = await CustomPuzzleService.loadPuzzles();
+    final solvedPuzzleIds = await PuzzleProgressService.loadSolvedPuzzleIds();
     if (!mounted) return;
     setState(() {
       _customPuzzles = custom;
+      _solvedPuzzleIds = solvedPuzzleIds;
     });
   }
 
@@ -122,6 +128,8 @@ class _PuzzleListScreenState extends State<PuzzleListScreen> {
                                 icon: Icons.looks_one,
                                 color: Colors.green,
                                 count: _getPuzzlesByMateIn(1).length,
+                                solvedCount:
+                                    _getSolvedCount(_getPuzzlesByMateIn(1)),
                                 onTap: () => _showPuzzleList(
                                   mateIn: 1,
                                   title: '1수 외통',
@@ -135,6 +143,8 @@ class _PuzzleListScreenState extends State<PuzzleListScreen> {
                                 icon: Icons.looks_two,
                                 color: Colors.orange,
                                 count: _getPuzzlesByMateIn(2).length,
+                                solvedCount:
+                                    _getSolvedCount(_getPuzzlesByMateIn(2)),
                                 onTap: () => _showPuzzleList(
                                   mateIn: 2,
                                   title: '2수 외통',
@@ -148,6 +158,8 @@ class _PuzzleListScreenState extends State<PuzzleListScreen> {
                                 icon: Icons.looks_3,
                                 color: Colors.red,
                                 count: _getPuzzlesByMateIn(3).length,
+                                solvedCount:
+                                    _getSolvedCount(_getPuzzlesByMateIn(3)),
                                 onTap: () => _showPuzzleList(
                                   mateIn: 3,
                                   title: '3수 외통',
@@ -161,6 +173,7 @@ class _PuzzleListScreenState extends State<PuzzleListScreen> {
                                 icon: Icons.add_box_rounded,
                                 color: Colors.indigo,
                                 count: _customPuzzles.length,
+                                solvedCount: 0,
                                 onTap: _openCustomCategory,
                               ),
                             ],
@@ -179,6 +192,7 @@ class _PuzzleListScreenState extends State<PuzzleListScreen> {
     required IconData icon,
     required Color color,
     required int count,
+    required int solvedCount,
     required VoidCallback onTap,
   }) {
     return Card(
@@ -227,7 +241,7 @@ class _PuzzleListScreenState extends State<PuzzleListScreen> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  '$count문제',
+                  '$solvedCount/$count',
                   style: TextStyle(color: color, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -249,12 +263,18 @@ class _PuzzleListScreenState extends State<PuzzleListScreen> {
         .toList();
   }
 
-  void _showPuzzleList({
+  int _getSolvedCount(List<Map<String, dynamic>> puzzles) {
+    return puzzles
+        .where((puzzle) => _solvedPuzzleIds.contains(puzzle['id']))
+        .length;
+  }
+
+  Future<void> _showPuzzleList({
     required int mateIn,
     required String title,
     required List<Map<String, dynamic>> puzzles,
-  }) {
-    Navigator.push(
+  }) async {
+    await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => PuzzleCategoryScreen(
@@ -264,6 +284,7 @@ class _PuzzleListScreenState extends State<PuzzleListScreen> {
         ),
       ),
     );
+    _loadData();
   }
 
   Future<void> _openCustomCategory() async {
@@ -277,7 +298,7 @@ class _PuzzleListScreenState extends State<PuzzleListScreen> {
   }
 }
 
-class PuzzleCategoryScreen extends StatelessWidget {
+class PuzzleCategoryScreen extends StatefulWidget {
   final String title;
   final int mateIn;
   final List<Map<String, dynamic>> puzzles;
@@ -288,6 +309,31 @@ class PuzzleCategoryScreen extends StatelessWidget {
     required this.mateIn,
     required this.puzzles,
   });
+
+  @override
+  State<PuzzleCategoryScreen> createState() => _PuzzleCategoryScreenState();
+}
+
+class _PuzzleCategoryScreenState extends State<PuzzleCategoryScreen> {
+  Set<String> _solvedPuzzleIds = <String>{};
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSolvedPuzzleIds();
+  }
+
+  Future<void> _loadSolvedPuzzleIds() async {
+    final solvedPuzzleIds = await PuzzleProgressService.loadSolvedPuzzleIds();
+    if (!mounted) return;
+    setState(() {
+      _solvedPuzzleIds = solvedPuzzleIds;
+    });
+  }
+
+  int get _solvedCount => widget.puzzles
+      .where((puzzle) => _solvedPuzzleIds.contains(puzzle['id']))
+      .length;
 
   @override
   Widget build(BuildContext context) {
@@ -313,7 +359,7 @@ class PuzzleCategoryScreen extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      title,
+                      widget.title,
                       style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -322,7 +368,7 @@ class PuzzleCategoryScreen extends StatelessWidget {
                     ),
                     const Spacer(),
                     Text(
-                      '${puzzles.length}문제',
+                      '$_solvedCount/${widget.puzzles.length}',
                       style:
                           const TextStyle(fontSize: 16, color: Colors.white70),
                     ),
@@ -332,19 +378,20 @@ class PuzzleCategoryScreen extends StatelessWidget {
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.all(16),
-                  itemCount: puzzles.length,
+                  itemCount: widget.puzzles.length,
                   itemBuilder: (context, index) {
-                    final puzzle = puzzles[index];
+                    final puzzle = widget.puzzles[index];
+                    final isSolved = _solvedPuzzleIds.contains(puzzle['id']);
                     return Card(
                       margin: const EdgeInsets.only(bottom: 8),
                       child: ListTile(
                         leading: CircleAvatar(
-                          backgroundColor:
-                              _colorForMate(mateIn).withValues(alpha: 0.2),
+                          backgroundColor: _colorForMate(widget.mateIn)
+                              .withValues(alpha: 0.2),
                           child: Text(
                             '${index + 1}',
                             style: TextStyle(
-                              color: _colorForMate(mateIn),
+                              color: _colorForMate(widget.mateIn),
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -354,7 +401,10 @@ class PuzzleCategoryScreen extends StatelessWidget {
                           '${puzzle['toMove'] == 'blue' ? '초' : '한'}나라 차례',
                           style: TextStyle(color: Colors.grey.shade700),
                         ),
-                        trailing: const Icon(Icons.play_arrow),
+                        trailing: Icon(
+                          isSolved ? Icons.check_circle : Icons.play_arrow,
+                          color: isSolved ? Colors.green : null,
+                        ),
                         onTap: () => _startPuzzle(context, puzzle),
                       ),
                     );
@@ -381,8 +431,10 @@ class PuzzleCategoryScreen extends StatelessWidget {
     }
   }
 
-  void _startPuzzle(BuildContext context, Map<String, dynamic> puzzle) {
+  Future<void> _startPuzzle(
+      BuildContext context, Map<String, dynamic> puzzle) async {
     final gameData = <String, dynamic>{
+      'id': puzzle['id'],
       'title': puzzle['title'],
       'fen': puzzle['fen'],
       'solution': puzzle['solution'],
@@ -394,12 +446,13 @@ class PuzzleCategoryScreen extends StatelessWidget {
       'totalMoves': puzzle['mateIn'] as int? ?? 1,
     };
 
-    Navigator.push(
+    await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => PuzzleGameScreen(game: gameData),
       ),
     );
+    _loadSolvedPuzzleIds();
   }
 }
 
