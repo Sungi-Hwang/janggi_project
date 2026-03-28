@@ -1657,22 +1657,12 @@ class GameState extends ChangeNotifier {
 
   /// Check whether a piece attacks the king square on the given board.
   ///
-  /// Fairy-Stockfish's Janggi rules do not treat palace diagonal rook/cannon
-  /// moves as direct king attacks, even though those moves are legal for
-  /// movement and ordinary captures. To stay aligned with puzzle validation
-  /// and engine hints, king attack detection uses this narrower rule set.
+  /// Attack detection must follow the same legality rules as ordinary captures.
+  /// In particular, chariots and cannons can give check through palace
+  /// diagonals when that capture is otherwise legal.
   bool _canAttackKingOnBoard(
       Piece piece, Position from, Position kingPosition, Board board) {
-    switch (piece.type) {
-      case PieceType.chariot:
-        return _isOrthogonalMove(from, kingPosition) &&
-            _isPathClearOnBoard(from, kingPosition, board);
-      case PieceType.cannon:
-        return _isOrthogonalMove(from, kingPosition) &&
-            _isValidCannonMoveOnBoard(from, kingPosition, board);
-      default:
-        return _isValidMoveOnBoard(piece, from, kingPosition, board);
-    }
+    return _isValidMoveOnBoard(piece, from, kingPosition, board);
   }
 
   // Helper methods for board-specific validation
