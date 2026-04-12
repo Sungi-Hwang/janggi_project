@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:provider/provider.dart';
 
+import '../models/rule_mode.dart';
 import '../providers/monetization_provider.dart';
 import '../providers/settings_provider.dart';
 import '../theme/janggi_skin.dart';
@@ -73,7 +74,8 @@ class SettingsScreen extends StatelessWidget {
                 children: [
                   ListTile(
                     title: const Text('AI 난이도'),
-                    subtitle: Text('현재: ${_difficultyLabel(clampedDifficulty)}'),
+                    subtitle:
+                        Text('현재: ${_difficultyLabel(clampedDifficulty)}'),
                     trailing: DropdownButton<int>(
                       value: clampedDifficulty,
                       items: _difficultyValues.map((value) {
@@ -109,6 +111,23 @@ class SettingsScreen extends StatelessWidget {
                         },
                         activeColor: Colors.brown,
                       ),
+                    ),
+                  ),
+                  ListTile(
+                    title: const Text('\ub8f0 \uae30\uc900'),
+                    subtitle: Text(settings.ruleMode.description),
+                    trailing: DropdownButton<RuleMode>(
+                      value: settings.ruleMode,
+                      items: RuleMode.values.map((mode) {
+                        return DropdownMenuItem<RuleMode>(
+                          value: mode,
+                          child: Text(mode.label),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        if (value == null) return;
+                        settings.setRuleMode(value);
+                      },
                     ),
                   ),
                 ],

@@ -41,7 +41,13 @@ add_dependencies(${BINARY_NAME} flutter_assemble)
 
 # --- Stockfish Engine Configuration ---
 # Collect engine sources
-file(GLOB ENGINE_SOURCES "../../engine/src/*.cpp")
+file(GLOB_RECURSE ENGINE_SOURCES
+  "../../engine/src/*.cpp"
+  "../../engine/src/syzygy/*.cpp"
+  "../../engine/src/nnue/*.cpp"
+  "../../engine/src/nnue/features/*.cpp"
+  "../../engine/src/nnue/layers/*.cpp"
+)
 # Exclude standalone entry points and web-specific files
 list(FILTER ENGINE_SOURCES EXCLUDE REGEX "main\\.cpp$")
 list(FILTER ENGINE_SOURCES EXCLUDE REGEX "test_dll\\.cpp$")
@@ -50,6 +56,10 @@ list(FILTER ENGINE_SOURCES EXCLUDE REGEX "pyffish\\.cpp$")
 
 # Define the shared library
 add_library(stockfish SHARED ${ENGINE_SOURCES})
+
+# The embedded Stockfish sources use std::optional, nested namespaces,
+# structured bindings, and other C++17 features.
+target_compile_features(stockfish PUBLIC cxx_std_17)
 
 # Compilation definitions (Janggi + Windows)
 target_compile_definitions(stockfish PRIVATE
@@ -64,6 +74,10 @@ target_compile_definitions(stockfish PRIVATE
 
 # Include directories
 target_include_directories(stockfish PRIVATE "../../engine/src")
+
+if(MSVC)
+  target_compile_options(stockfish PRIVATE /std:c++17 /EHsc /utf-8)
+endif()
 
 # Ensure stockfish is built before runner (though not strictly linked)
 add_dependencies(${BINARY_NAME} stockfish)

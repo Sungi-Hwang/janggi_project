@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import '../models/piece.dart';
 
@@ -52,7 +53,7 @@ class EPDParser {
       _cachedPositions = positions;
       return positions;
     } catch (e) {
-      print('Error loading EPD file: $e');
+      debugPrint('Error loading EPD file: $e');
       return [];
     }
   }
@@ -79,7 +80,7 @@ class EPDParser {
         redSetup: redSetup,
       );
     } catch (e) {
-      print('Error parsing EPD line: $line - $e');
+      debugPrint('Error parsing EPD line: $line - $e');
       return null;
     }
   }
@@ -114,7 +115,7 @@ class EPDParser {
 
       return null;
     } catch (e) {
-      print('Error detecting Blue setup: $e');
+      debugPrint('Error detecting Blue setup: $e');
       return null;
     }
   }
@@ -141,7 +142,7 @@ class EPDParser {
 
       return null;
     } catch (e) {
-      print('Error detecting Red setup: $e');
+      debugPrint('Error detecting Red setup: $e');
       return null;
     }
   }
@@ -159,7 +160,7 @@ class EPDParser {
     }).toList();
   }
 
-  /// Build a move tree: Map<currentFEN, List<possibleNextMoves>>
+  /// Build a move tree: `Map<currentFEN, List<possibleNextMoves>>`
   /// This allows O(1) lookup of valid moves from any position
   static Map<String, List<String>> buildMoveTree(List<EPDPosition> positions) {
     final moveTree = <String, List<String>>{};

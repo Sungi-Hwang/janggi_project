@@ -5,10 +5,10 @@ import '../services/sound_manager.dart';
 
 /// Notification types for game events
 enum NotificationType {
-  check,        // 장군
-  escapeCheck,  // 멍군 (장군에서 벗어남)
-  win,          // 승리
-  lose,         // 패배
+  check, // 장군
+  escapeCheck, // 멍군 (장군에서 벗어남)
+  win, // 승리
+  lose, // 패배
 }
 
 /// Overlay widget for game notifications with animations, sounds, and haptics
@@ -16,7 +16,7 @@ class GameNotificationOverlay extends StatefulWidget {
   final NotificationType? type;
   final String? customMessage;
   final VoidCallback? onMainMenu; // 메인 메뉴로 가기
-  final VoidCallback? onRestart;  // 재시작
+  final VoidCallback? onRestart; // 재시작
 
   const GameNotificationOverlay({
     super.key,
@@ -27,7 +27,8 @@ class GameNotificationOverlay extends StatefulWidget {
   });
 
   @override
-  State<GameNotificationOverlay> createState() => _GameNotificationOverlayState();
+  State<GameNotificationOverlay> createState() =>
+      _GameNotificationOverlayState();
 }
 
 class _GameNotificationOverlayState extends State<GameNotificationOverlay>
@@ -224,8 +225,13 @@ class _GameNotificationOverlayState extends State<GameNotificationOverlay>
     final frequency = 10.0; // Multiple shakes
     final dampening = 1.0 - shake; // Gradually reduce shake
 
-    final offsetX = intensity * dampening * math.sin(shake * frequency * math.pi);
-    final offsetY = intensity * 0.3 * dampening * math.sin((shake * frequency * math.pi) + math.pi / 2); // Slight vertical shake
+    final offsetX =
+        intensity * dampening * math.sin(shake * frequency * math.pi);
+    final offsetY = intensity *
+        0.3 *
+        dampening *
+        math.sin((shake * frequency * math.pi) +
+            math.pi / 2); // Slight vertical shake
 
     return Offset(offsetX, offsetY);
   }
@@ -241,7 +247,8 @@ class _GameNotificationOverlayState extends State<GameNotificationOverlay>
     final glowIntensity = isCheck ? (_shakeAnimation.value * 0.5 + 0.5) : 1.0;
 
     // For notifications with background image (check, escapeCheck, win, lose), use sequential animation
-    if ((isCheck || isEscapeCheck || isWin || isLose) && config.backgroundImagePath != null) {
+    if ((isCheck || isEscapeCheck || isWin || isLose) &&
+        config.backgroundImagePath != null) {
       return _buildCheckSequentialAnimation(config, glowIntensity);
     }
 
@@ -273,17 +280,7 @@ class _GameNotificationOverlayState extends State<GameNotificationOverlay>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Icon or Image (for single-image mode)
-          if (isCheck && config.imagePath != null) ...[
-            // Use image for check notification
-            Image.asset(
-              config.imagePath!,
-              width: 100,
-              height: 100,
-              fit: BoxFit.contain,
-            ),
-            const SizedBox(height: 16),
-          ] else if (config.icon != null) ...[
+          if (config.icon != null) ...[
             // Use icon for other notifications
             Icon(
               config.icon,
@@ -329,11 +326,11 @@ class _GameNotificationOverlayState extends State<GameNotificationOverlay>
     );
   }
 
-  Widget _buildCheckSequentialAnimation(_NotificationConfig config, double glowIntensity) {
-    // Clamp glow intensity to valid range
-    final safeGlowIntensity = glowIntensity.clamp(0.0, 1.0);
+  Widget _buildCheckSequentialAnimation(
+      _NotificationConfig config, double glowIntensity) {
     final inkProgress = _inkSplashAnimation.value.clamp(0.0, 1.0);
-    final isWinOrLose = widget.type == NotificationType.win || widget.type == NotificationType.lose;
+    final isWinOrLose = widget.type == NotificationType.win ||
+        widget.type == NotificationType.lose;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -356,7 +353,8 @@ class _GameNotificationOverlayState extends State<GameNotificationOverlay>
               ),
 
               // Check text appearing on top after ink splash (only if foregroundImagePath is provided)
-              if (config.foregroundImagePath != null && _textAppearAnimation.value > 0)
+              if (config.foregroundImagePath != null &&
+                  _textAppearAnimation.value > 0)
                 Transform.scale(
                   scale: _textAppearAnimation.value,
                   child: Opacity(
@@ -385,7 +383,8 @@ class _GameNotificationOverlayState extends State<GameNotificationOverlay>
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.black87,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                     side: BorderSide(color: Colors.grey.shade400, width: 2),
@@ -405,7 +404,8 @@ class _GameNotificationOverlayState extends State<GameNotificationOverlay>
                       ? Colors.amber.shade600
                       : Colors.blue.shade600,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -457,7 +457,8 @@ class _GameNotificationOverlayState extends State<GameNotificationOverlay>
           borderColor: Colors.blue.shade700,
           shadowColor: Colors.blue.withValues(alpha: 0.6),
           icon: Icons.shield_outlined,
-          backgroundImagePath: 'assets/images/멍군.png', // Blue ink animation (멍군_모션 renamed to 멍군.png)
+          backgroundImagePath:
+              'assets/images/멍군.png', // Blue ink animation (멍군_모션 renamed to 멍군.png)
           foregroundImagePath: null, // No separate text - all in one image
         );
 
@@ -494,7 +495,6 @@ class _NotificationConfig {
   final Color borderColor;
   final Color shadowColor;
   final IconData? icon;
-  final String? imagePath; // Path to custom image asset (single image mode)
   final String? backgroundImagePath; // Path to background image (ink splash)
   final String? foregroundImagePath; // Path to foreground image (check text)
 
@@ -505,7 +505,6 @@ class _NotificationConfig {
     required this.borderColor,
     required this.shadowColor,
     this.icon,
-    this.imagePath,
     this.backgroundImagePath,
     this.foregroundImagePath,
   });

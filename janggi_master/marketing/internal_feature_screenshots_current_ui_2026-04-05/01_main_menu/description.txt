@@ -1,0 +1,10 @@
+﻿기능: 메인 메뉴
+파일: screenshot.png
+원본: D:\Project\janggi-master\janggi_master\test_tmp\current_cap2.png
+
+설명:
+현재 메인 메뉴 UI입니다. 장기한수 로고와 네온 스타일 버튼으로 AI 대국, 오프라인 대국, 이어하기 대국, 묘수풀이, 설정 진입이 한 화면에 정리돼 있습니다.
+
+비고:
+이 폴더는 현재 UI와 맞는 최근 캡처만 다시 선별해서 구성한 묶음입니다.
+이전 beta/old 계열 스크린샷 폴더보다 최신 디자인 반영도가 높습니다.

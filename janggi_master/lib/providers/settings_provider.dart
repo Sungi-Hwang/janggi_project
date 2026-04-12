@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../models/rule_mode.dart';
 import '../services/settings_service.dart';
 
 class SettingsProvider extends ChangeNotifier {
@@ -14,6 +15,7 @@ class SettingsProvider extends ChangeNotifier {
   bool get showCoordinates => _service.showCoordinates;
   int get aiThinkingTime => _service.aiThinkingTime;
   int get aiDifficulty => _service.aiDifficulty;
+  RuleMode get ruleMode => _service.ruleMode;
 
   Future<void> setSoundEnabled(bool value) async {
     await _service.setSoundEnabled(value);
@@ -52,6 +54,11 @@ class SettingsProvider extends ChangeNotifier {
 
   Future<void> setAiDifficulty(int value) async {
     await _service.setAiDifficulty(value);
+    notifyListeners();
+  }
+
+  Future<void> setRuleMode(RuleMode value) async {
+    await _service.setRuleMode(value);
     notifyListeners();
   }
 }

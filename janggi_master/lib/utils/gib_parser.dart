@@ -1,93 +1,135 @@
+import 'dart:convert';
+import 'dart:io';
+
 import '../models/board.dart';
 import '../models/piece.dart';
 import '../models/position.dart';
-import '../stockfish_ffi.dart';
-import '../utils/stockfish_converter.dart';
 
-/// Parser for GIB (Game Information Base) files
-/// GIB is a format used for Korean Janggi game records
-class GibParser {
-  /// Parse a GIB file and return list of games
-  /// Each GIB file can contain multiple games
-  static List<Map<String, dynamic>> parseGibFile(String gibContent) {
-    final games = <Map<String, dynamic>>[];
-    final lines = gibContent.split('\n');
+class GibDecodedContent {
+  const GibDecodedContent({
+    required this.text,
+    required this.encoding,
+  });
 
-    Map<String, String>? currentMetadata;
-    List<String> currentMoves = [];
+  final String text;
+  final String encoding;
+}
 
-    for (var line in lines) {
-      line = line.trim();
-      if (line.isEmpty) continue;
+class GibNormalizedGame {
+  const GibNormalizedGame({
+    required this.sourceId,
+    required this.sourceType,
+    required this.sourceUrl,
+    required this.downloadUrl,
+    required this.localPath,
+    required this.gameId,
+    required this.gameIndex,
+    required this.title,
+    required this.round,
+    required this.date,
+    required this.players,
+    required this.result,
+    required this.setupBlue,
+    required this.setupRed,
+    required this.moves,
+    required this.moveCount,
+    required this.initialFen,
+    required this.rawMetadata,
+    required this.encoding,
+  });
 
-      // Parse metadata in [Key "Value"] format
-      if (line.startsWith('[') && line.endsWith(']')) {
-        final match = RegExp(r'\[([^\]]+)\s+"([^"]+)"\]').firstMatch(line);
-        if (match != null) {
-          final key = match.group(1)?.trim() ?? '';
-          final value = match.group(2)?.trim() ?? '';
+  final String sourceId;
+  final String sourceType;
+  final String? sourceUrl;
+  final String? downloadUrl;
+  final String localPath;
+  final String gameId;
+  final int gameIndex;
+  final String title;
+  final String? round;
+  final String? date;
+  final Map<String, String?> players;
+  final String? result;
+  final String? setupBlue;
+  final String? setupRed;
+  final List<String> moves;
+  final int moveCount;
+  final String? initialFen;
+  final Map<String, String> rawMetadata;
+  final String encoding;
 
-          // Start new game if we see metadata after having moves
-          if (currentMetadata != null &&
-              currentMoves.isNotEmpty &&
-              key.isNotEmpty) {
-            games.add(_createGameRecord(currentMetadata, currentMoves));
-            currentMetadata = {};
-            currentMoves = [];
-          }
-
-          currentMetadata ??= {};
-          currentMetadata[key] = value;
-        }
-      }
-      // Parse moves (format: 1. move1 2. move2 ...)
-      else if (RegExp(r'^\d+\.').hasMatch(line)) {
-        // Extract moves from numbered format
-        final moveMatches = RegExp(r'\d+\.\s*([^\s]+)').allMatches(line);
-        for (var match in moveMatches) {
-          final move = match.group(1);
-          if (move != null && move.isNotEmpty) {
-            currentMoves.add(move);
-          }
-        }
-      }
-    }
-
-    // Add last game
-    if (currentMetadata != null && currentMoves.isNotEmpty) {
-      games.add(_createGameRecord(currentMetadata, currentMoves));
-    }
-
-    return games;
-  }
-
-  /// Create a game record from metadata and moves
-  static Map<String, dynamic> _createGameRecord(
-    Map<String, String> metadata,
-    List<String> moves,
-  ) {
-    // Extract FEN from "판" field
-    String? fenPosition;
-    if (metadata.containsKey('판')) {
-      final fenParts = metadata['판']!.split(' ');
-      if (fenParts.isNotEmpty) {
-        fenPosition = fenParts[0]; // Just the board position part
-      }
-    }
-
+  Map<String, dynamic> toJson() {
     return {
-      'metadata': metadata,
-      'moves': List<String>.from(moves),
-      'fen': fenPosition,
-      'title': metadata['초나라명'] ?? metadata['대회명칭'] ?? '묘수풀이',
-      'description': metadata['비고'] ?? '',
-      'bluePlayer': metadata['초나라명'] ?? '초',
-      'redPlayer': metadata['한나라명'] ?? '한',
-      'result': metadata['결과'] ?? '',
+      'sourceId': sourceId,
+      'sourceType': sourceType,
+      'sourceUrl': sourceUrl,
+      'downloadUrl': downloadUrl,
+      'localPath': localPath,
+      'gameId': gameId,
+      'gameIndex': gameIndex,
+      'title': title,
+      'round': round,
+      'date': date,
+      'players': players,
+      'result': result,
+      'setupBlue': setupBlue,
+      'setupRed': setupRed,
+      'moves': moves,
+      'moveCount': moveCount,
+      'initialFen': initialFen,
+      'rawMetadata': rawMetadata,
+      'encoding': encoding,
     };
   }
+}
 
-  /// Parse a single GIB game entry
+class GibParser {
+  static final RegExp _metadataPattern = RegExp(r'\[([^\]"]+)\s*"([^"]*)"\]');
+  static final RegExp _numberedMovePattern = RegExp(r'\b\d+\.\s*([^\s]+)');
+  static final RegExp _coordPattern = RegExp(r'(\d)(\d)[^\d]*(\d)(\d)');
+
+  static const Map<String, String> _metadataKeyAliases = {
+    'title': 'title',
+    'event': 'title',
+    'gametitle': 'title',
+    '대회명': 'title',
+    '대국명': 'title',
+    'round': 'round',
+    '회전': 'round',
+    'date': 'date',
+    '대국일자': 'date',
+    'blueplayer': 'bluePlayer',
+    '초대국자': 'bluePlayer',
+    'redplayer': 'redPlayer',
+    '한대국자': 'redPlayer',
+    'hanplayer1': 'bluePlayer',
+    'hanplayer2': 'redPlayer',
+    'result': 'result',
+    '대국결과': 'result',
+    'bluesetup': 'setupBlue',
+    '초차림': 'setupBlue',
+    'redsetup': 'setupRed',
+    '한차림': 'setupRed',
+    'setupblue': 'setupBlue',
+    'setupred': 'setupRed',
+    'fen': 'initialFen',
+    'initialfen': 'initialFen',
+    'position': 'initialFen',
+    'board': 'initialFen',
+  };
+
+  static List<Map<String, dynamic>> parseGibFile(String gibContent) {
+    final normalized = parseNormalizedGames(
+      gibContent,
+      sourceId: 'legacy',
+      sourceType: 'legacy',
+      sourceUrl: null,
+      localPath: '',
+      encoding: 'utf8',
+    );
+    return normalized.map(_legacyGameRecordFromNormalized).toList();
+  }
+
   static Map<String, dynamic> parseGib(String gibContent) {
     final games = parseGibFile(gibContent);
     return games.isNotEmpty
@@ -96,38 +138,264 @@ class GibParser {
             'metadata': <String, String>{},
             'moves': <String>[],
             'fen': null,
-            'title': '묘수풀이',
+            'title': 'Untitled GIB',
             'description': '',
           };
   }
 
-  /// Parse FEN string to Board (if GIB contains FEN position)
+  static GibDecodedContent decodeBytes(
+    List<int> bytes, {
+    String? sourceLabel,
+  }) {
+    final utf8Decoded = _tryDecodeUtf8(bytes);
+    if (utf8Decoded != null && _looksDecoded(utf8Decoded)) {
+      return GibDecodedContent(text: utf8Decoded, encoding: 'utf8');
+    }
+
+    if (Platform.isWindows) {
+      for (final codePage in const <int>[949, 51949]) {
+        final decoded = _decodeWithWindowsCodePage(bytes, codePage);
+        if (decoded != null && _looksDecoded(decoded)) {
+          return GibDecodedContent(
+            text: decoded,
+            encoding: codePage == 949 ? 'cp949' : 'euc-kr',
+          );
+        }
+      }
+    }
+
+    return GibDecodedContent(
+      text: utf8.decode(bytes, allowMalformed: true),
+      encoding: 'utf8-lossy',
+    );
+  }
+
+  static List<GibNormalizedGame> parseNormalizedGamesFromBytes(
+    List<int> bytes, {
+    required String sourceId,
+    required String sourceType,
+    required String? sourceUrl,
+    required String localPath,
+    String? downloadUrl,
+  }) {
+    final decoded = decodeBytes(bytes, sourceLabel: localPath);
+    return parseNormalizedGames(
+      decoded.text,
+      sourceId: sourceId,
+      sourceType: sourceType,
+      sourceUrl: sourceUrl,
+      localPath: localPath,
+      encoding: decoded.encoding,
+      downloadUrl: downloadUrl,
+    );
+  }
+
+  static List<GibNormalizedGame> parseNormalizedGames(
+    String gibContent, {
+    required String sourceId,
+    required String sourceType,
+    required String? sourceUrl,
+    required String localPath,
+    required String encoding,
+    String? downloadUrl,
+  }) {
+    final lines = const LineSplitter().convert(gibContent);
+    final games = <GibNormalizedGame>[];
+    Map<String, String>? currentMetadata;
+    final currentMoves = <String>[];
+    int gameIndex = 0;
+
+    void flushCurrentGame() {
+      if (currentMetadata == null || currentMoves.isEmpty) {
+        currentMetadata = null;
+        currentMoves.clear();
+        return;
+      }
+
+      games.add(
+        _createNormalizedGame(
+          metadata: currentMetadata!,
+          moves: List<String>.from(currentMoves),
+          sourceId: sourceId,
+          sourceType: sourceType,
+          sourceUrl: sourceUrl,
+          localPath: localPath,
+          encoding: encoding,
+          gameIndex: gameIndex,
+          downloadUrl: downloadUrl,
+        ),
+      );
+      gameIndex++;
+      currentMetadata = null;
+      currentMoves.clear();
+    }
+
+    for (final rawLine in lines) {
+      final line = rawLine.trim();
+      if (line.isEmpty) continue;
+
+      final metadataEntry = _parseMetadataLine(line);
+      if (metadataEntry != null) {
+        if (currentMetadata != null && currentMoves.isNotEmpty) {
+          flushCurrentGame();
+        }
+        currentMetadata ??= <String, String>{};
+        currentMetadata![metadataEntry.key] = metadataEntry.value;
+        continue;
+      }
+
+      final extractedMoves = extractNumberedMoves(line);
+      if (extractedMoves.isNotEmpty) {
+        currentMoves.addAll(extractedMoves);
+      }
+    }
+
+    flushCurrentGame();
+    return games;
+  }
+
+  static GibNormalizedGame parsePlainTextMoveList(
+    String content, {
+    required String sourceId,
+    required String sourceType,
+    required String localPath,
+    required String title,
+    required String encoding,
+    String? sourceUrl,
+  }) {
+    final moves = <String>[];
+    final rawMetadata = <String, String>{};
+
+    for (final rawLine in const LineSplitter().convert(content)) {
+      final line = rawLine.trim();
+      if (line.isEmpty) continue;
+
+      final metadataEntry = _parseMetadataLine(line);
+      if (metadataEntry != null) {
+        rawMetadata[metadataEntry.key] = metadataEntry.value;
+      }
+      moves.addAll(extractNumberedMoves(line));
+    }
+
+    final blueSetup =
+        parsePieceSetup(_findCanonicalMetadataValue(rawMetadata, 'setupBlue'));
+    final redSetup =
+        parsePieceSetup(_findCanonicalMetadataValue(rawMetadata, 'setupRed'));
+
+    return GibNormalizedGame(
+      sourceId: sourceId,
+      sourceType: sourceType,
+      sourceUrl: sourceUrl,
+      downloadUrl: null,
+      localPath: localPath,
+      gameId: '$sourceId#1',
+      gameIndex: 0,
+      title: title,
+      round: _findCanonicalMetadataValue(rawMetadata, 'round'),
+      date: _findCanonicalMetadataValue(rawMetadata, 'date'),
+      players: {
+        'blue': _findCanonicalMetadataValue(rawMetadata, 'bluePlayer'),
+        'red': _findCanonicalMetadataValue(rawMetadata, 'redPlayer'),
+      },
+      result: _findCanonicalMetadataValue(rawMetadata, 'result'),
+      setupBlue:
+          blueSetup == null ? null : pieceSetupToCanonicalString(blueSetup),
+      setupRed: redSetup == null ? null : pieceSetupToCanonicalString(redSetup),
+      moves: moves,
+      moveCount: moves.length,
+      initialFen: createInitialFen(blueSetup: blueSetup, redSetup: redSetup),
+      rawMetadata: rawMetadata,
+      encoding: encoding,
+    );
+  }
+
+  static List<String> extractNumberedMoves(String line) {
+    return _numberedMovePattern
+        .allMatches(line)
+        .map((match) => match.group(1)?.trim() ?? '')
+        .where((move) => move.isNotEmpty)
+        .toList(growable: false);
+  }
+
+  static bool looksLikeGib(String content) {
+    return content.contains('[') &&
+        _metadataPattern.hasMatch(content) &&
+        _numberedMovePattern.hasMatch(content);
+  }
+
+  static bool looksLikePlainTextMoveList(String content) {
+    return !looksLikeGib(content) && _numberedMovePattern.hasMatch(content);
+  }
+
+  static PieceSetup? parsePieceSetup(String? rawValue) {
+    if (rawValue == null) return null;
+    final normalized = rawValue
+        .replaceAll(RegExp(r'\s+'), '')
+        .replaceAll(RegExp(r'[^a-zA-Z0-9가-힣]+'), '')
+        .toLowerCase();
+
+    switch (normalized) {
+      case '상마마상':
+      case 'elephanthorsehorseelephant':
+        return PieceSetup.elephantHorseHorseElephant;
+      case '상마상마':
+      case 'elephanthorseelephanthorse':
+        return PieceSetup.elephantHorseElephantHorse;
+      case '마상상마':
+      case 'horseelephantelephanthorse':
+        return PieceSetup.horseElephantElephantHorse;
+      case '마상마상':
+      case 'horseelephanthorseelephant':
+        return PieceSetup.horseElephantHorseElephant;
+      default:
+        return null;
+    }
+  }
+
+  static String pieceSetupToCanonicalString(PieceSetup setup) {
+    switch (setup) {
+      case PieceSetup.elephantHorseHorseElephant:
+        return 'elephantHorseHorseElephant';
+      case PieceSetup.elephantHorseElephantHorse:
+        return 'elephantHorseElephantHorse';
+      case PieceSetup.horseElephantElephantHorse:
+        return 'horseElephantElephantHorse';
+      case PieceSetup.horseElephantHorseElephant:
+        return 'horseElephantHorseElephant';
+    }
+  }
+
+  static String createInitialFen({
+    PieceSetup? blueSetup,
+    PieceSetup? redSetup,
+  }) {
+    final board = Board();
+    board.setupInitialPosition(
+      blueSetup: blueSetup ?? PieceSetup.horseElephantHorseElephant,
+      redSetup: redSetup ?? PieceSetup.horseElephantHorseElephant,
+    );
+    return boardToFen(board, PieceColor.blue);
+  }
+
   static Board? fenToBoard(String fen) {
     try {
       final parts = fen.split(' ');
       if (parts.isEmpty) return null;
 
       final board = Board();
-      board.clear(); // Clear default setup
-
-      final rows = parts[0].split('/');
+      board.clear();
+      final rows = parts.first.split('/');
       if (rows.length != 10) return null;
 
       for (int rank = 0; rank < 10; rank++) {
         int file = 0;
-        final row = rows[rank];
-
-        for (int i = 0; i < row.length; i++) {
-          final char = row[i];
-
-          // Handle empty squares (numbers)
-          if (char.codeUnitAt(0) >= '0'.codeUnitAt(0) &&
-              char.codeUnitAt(0) <= '9'.codeUnitAt(0)) {
-            file += int.parse(char);
+        for (int i = 0; i < rows[rank].length; i++) {
+          final char = rows[rank][i];
+          final digit = int.tryParse(char);
+          if (digit != null) {
+            file += digit;
             continue;
           }
-
-          // Parse piece
           final piece = _charToPiece(char);
           if (piece != null && file < 9) {
             board.setPiece(Position(file: file, rank: 9 - rank), piece);
@@ -135,162 +403,54 @@ class GibParser {
           file++;
         }
       }
-
       return board;
-    } catch (e) {
+    } catch (_) {
       return null;
     }
   }
 
-  /// Convert FEN character to Piece
-  static Piece? _charToPiece(String char) {
-    // Uppercase = Blue (초), Lowercase = Red (한)
-    final isBlue = char == char.toUpperCase();
-    final color = isBlue ? PieceColor.blue : PieceColor.red;
-    final c = char.toLowerCase();
-
-    PieceType? type;
-    switch (c) {
-      case 'k':
-        type = PieceType.general;
-        break;
-      case 'a':
-        type = PieceType.guard;
-        break;
-      case 'n':
-        type = PieceType.horse;
-        break;
-      case 'b':
-        type = PieceType.elephant;
-        break;
-      case 'r':
-        type = PieceType.chariot;
-        break;
-      case 'c':
-        type = PieceType.cannon;
-        break;
-      case 'p':
-        type = PieceType.soldier;
-        break;
-      default:
-        return null;
-    }
-
-    return Piece(type: type, color: color);
-  }
-
-  /// Convert Board to FEN string
   static String boardToFen(Board board, PieceColor currentPlayer) {
     final buffer = StringBuffer();
-
-    // Board position (rank 9 to 0, top to bottom)
     for (int rank = 9; rank >= 0; rank--) {
       int emptyCount = 0;
-
       for (int file = 0; file < 9; file++) {
         final piece = board.getPiece(Position(file: file, rank: rank));
-
         if (piece == null) {
           emptyCount++;
-        } else {
-          if (emptyCount > 0) {
-            buffer.write(emptyCount);
-            emptyCount = 0;
-          }
-
-          final char = _pieceToChar(piece);
-          buffer.write(char);
+          continue;
         }
+        if (emptyCount > 0) {
+          buffer.write(emptyCount);
+          emptyCount = 0;
+        }
+        buffer.write(_pieceToChar(piece));
       }
-
       if (emptyCount > 0) {
         buffer.write(emptyCount);
       }
-
       if (rank > 0) {
         buffer.write('/');
       }
     }
-
-    // Current player (w=Blue, b=Red)
     buffer.write(' ');
     buffer.write(currentPlayer == PieceColor.blue ? 'w' : 'b');
-
-    // Additional fields (castling, en passant, etc. - not used in Janggi)
     buffer.write(' - - 0 1');
-
     return buffer.toString();
   }
 
-  /// Convert Piece to FEN character
-  static String _pieceToChar(Piece piece) {
-    String char;
-    switch (piece.type) {
-      case PieceType.general:
-        char = 'k';
-        break;
-      case PieceType.guard:
-        char = 'a';
-        break;
-      case PieceType.horse:
-        char = 'n';
-        break;
-      case PieceType.elephant:
-        char = 'b';
-        break;
-      case PieceType.chariot:
-        char = 'r';
-        break;
-      case PieceType.cannon:
-        char = 'c';
-        break;
-      case PieceType.soldier:
-        char = 'p';
-        break;
-    }
-
-    // Blue = uppercase, Red = lowercase
-    return piece.color == PieceColor.blue ? char.toUpperCase() : char;
-  }
-
-  /// Parse GIB move notation to from/to positions
-  /// GIB format: "41漢兵42" means rank 4, file 1 → rank 4, file 2
-  ///
-  /// GIB coordinate system:
-  /// - YX format (rank, file) - first digit is rank, second is file
-  /// - 1-based indexing (files 1-9, ranks 1-10)
-  /// - Ranks numbered from Red's side: rank 1 = top (board rank 9), rank 10 = bottom (board rank 0)
-  /// - Files numbered left to right: file 1 = left (board file 0), file 9 = right (board file 8)
-  ///
-  /// Conversion formulas:
-  /// - boardRank = 10 - gibRank
-  /// - boardFile = gibFile - 1
-  ///
-  /// Example: "41" = GIB rank 4, file 1 = board rank 6, file 0
   static Map<String, Position>? parseGibMove(String gibMove) {
-    // Remove any trailing annotations (장군, etc.)
-    final cleanMove = gibMove.replaceAll(RegExp(r'[가-힣]+$'), '').trim();
-
-    // Extract coordinate part (should be at least 4 digits)
-    final coordMatch = RegExp(r'(\d)(\d)[^\d]*(\d)(\d)').firstMatch(cleanMove);
+    final coordMatch = _coordPattern.firstMatch(gibMove);
     if (coordMatch == null) return null;
 
     try {
-      // Parse the 4 digits: YX YX format (rank-file rank-file)
-      var gibFromRank = int.parse(
-          coordMatch.group(1)!); // First digit = rank (1-10, 0 means 10)
-      final gibFromFile =
-          int.parse(coordMatch.group(2)!); // Second digit = file (1-9)
-      var gibToRank = int.parse(
-          coordMatch.group(3)!); // Third digit = rank (1-10, 0 means 10)
-      final gibToFile =
-          int.parse(coordMatch.group(4)!); // Fourth digit = file (1-9)
+      var gibFromRank = int.parse(coordMatch.group(1)!);
+      final gibFromFile = int.parse(coordMatch.group(2)!);
+      var gibToRank = int.parse(coordMatch.group(3)!);
+      final gibToFile = int.parse(coordMatch.group(4)!);
 
-      // Some GIB files encode rank 10 as 0.
       if (gibFromRank == 0) gibFromRank = 10;
       if (gibToRank == 0) gibToRank = 10;
 
-      // Validate GIB coordinates (1-based)
       if (gibFromRank < 1 ||
           gibFromRank > 10 ||
           gibFromFile < 1 ||
@@ -302,116 +462,263 @@ class GibParser {
         return null;
       }
 
-      // Convert GIB coordinates to 0-based board coordinates
-      final fromRank = 10 - gibFromRank; // GIB rank 1 (top) = board rank 9
-      final fromFile = gibFromFile - 1; // GIB file 1 (left) = board file 0
-      final toRank = 10 - gibToRank;
-      final toFile = gibToFile - 1;
-
       return {
-        'from': Position(file: fromFile, rank: fromRank),
-        'to': Position(file: toFile, rank: toRank),
+        'from': Position(file: gibFromFile - 1, rank: 10 - gibFromRank),
+        'to': Position(file: gibToFile - 1, rank: 10 - gibToRank),
       };
-    } catch (e) {
+    } catch (_) {
       return null;
     }
   }
 
-  /// Replay moves on a board and return the resulting position
-  /// Returns null if replay fails
-  static Board? replayMovesToPosition(List<String> gibMoves, {int? upToMove}) {
-    final board = Board();
-    board.setupInitialPosition();
-
-    final moveCount = upToMove ?? gibMoves.length;
-    final movesToReplay = gibMoves.take(moveCount).toList();
-
-    for (var i = 0; i < movesToReplay.length; i++) {
-      final gibMove = movesToReplay[i];
-      final positions = parseGibMove(gibMove);
-
-      if (positions == null) {
-        // Skip invalid moves
-        continue;
-      }
-
-      final from = positions['from']!;
-      final to = positions['to']!;
-
-      // Make the move on the board
-      board.movePiece(from, to);
+  static Board? replayMovesToPosition(
+    List<String> gibMoves, {
+    int? upToMove,
+    PieceSetup blueSetup = PieceSetup.horseElephantHorseElephant,
+    PieceSetup redSetup = PieceSetup.horseElephantHorseElephant,
+    Board? initialBoard,
+  }) {
+    final board = initialBoard?.copy() ?? Board();
+    if (initialBoard == null) {
+      board.setupInitialPosition(blueSetup: blueSetup, redSetup: redSetup);
     }
 
+    final moveCount = upToMove ?? gibMoves.length;
+    for (final gibMove in gibMoves.take(moveCount)) {
+      final positions = parseGibMove(gibMove);
+      if (positions == null) continue;
+      board.movePiece(positions['from']!, positions['to']!);
+    }
     return board;
   }
 
-  /// Evaluate position score using Stockfish's new analyze function
-  /// Returns evaluation in format: {'type': 'cp'/'mate', 'value': score}
-  /// This uses the new stockfish_analyze C++ function that extracts score directly
-  static Future<Map<String, dynamic>?> _evaluatePosition(
-      Board board, PieceColor currentPlayer) async {
-    try {
-      final fen = StockfishConverter.boardToFEN(board, currentPlayer);
+  static GibNormalizedGame _createNormalizedGame({
+    required Map<String, String> metadata,
+    required List<String> moves,
+    required String sourceId,
+    required String sourceType,
+    required String? sourceUrl,
+    required String localPath,
+    required String encoding,
+    required int gameIndex,
+    String? downloadUrl,
+  }) {
+    final title =
+        _findCanonicalMetadataValue(metadata, 'title') ?? 'Untitled GIB Game';
+    final round = _findCanonicalMetadataValue(metadata, 'round');
+    final date = _findCanonicalMetadataValue(metadata, 'date');
+    final bluePlayer = _findCanonicalMetadataValue(metadata, 'bluePlayer');
+    final redPlayer = _findCanonicalMetadataValue(metadata, 'redPlayer');
+    final result = _findCanonicalMetadataValue(metadata, 'result');
+    final setupBlue =
+        parsePieceSetup(_findCanonicalMetadataValue(metadata, 'setupBlue'));
+    final setupRed =
+        parsePieceSetup(_findCanonicalMetadataValue(metadata, 'setupRed'));
+    final explicitFen = _findCanonicalMetadataValue(metadata, 'initialFen');
+    final initialFen = explicitFen ??
+        createInitialFen(blueSetup: setupBlue, redSetup: setupRed);
 
-      // Use isolate path so puzzle loading does not block UI rendering.
-      final result = await StockfishFFI.analyzeIsolated(fen, depth: 10);
+    return GibNormalizedGame(
+      sourceId: sourceId,
+      sourceType: sourceType,
+      sourceUrl: sourceUrl,
+      downloadUrl: downloadUrl,
+      localPath: localPath,
+      gameId: '$sourceId#${gameIndex + 1}',
+      gameIndex: gameIndex,
+      title: title,
+      round: round,
+      date: date,
+      players: {
+        'blue': bluePlayer,
+        'red': redPlayer,
+      },
+      result: result,
+      setupBlue:
+          setupBlue == null ? null : pieceSetupToCanonicalString(setupBlue),
+      setupRed: setupRed == null ? null : pieceSetupToCanonicalString(setupRed),
+      moves: moves,
+      moveCount: moves.length,
+      initialFen: initialFen,
+      rawMetadata: Map<String, String>.from(metadata),
+      encoding: encoding,
+    );
+  }
 
-      if (result != null) {
-        return {
-          'type': result['type'],
-          'value': result['value'],
-        };
+  static Map<String, dynamic> _legacyGameRecordFromNormalized(
+    GibNormalizedGame game,
+  ) {
+    return {
+      'metadata': game.rawMetadata,
+      'moves': List<String>.from(game.moves),
+      'fen': game.initialFen,
+      'title': game.title,
+      'description': '',
+      'bluePlayer': game.players['blue'] ?? 'blue',
+      'redPlayer': game.players['red'] ?? 'red',
+      'result': game.result ?? '',
+    };
+  }
+
+  static String? _findCanonicalMetadataValue(
+    Map<String, String> metadata,
+    String canonicalKey,
+  ) {
+    for (final entry in metadata.entries) {
+      final alias = _metadataKeyAliases[_normalizeMetadataKey(entry.key)];
+      if (alias == canonicalKey) {
+        return entry.value.trim();
       }
+    }
 
-      // Fallback: position might be unclear
-      return {'type': 'cp', 'value': 0};
-    } catch (e) {
-      print('ERROR in _evaluatePosition: $e');
+    final values = metadata.values
+        .map((value) => value.trim())
+        .where((value) => value.isNotEmpty)
+        .toList(growable: false);
+    if (values.isEmpty) return null;
+
+    switch (canonicalKey) {
+      case 'title':
+        return values.isNotEmpty ? values[0] : null;
+      case 'round':
+        return values.length > 1 ? values[1] : null;
+      case 'date':
+        for (final value in values) {
+          if (RegExp(r'^\d{4}[-./]\d{2}[-./]\d{2}$').hasMatch(value)) {
+            return value.replaceAll('.', '-');
+          }
+        }
+        return values.length > 2 ? values[2] : null;
+      case 'bluePlayer':
+        return values.length > 4 ? values[4] : null;
+      case 'redPlayer':
+        return values.length > 5 ? values[5] : null;
+      case 'setupBlue':
+        return values.length > 6 ? values[6] : null;
+      case 'setupRed':
+        return values.length > 7 ? values[7] : null;
+      case 'result':
+        return values.isNotEmpty ? values.last : null;
+      default:
+        return null;
+    }
+  }
+
+  static String _normalizeMetadataKey(String key) {
+    return key.trim().toLowerCase().replaceAll(RegExp(r'[\s_:\-]'), '');
+  }
+
+  static MapEntry<String, String>? _parseMetadataLine(String line) {
+    final strictMatch = _metadataPattern.firstMatch(line);
+    if (strictMatch != null) {
+      return MapEntry(
+        strictMatch.group(1)!.trim(),
+        strictMatch.group(2)!.trim(),
+      );
+    }
+
+    if (!line.startsWith('[') || !line.contains('"')) {
+      return null;
+    }
+
+    final firstQuote = line.indexOf('"');
+    if (firstQuote <= 1) {
+      return null;
+    }
+
+    final key = line.substring(1, firstQuote).trim();
+    var value = line.substring(firstQuote + 1).trim();
+    if (value.endsWith('"]')) {
+      value = value.substring(0, value.length - 2);
+    } else if (value.endsWith(']')) {
+      value = value.substring(0, value.length - 1);
+    } else if (value.endsWith('"')) {
+      value = value.substring(0, value.length - 1);
+    }
+
+    if (key.isEmpty || value.isEmpty) {
+      return null;
+    }
+    return MapEntry(key, value.trim());
+  }
+
+  static String? _tryDecodeUtf8(List<int> bytes) {
+    try {
+      return utf8.decode(bytes, allowMalformed: false);
+    } catch (_) {
       return null;
     }
   }
 
-  /// Find the critical puzzle position using reverse analysis
-  /// Returns the move index where the decisive sequence begins
-  /// Uses Stockfish to detect cp -> mate transition
-  static Future<int> findPuzzleStartPosition(
-    List<String> gibMoves, {
-    int minMovesFromEnd = 5,
-    int maxMovesFromEnd = 30,
-  }) async {
-    // Start from near the end and work backwards
-    final totalMoves = gibMoves.length;
-    final startSearchFrom = (totalMoves - minMovesFromEnd).clamp(0, totalMoves);
-    final endSearchAt = (totalMoves - maxMovesFromEnd).clamp(0, totalMoves);
+  static bool _looksDecoded(String value) {
+    if (value.trim().isEmpty) return false;
+    if (value.contains('\uFFFD') || value.contains('\u0000')) return false;
+    if (looksLikeGib(value) || looksLikePlainTextMoveList(value)) return true;
+    return value.contains('[') && value.contains('"');
+  }
 
-    String? previousType;
+  static String? _decodeWithWindowsCodePage(List<int> bytes, int codePage) {
+    final tempDir = Directory.systemTemp.createTempSync('janggi_gib_decode_');
+    final tempFile = File('${tempDir.path}${Platform.pathSeparator}input.bin');
+    tempFile.writeAsBytesSync(bytes, flush: true);
 
-    // Search backwards for cp -> mate transition
-    for (int moveIdx = startSearchFrom; moveIdx >= endSearchAt; moveIdx--) {
-      // Replay to this position
-      final board = replayMovesToPosition(gibMoves, upToMove: moveIdx);
-      if (board == null) continue;
+    final escapedPath = tempFile.path.replaceAll("'", "''");
+    final script = [
+      r'$OutputEncoding=[Console]::OutputEncoding=[System.Text.UTF8Encoding]::new($false)',
+      '[System.Text.Encoding]::GetEncoding($codePage).GetString('
+          "[System.IO.File]::ReadAllBytes('$escapedPath'))",
+    ].join('; ');
 
-      // Determine current player
-      final currentPlayer =
-          (moveIdx % 2 == 0) ? PieceColor.blue : PieceColor.red;
-
-      // Evaluate position
-      final eval = await _evaluatePosition(board, currentPlayer);
-      if (eval == null) continue;
-
-      final currentType = eval['type'] as String;
-
-      // Detect transition: mate -> cp (going backwards means cp -> mate going forwards)
-      if (previousType == 'mate' && currentType == 'cp') {
-        // Found the transition! The next position (moveIdx + 1) is where mate sequence starts
-        return moveIdx + 1;
+    try {
+      final result = Process.runSync(
+        'powershell',
+        <String>['-NoProfile', '-Command', script],
+        runInShell: false,
+        stdoutEncoding: utf8,
+        stderrEncoding: utf8,
+      );
+      if (result.exitCode != 0) {
+        return null;
       }
-
-      previousType = currentType;
+      return (result.stdout as String).replaceAll('\r\n', '\n').trimRight();
+    } catch (_) {
+      return null;
+    } finally {
+      if (tempDir.existsSync()) {
+        tempDir.deleteSync(recursive: true);
+      }
     }
+  }
 
-    // Fallback: return 70% if no critical position found
-    return (totalMoves * 0.7).round().clamp(10, totalMoves - 5);
+  static Piece? _charToPiece(String char) {
+    final isBlue = char == char.toUpperCase();
+    final color = isBlue ? PieceColor.blue : PieceColor.red;
+    final lower = char.toLowerCase();
+
+    final type = switch (lower) {
+      'k' => PieceType.general,
+      'a' => PieceType.guard,
+      'n' => PieceType.horse,
+      'b' => PieceType.elephant,
+      'r' => PieceType.chariot,
+      'c' => PieceType.cannon,
+      'p' => PieceType.soldier,
+      _ => null,
+    };
+    if (type == null) return null;
+    return Piece(type: type, color: color);
+  }
+
+  static String _pieceToChar(Piece piece) {
+    final base = switch (piece.type) {
+      PieceType.general => 'k',
+      PieceType.guard => 'a',
+      PieceType.horse => 'n',
+      PieceType.elephant => 'b',
+      PieceType.chariot => 'r',
+      PieceType.cannon => 'c',
+      PieceType.soldier => 'p',
+    };
+    return piece.color == PieceColor.blue ? base.toUpperCase() : base;
   }
 }

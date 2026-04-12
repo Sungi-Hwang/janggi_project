@@ -1,0 +1,10 @@
+﻿기능: 묘수풀이 진행 화면
+파일: screenshot.png
+원본: D:\Project\janggi-master\janggi_master\test_tmp\puzzle_before_hint.png
+
+설명:
+실제 묘수풀이 플레이 화면입니다. 진행 카운트, 보드 상태, 다시 시작/힌트/무르기 버튼이 함께 보이는 현재 퍼즐 플레이 UI입니다.
+
+비고:
+이 폴더는 현재 UI와 맞는 최근 캡처만 다시 선별해서 구성한 묶음입니다.
+이전 beta/old 계열 스크린샷 폴더보다 최신 디자인 반영도가 높습니다.

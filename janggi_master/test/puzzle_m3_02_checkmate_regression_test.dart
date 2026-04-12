@@ -18,7 +18,7 @@ Future<void> _move(GameState state, String from, String to) async {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('m3_02 should not end early after the center capture', () async {
+  test('m3_02 becomes mate after the palace-center capture', () async {
     const fen = '4ck3/4aa3/9/9/1p5p1/3R5/3P1r3/9/4C4/3K5 b - - 0 1';
 
     final state = GameState(gameMode: GameMode.twoPlayer);
@@ -30,16 +30,10 @@ void main() {
 
     expect(
       state.isGameOver,
-      isFalse,
-      reason: 'm3_02 is a mate-in-3 line and must continue after f1e2.',
-    );
-
-    await state.onSquareTapped(_uci('d2'));
-    expect(
-      state.validMoves,
-      containsAll(<Position>[_uci('d1'), _uci('d3')]),
+      isTrue,
       reason:
-          'After f1e2, the defending king must still be able to escape to d1 or d3.',
+          'With the red chariot on the palace center, both palace-corner escapes are still covered diagonally.',
     );
+    expect(state.gameOverReason, 'red_wins_checkmate');
   });
 }

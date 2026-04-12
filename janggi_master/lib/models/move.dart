@@ -8,6 +8,8 @@ class Move {
   final Piece? capturedPiece;
   final bool isCheck;
   final bool isCheckmate;
+  final bool isPass;
+  final String? engineUci;
 
   const Move({
     required this.from,
@@ -15,6 +17,8 @@ class Move {
     this.capturedPiece,
     this.isCheck = false,
     this.isCheckmate = false,
+    this.isPass = false,
+    this.engineUci,
   });
 
   /// Create move from UCI notation (e.g., "e2e4")
@@ -38,10 +42,16 @@ class Move {
   /// Convert to UCI notation for Stockfish
   /// Stockfish uses ranks 1-10, but Flutter uses 0-9
   String toUCI() {
+    if (engineUci != null && engineUci!.isNotEmpty) {
+      return engineUci!;
+    }
+
     final fromFile = String.fromCharCode('a'.codeUnitAt(0) + from.file);
-    final fromRank = from.rank + 1; // Convert Flutter rank (0-9) to Stockfish rank (1-10)
+    final fromRank =
+        from.rank + 1; // Convert Flutter rank (0-9) to Stockfish rank (1-10)
     final toFile = String.fromCharCode('a'.codeUnitAt(0) + to.file);
-    final toRank = to.rank + 1; // Convert Flutter rank (0-9) to Stockfish rank (1-10)
+    final toRank =
+        to.rank + 1; // Convert Flutter rank (0-9) to Stockfish rank (1-10)
     return '$fromFile$fromRank$toFile$toRank';
   }
 
@@ -59,6 +69,10 @@ class Move {
 
   @override
   String toString() {
+    if (isPass) {
+      return 'pass';
+    }
+
     final buffer = StringBuffer();
     buffer.write(toUCI());
     if (isCapture) buffer.write('x${capturedPiece!.character}');
@@ -76,6 +90,8 @@ class Move {
     Piece? capturedPiece,
     bool? isCheck,
     bool? isCheckmate,
+    bool? isPass,
+    String? engineUci,
   }) {
     return Move(
       from: from ?? this.from,
@@ -83,6 +99,8 @@ class Move {
       capturedPiece: capturedPiece ?? this.capturedPiece,
       isCheck: isCheck ?? this.isCheck,
       isCheckmate: isCheckmate ?? this.isCheckmate,
+      isPass: isPass ?? this.isPass,
+      engineUci: engineUci ?? this.engineUci,
     );
   }
 }

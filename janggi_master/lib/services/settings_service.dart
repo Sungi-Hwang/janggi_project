@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import '../models/rule_mode.dart';
 import '../theme/janggi_skin.dart';
 
 /// 앱의 설정을 관리하는 서비스
@@ -11,6 +12,7 @@ class SettingsService {
   static const String _keyShowCoordinates = 'show_coordinates';
   static const String _keyAiThinkingTime = 'ai_thinking_time';
   static const String _keyAiDifficulty = 'ai_difficulty';
+  static const String _keyRuleMode = 'rule_mode';
 
   late SharedPreferences _prefs;
 
@@ -56,4 +58,10 @@ class SettingsService {
   int get aiDifficulty => _prefs.getInt(_keyAiDifficulty) ?? 5;
   Future<void> setAiDifficulty(int value) =>
       _prefs.setInt(_keyAiDifficulty, value.clamp(1, 15));
+
+  RuleMode get ruleMode =>
+      RuleModeX.fromStorageValue(_prefs.getString(_keyRuleMode));
+
+  Future<void> setRuleMode(RuleMode value) =>
+      _prefs.setString(_keyRuleMode, value.storageValue);
 }

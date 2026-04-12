@@ -1,19 +1,64 @@
+import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
 import 'package:ffi/ffi.dart';
 import 'package:flutter/foundation.dart';
+import 'models/rule_mode.dart';
 
 // Define the C function signatures
 typedef StockfishInitC = Void Function();
 typedef StockfishCommandC = Pointer<Char> Function(Pointer<Char>);
 typedef StockfishCleanupC = Void Function();
-typedef StockfishAnalyzeC = Pointer<Char> Function(Pointer<Char>, Int32);
+typedef StockfishAnalyzeC = Pointer<Char> Function(
+    Pointer<Char>, Pointer<Char>, Int32);
+typedef StockfishPositionStateC = Pointer<Char> Function(
+    Pointer<Char>, Pointer<Char>, Pointer<Char>);
 
 // Define the Dart function types
 typedef StockfishInit = void Function();
 typedef StockfishCommand = Pointer<Char> Function(Pointer<Char>);
 typedef StockfishCleanup = void Function();
-typedef StockfishAnalyze = Pointer<Char> Function(Pointer<Char>, int);
+typedef StockfishAnalyze = Pointer<Char> Function(
+    Pointer<Char>, Pointer<Char>, int);
+typedef StockfishPositionState = Pointer<Char> Function(
+    Pointer<Char>, Pointer<Char>, Pointer<Char>);
+
+class EnginePositionState {
+  final String sideToMove;
+  final List<String> legalMoves;
+  final bool inCheck;
+  final bool bikjang;
+  final bool canPass;
+  final bool gameOver;
+  final String winner;
+  final String reason;
+
+  const EnginePositionState({
+    required this.sideToMove,
+    required this.legalMoves,
+    required this.inCheck,
+    required this.bikjang,
+    required this.canPass,
+    required this.gameOver,
+    required this.winner,
+    required this.reason,
+  });
+
+  factory EnginePositionState.fromJson(Map<String, dynamic> json) {
+    return EnginePositionState(
+      sideToMove: json['sideToMove'] as String? ?? 'blue',
+      legalMoves: (json['legalMoves'] as List<dynamic>? ?? const <dynamic>[])
+          .whereType<String>()
+          .toList(growable: false),
+      inCheck: json['inCheck'] as bool? ?? false,
+      bikjang: json['bikjang'] as bool? ?? false,
+      canPass: json['canPass'] as bool? ?? false,
+      gameOver: json['gameOver'] as bool? ?? false,
+      winner: json['winner'] as String? ?? 'none',
+      reason: json['reason'] as String? ?? 'ongoing',
+    );
+  }
+}
 
 class StockfishFFI {
   static DynamicLibrary? _lib;
@@ -25,6 +70,11 @@ class StockfishFFI {
   static const int _minHashMb = 16;
   static const int _maxHashMb = 512;
   static const int _maxThreads = 64;
+  static String _activeVariant = RuleMode.officialKja.engineVariantName;
+
+  static void _log(String message) {
+    debugPrint(message);
+  }
 
   // Lazy load the library
   static DynamicLibrary get _library {
@@ -61,6 +111,11 @@ class StockfishFFI {
       .lookup<NativeFunction<StockfishAnalyzeC>>('stockfish_analyze')
       .asFunction();
 
+  static final StockfishPositionState _stockfishPositionState = _library
+      .lookup<NativeFunction<StockfishPositionStateC>>(
+          'stockfish_position_state')
+      .asFunction();
+
   static int _defaultThreads() {
     final cpuCount = Platform.numberOfProcessors;
     if (cpuCount <= 0) return 1;
@@ -84,48 +139,83 @@ class StockfishFFI {
     return result.trim();
   }
 
+  static String _normalizeVariant(String? variant) {
+    final normalized = variant?.trim().toLowerCase();
+    if (normalized == null || normalized.isEmpty) {
+      return RuleMode.officialKja.engineVariantName;
+    }
+    return normalized;
+  }
+
+  static void _ensureVariant(String variant) {
+    if (!_initialized) {
+      throw StateError('Stockfish not initialized. Call init() first.');
+    }
+
+    final resolvedVariant = _normalizeVariant(variant);
+    if (_activeVariant == resolvedVariant) {
+      return;
+    }
+
+    _log('Switching variant to $resolvedVariant...');
+    _commandUnchecked('setoption name UCI_Variant value $resolvedVariant');
+    _commandUnchecked('ucinewgame');
+    final ready = _commandUnchecked('isready');
+    _log('isready response after variant switch: $ready');
+    _activeVariant = resolvedVariant;
+  }
+
   // Public Dart methods
-  static void init({int? threads, int? hashMb}) {
+  static void init({
+    int? threads,
+    int? hashMb,
+    String variant = 'janggi',
+  }) {
+    final resolvedVariant = _normalizeVariant(variant);
     if (!_initialized) {
       try {
         final resolvedThreads = _sanitizeThreads(threads ?? _defaultThreads());
         final resolvedHashMb = _sanitizeHashMb(hashMb ?? _defaultHashMb);
 
-        print('Initializing Stockfish engine...');
+        _log('Initializing Stockfish engine...');
         _stockfishInit();
 
         // Initialize UCI protocol
-        print('Sending UCI initialization commands...');
+        _log('Sending UCI initialization commands...');
         final result1 = _commandUnchecked('uci');
-        print('UCI response: $result1');
+        _log('UCI response: $result1');
 
-        // Set variant to janggi
-        print('Setting variant to janggi...');
-        _commandUnchecked('setoption name UCI_Variant value janggi');
+        // Set variant before any position-dependent commands.
+        _log('Setting variant to $resolvedVariant...');
+        _commandUnchecked('setoption name UCI_Variant value $resolvedVariant');
+        _activeVariant = resolvedVariant;
 
         // Configure engine resources for mobile stability/performance.
-        print('Setting Threads to $resolvedThreads...');
+        _log('Setting Threads to $resolvedThreads...');
         _commandUnchecked('setoption name Threads value $resolvedThreads');
 
-        print('Setting Hash to ${resolvedHashMb}MB...');
+        _log('Setting Hash to ${resolvedHashMb}MB...');
         _commandUnchecked('setoption name Hash value $resolvedHashMb');
 
         // Keep MultiPV deterministic for game play.
-        print('Setting MultiPV to 1 for stable best-move parsing...');
+        _log('Setting MultiPV to 1 for stable best-move parsing...');
         _commandUnchecked('setoption name MultiPV value 1');
 
         // Send isready to confirm
         final result3 = _commandUnchecked('isready');
-        print('isready response: $result3');
+        _log('isready response: $result3');
 
         _initialized = true;
-        print('Stockfish engine initialized successfully with Janggi variant');
+        _log(
+          'Stockfish engine initialized successfully with $resolvedVariant variant',
+        );
       } catch (e) {
-        print('ERROR initializing Stockfish: $e');
+        _log('ERROR initializing Stockfish: $e');
         rethrow;
       }
     } else {
-      print('Stockfish already initialized');
+      _ensureVariant(resolvedVariant);
+      _log('Stockfish already initialized');
     }
   }
 
@@ -141,7 +231,8 @@ class StockfishFFI {
     if (_initialized) {
       _stockfishCleanup();
       _initialized = false;
-      print('Stockfish engine cleaned up');
+      _activeVariant = RuleMode.officialKja.engineVariantName;
+      _log('Stockfish engine cleaned up');
     }
   }
 
@@ -153,12 +244,18 @@ class StockfishFFI {
   }
 
   // Helper method to start a new game
-  static void newGame() {
+  static void newGame({String variant = 'janggi'}) {
+    _ensureVariant(variant);
     command('ucinewgame');
   }
 
   // Helper method to set position
-  static void setPosition({String? fen, List<String>? moves}) {
+  static void setPosition({
+    String? fen,
+    List<String>? moves,
+    String variant = 'janggi',
+  }) {
+    _ensureVariant(variant);
     String cmd = 'position ';
     if (fen != null) {
       debugPrint('StockfishFFI.setPosition: Using FEN: $fen');
@@ -199,7 +296,11 @@ class StockfishFFI {
   }
 
   // Helper method to get best move
-  static String? getBestMove({int depth = 10, int? movetime}) {
+  static String? getBestMove({
+    int depth = 10,
+    int? movetime,
+    bool allowPass = false,
+  }) {
     String cmd = 'go depth $depth';
     if (movetime != null && movetime > 0) {
       cmd += ' movetime $movetime';
@@ -208,7 +309,10 @@ class StockfishFFI {
     debugPrint('StockfishFFI.getBestMove: Sending command: $cmd');
     final response = command(cmd);
     debugPrint('StockfishFFI.getBestMove: Full response:\n$response');
-    final selectedMove = selectBestMoveFromEngineResponse(response);
+    final selectedMove = _selectBestMoveFromEngineResponse(
+      response,
+      allowPass: allowPass,
+    );
 
     if (selectedMove == null) {
       debugPrint('StockfishFFI.getBestMove: No bestmove found in response!');
@@ -235,7 +339,23 @@ class StockfishFFI {
     return from != to;
   }
 
-  static String? _extractPvMove(String line) {
+  static bool isPassUciMove(String move) {
+    final normalized = move.trim().toLowerCase();
+    final match = _uciMovePattern.firstMatch(normalized);
+    if (match == null) {
+      return false;
+    }
+
+    final from = '${match.group(1)}${match.group(2)}';
+    final to = '${match.group(3)}${match.group(4)}';
+    return from == to;
+  }
+
+  static bool _isRecognizedUciMove(String move, {required bool allowPass}) {
+    return isUsableUciMove(move) || (allowPass && isPassUciMove(move));
+  }
+
+  static String? _extractPvMove(String line, {required bool allowPass}) {
     if (!line.contains('info') || !line.contains(' pv ')) {
       return null;
     }
@@ -251,7 +371,7 @@ class StockfishFFI {
     }
 
     final firstMove = pvMoves.first.trim();
-    if (!isUsableUciMove(firstMove)) {
+    if (!_isRecognizedUciMove(firstMove, allowPass: allowPass)) {
       debugPrint(
           'StockfishFFI.selectBestMoveFromEngineResponse: Ignoring invalid PV move "$firstMove"');
       return null;
@@ -260,8 +380,10 @@ class StockfishFFI {
     return firstMove;
   }
 
-  @visibleForTesting
-  static String? selectBestMoveFromEngineResponse(String response) {
+  static String? _selectBestMoveFromEngineResponse(
+    String response, {
+    required bool allowPass,
+  }) {
     final lines = response.split(RegExp(r'\r?\n'));
 
     for (final rawLine in lines) {
@@ -276,7 +398,7 @@ class StockfishFFI {
       }
 
       final move = parts[1].trim();
-      if (isUsableUciMove(move)) {
+      if (_isRecognizedUciMove(move, allowPass: allowPass)) {
         return move;
       }
 
@@ -286,7 +408,7 @@ class StockfishFFI {
 
     for (final rawLine in lines) {
       final line = rawLine.trim();
-      final pvMove = _extractPvMove(line);
+      final pvMove = _extractPvMove(line, allowPass: allowPass);
       if (pvMove != null) {
         return pvMove;
       }
@@ -295,17 +417,29 @@ class StockfishFFI {
     return null;
   }
 
+  @visibleForTesting
+  static String? selectBestMoveFromEngineResponse(String response) {
+    return _selectBestMoveFromEngineResponse(response, allowPass: false);
+  }
+
   /// Analyze a position and return score + bestmove directly from engine.
   /// Returns: {'type': 'cp'/'mate', 'value': int, 'bestmove': String?}
   /// This bypasses stdout parsing and gets score directly from Thread->rootMoves.
-  static Map<String, dynamic>? analyze(String fen, {int depth = 10}) {
+  static Map<String, dynamic>? analyze(
+    String fen, {
+    int depth = 10,
+    String variant = 'janggi',
+  }) {
     if (!_initialized) {
       throw StateError('Stockfish not initialized. Call init() first.');
     }
 
+    final variantP = _normalizeVariant(variant).toNativeUtf8();
     final fenP = fen.toNativeUtf8();
-    final resultP = _stockfishAnalyze(fenP.cast<Char>(), depth);
+    final resultP =
+        _stockfishAnalyze(variantP.cast<Char>(), fenP.cast<Char>(), depth);
     final result = resultP.cast<Utf8>().toDartString();
+    malloc.free(variantP);
     malloc.free(fenP);
 
     // debugPrint('StockfishFFI.analyze: Result: "$result"');
@@ -343,53 +477,150 @@ class StockfishFFI {
     return null;
   }
 
+  static EnginePositionState? getPositionState({
+    required String rootFen,
+    List<String>? moves,
+    String variant = 'janggi',
+  }) {
+    if (!_initialized) {
+      throw StateError('Stockfish not initialized. Call init() first.');
+    }
+
+    final variantP = _normalizeVariant(variant).toNativeUtf8();
+    final fenP = rootFen.toNativeUtf8();
+    final movesP =
+        (moves == null || moves.isEmpty ? '' : moves.join(' ')).toNativeUtf8();
+
+    try {
+      final resultP = _stockfishPositionState(
+        variantP.cast<Char>(),
+        fenP.cast<Char>(),
+        movesP.cast<Char>(),
+      );
+      final result = resultP.cast<Utf8>().toDartString();
+      if (result.startsWith('error:')) {
+        debugPrint('StockfishFFI.getPositionState: $result');
+        return null;
+      }
+
+      final decoded = jsonDecode(result);
+      if (decoded is! Map<String, dynamic>) {
+        debugPrint('StockfishFFI.getPositionState: Unexpected payload $result');
+        return null;
+      }
+
+      return EnginePositionState.fromJson(decoded);
+    } catch (e) {
+      debugPrint('StockfishFFI.getPositionState: Error: $e');
+      return null;
+    } finally {
+      malloc.free(variantP);
+      malloc.free(fenP);
+      malloc.free(movesP);
+    }
+  }
+
   /// Run best-move search in a background isolate to avoid blocking the UI.
   static Future<String?> getBestMoveIsolated({
     required String fen,
+    String variant = 'janggi',
+    int depth = 10,
+    int? movetime,
+    bool allowPass = true,
+    int? threads,
+    int? hashMb,
+  }) {
+    return compute<Map<String, dynamic>, String?>(
+      _getBestMoveInIsolate,
+      _buildIsolateRequest(
+        variant: variant,
+        threads: threads,
+        hashMb: hashMb,
+        extra: <String, dynamic>{
+          'fen': fen,
+          'depth': depth,
+          'movetime': movetime,
+          'allowPass': allowPass,
+        },
+      ),
+    );
+  }
+
+  static Future<String?> getBestMoveFromHistoryIsolated({
+    required String rootFen,
+    required List<String> moves,
+    String variant = 'janggi',
     int depth = 10,
     int? movetime,
     int? threads,
     int? hashMb,
   }) {
     return compute<Map<String, dynamic>, String?>(
-      _getBestMoveInIsolate,
-      <String, dynamic>{
-        'fen': fen,
-        'depth': depth,
-        'movetime': movetime,
-        'threads': threads,
-        'hashMb': hashMb,
-      },
+      _getBestMoveFromHistoryInIsolate,
+      _buildIsolateRequest(
+        variant: variant,
+        threads: threads,
+        hashMb: hashMb,
+        extra: <String, dynamic>{
+          'rootFen': rootFen,
+          'moves': moves,
+          'depth': depth,
+          'movetime': movetime,
+        },
+      ),
     );
   }
 
   /// Run direct analyze() in a background isolate to avoid blocking the UI.
   static Future<Map<String, dynamic>?> analyzeIsolated(
     String fen, {
+    String variant = 'janggi',
     int depth = 10,
     int? threads,
     int? hashMb,
   }) {
     return compute<Map<String, dynamic>, Map<String, dynamic>?>(
       _analyzeInIsolate,
-      <String, dynamic>{
-        'fen': fen,
-        'depth': depth,
-        'threads': threads,
-        'hashMb': hashMb,
-      },
+      _buildIsolateRequest(
+        variant: variant,
+        threads: threads,
+        hashMb: hashMb,
+        extra: <String, dynamic>{
+          'fen': fen,
+          'depth': depth,
+        },
+      ),
     );
   }
 
   /// Warm up the native engine in a background isolate.
-  static Future<void> warmupIsolated({int? threads, int? hashMb}) async {
+  static Future<void> warmupIsolated({
+    int? threads,
+    int? hashMb,
+    String variant = 'janggi',
+  }) async {
     await compute<Map<String, dynamic>, bool>(
       _warmupInIsolate,
-      <String, dynamic>{
-        'threads': threads,
-        'hashMb': hashMb,
-      },
+      _buildIsolateRequest(
+        variant: variant,
+        threads: threads,
+        hashMb: hashMb,
+      ),
     );
+  }
+
+  static Map<String, dynamic> _buildIsolateRequest({
+    required String variant,
+    int? threads,
+    int? hashMb,
+    Map<String, dynamic> extra = const <String, dynamic>{},
+  }) {
+    return <String, dynamic>{
+      'variant': variant,
+      'threads': threads,
+      'hashMb': hashMb,
+      ...extra,
+    };
   }
 }
 
@@ -397,39 +628,69 @@ String? _getBestMoveInIsolate(Map<String, dynamic> request) {
   final fen = request['fen'] as String;
   final depth = request['depth'] as int? ?? 10;
   final movetime = request['movetime'] as int?;
-  final threads = request['threads'] as int?;
-  final hashMb = request['hashMb'] as int?;
+  final allowPass = request['allowPass'] as bool? ?? true;
 
-  try {
-    StockfishFFI.init(threads: threads, hashMb: hashMb);
-    StockfishFFI.setPosition(fen: fen);
-    return StockfishFFI.getBestMove(depth: depth, movetime: movetime);
-  } finally {
-    StockfishFFI.cleanup();
-  }
+  return _runWithInitializedEngine<String?>(request, () {
+    final variant = _requestVariant(request);
+    StockfishFFI.setPosition(fen: fen, variant: variant);
+    return StockfishFFI.getBestMove(
+      depth: depth,
+      movetime: movetime,
+      allowPass: allowPass,
+    );
+  });
+}
+
+String? _getBestMoveFromHistoryInIsolate(Map<String, dynamic> request) {
+  final rootFen = request['rootFen'] as String;
+  final moves = (request['moves'] as List<dynamic>? ?? const <dynamic>[])
+      .whereType<String>()
+      .toList(growable: false);
+  final depth = request['depth'] as int? ?? 10;
+  final movetime = request['movetime'] as int?;
+
+  return _runWithInitializedEngine<String?>(request, () {
+    final variant = _requestVariant(request);
+    StockfishFFI.setPosition(fen: rootFen, moves: moves, variant: variant);
+    return StockfishFFI.getBestMove(
+      depth: depth,
+      movetime: movetime,
+      allowPass: true,
+    );
+  });
 }
 
 Map<String, dynamic>? _analyzeInIsolate(Map<String, dynamic> request) {
   final fen = request['fen'] as String;
   final depth = request['depth'] as int? ?? 10;
-  final threads = request['threads'] as int?;
-  final hashMb = request['hashMb'] as int?;
 
-  try {
-    StockfishFFI.init(threads: threads, hashMb: hashMb);
-    return StockfishFFI.analyze(fen, depth: depth);
-  } finally {
-    StockfishFFI.cleanup();
-  }
+  return _runWithInitializedEngine<Map<String, dynamic>?>(request, () {
+    final variant = _requestVariant(request);
+    return StockfishFFI.analyze(fen, depth: depth, variant: variant);
+  });
 }
 
 bool _warmupInIsolate(Map<String, dynamic> request) {
+  return _runWithInitializedEngine<bool>(request, () {
+    return true;
+  });
+}
+
+String _requestVariant(Map<String, dynamic> request) {
+  return request['variant'] as String? ?? 'janggi';
+}
+
+T _runWithInitializedEngine<T>(
+  Map<String, dynamic> request,
+  T Function() body,
+) {
   final threads = request['threads'] as int?;
   final hashMb = request['hashMb'] as int?;
+  final variant = _requestVariant(request);
 
   try {
-    StockfishFFI.init(threads: threads, hashMb: hashMb);
-    return true;
+    StockfishFFI.init(threads: threads, hashMb: hashMb, variant: variant);
+    return body();
   } finally {
     StockfishFFI.cleanup();
   }

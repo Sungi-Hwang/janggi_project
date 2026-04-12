@@ -1,0 +1,10 @@
+﻿기능: 설정 화면
+파일: screenshot.png
+원본: D:\Project\janggi-master\janggi_master\test_tmp\settings_now.png
+
+설명:
+사운드, AI 난이도, AI 생각시간, 프리미엄/광고 제거, 보드 디자인, 언어 등을 조절하는 현재 설정 화면입니다.
+
+비고:
+이 폴더는 현재 UI와 맞는 최근 캡처만 다시 선별해서 구성한 묶음입니다.
+이전 beta/old 계열 스크린샷 폴더보다 최신 디자인 반영도가 높습니다.

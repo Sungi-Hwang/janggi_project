@@ -1,0 +1,10 @@
+﻿기능: 이어하기 분석 진행 화면
+파일: screenshot.png
+원본: D:\Project\janggi-master\janggi_master\test_tmp\continue_after_start.png
+
+설명:
+배치 이어하기 이후 AI 분석/대국으로 넘어간 화면입니다. 편집 단계 다음에 어떤 플레이 화면으로 이어지는지 보여주는 용도로 쓰기 좋습니다.
+
+비고:
+이 폴더는 현재 UI와 맞는 최근 캡처만 다시 선별해서 구성한 묶음입니다.
+이전 beta/old 계열 스크린샷 폴더보다 최신 디자인 반영도가 높습니다.

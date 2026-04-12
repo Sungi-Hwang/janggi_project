@@ -7,6 +7,7 @@ import 'providers/monetization_provider.dart';
 import 'providers/settings_provider.dart';
 import 'screens/custom_puzzle_editor_screen.dart';
 import 'screens/game_screen.dart' show GameMode, GameScreen;
+import 'screens/pre_game_setup_screen.dart';
 import 'screens/puzzle_list_screen.dart';
 import 'screens/settings_screen.dart';
 import 'services/monetization_service.dart';
@@ -52,7 +53,7 @@ class MyApp extends StatelessWidget {
     SoundManager().setVolume(settings.soundVolume);
 
     return MaterialApp(
-      title: '장기한수 (Janggi Hansu)',
+      title: '장기 한수 (Janggi Hansu)',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
@@ -71,10 +72,11 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: kAutoAiTest
-          ? const GameScreen(
+          ? GameScreen(
               gameMode: GameMode.vsAI,
               aiDifficulty: 5,
               aiColor: PieceColor.red,
+              ruleMode: settings.ruleMode,
             )
           : const MainMenu(),
     );
@@ -86,16 +88,9 @@ class MainMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const showMenuBanner = MonetizationConfig.enableMainMenuBanner;
+
     return Scaffold(
-      bottomNavigationBar: MonetizationConfig.enableMainMenuBanner
-          ? const SafeArea(
-              top: false,
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(0, 4, 0, 8),
-                child: Center(child: AdBannerSlot()),
-              ),
-            )
-          : null,
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -104,175 +99,177 @@ class MainMenu extends StatelessWidget {
           ),
         ),
         child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 16,
-                  horizontal: 16,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        final titleSize =
-                            (MediaQuery.of(context).size.width * 0.12)
-                                .clamp(40.0, 60.0);
-                        final subtitleSize =
-                            (MediaQuery.of(context).size.width * 0.06)
-                                .clamp(20.0, 28.0);
-
-                        return Column(
-                          children: [
-                            Text(
-                              '장기한수',
-                              style: TextStyle(
-                                fontSize: titleSize,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                shadows: [
-                                  Shadow(
-                                    offset: const Offset(0, 4),
-                                    blurRadius: 12,
-                                    color: Colors.black.withValues(alpha: 0.8),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Janggi Hansu',
-                              style: TextStyle(
-                                fontSize: subtitleSize,
-                                fontWeight: FontWeight.w300,
-                                color: Colors.white70,
-                                letterSpacing: 2,
-                              ),
-                            ),
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: Center(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.fromLTRB(
+                      16,
+                      16,
+                      16,
+                      showMenuBanner ? 104 : 16,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildTitle(context),
+                        const SizedBox(height: 48),
+                        _buildMenuButton(
+                          context: context,
+                          label: 'AI 대국',
+                          icon: Icons.smart_toy,
+                          gradientColors: const [
+                            Color(0xFF0A4D68),
+                            Color(0xFF05161A),
                           ],
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 48),
-                    _buildMenuButton(
-                      context: context,
-                      label: 'AI 대국',
-                      icon: Icons.smart_toy,
-                      gradientColors: const [
-                        Color(0xFF0A4D68),
-                        Color(0xFF05161A),
+                          neonColor: const Color(0xFF00D9FF),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const PreGameSetupScreen(
+                                  gameMode: GameMode.vsAI,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        _buildMenuButton(
+                          context: context,
+                          label: '오프라인 대국',
+                          icon: Icons.people,
+                          gradientColors: const [
+                            Color(0xFF0A4D1A),
+                            Color(0xFF051A08),
+                          ],
+                          neonColor: const Color(0xFF00FF88),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const PreGameSetupScreen(
+                                  gameMode: GameMode.twoPlayer,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        _buildMenuButton(
+                          context: context,
+                          label: '이어하기 대국',
+                          icon: Icons.smart_toy,
+                          gradientColors: const [
+                            Color(0xFF0A3B4D),
+                            Color(0xFF051218),
+                          ],
+                          neonColor: const Color(0xFF00E5FF),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const CustomPuzzleEditorScreen(
+                                  mode: CustomPuzzleEditorMode.aiContinue,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        _buildMenuButton(
+                          context: context,
+                          label: '묘수풀이',
+                          icon: Icons.extension,
+                          gradientColors: const [
+                            Color(0xFF4D0A68),
+                            Color(0xFF1A0522),
+                          ],
+                          neonColor: const Color(0xFFD900FF),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const PuzzleListScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        _buildMenuButton(
+                          context: context,
+                          label: '설정',
+                          icon: Icons.settings,
+                          gradientColors: const [
+                            Color(0xFF4D2A0A),
+                            Color(0xFF1A1005),
+                          ],
+                          neonColor: const Color(0xFFFF9900),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const SettingsScreen(),
+                              ),
+                            );
+                          },
+                        ),
                       ],
-                      neonColor: const Color(0xFF00D9FF),
-                      onTap: () {
-                        final settings = context.read<SettingsProvider>();
-                        final monetization =
-                            context.read<MonetizationProvider>();
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => GameScreen(
-                              gameMode: GameMode.vsAI,
-                              aiDifficulty: monetization.enforceDifficultyLimit(
-                                  settings.aiDifficulty),
-                              aiThinkingTimeSec:
-                                  monetization.enforceThinkingTimeLimit(
-                                      settings.aiThinkingTime),
-                              aiColor: PieceColor.red,
-                            ),
-                          ),
-                        );
-                      },
                     ),
-                    const SizedBox(height: 16),
-                    _buildMenuButton(
-                      context: context,
-                      label: '\uC624\uD504\uB77C\uC778 \uB300\uAD6D',
-                      icon: Icons.people,
-                      gradientColors: const [
-                        Color(0xFF0A4D1A),
-                        Color(0xFF051A08),
-                      ],
-                      neonColor: const Color(0xFF00FF88),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const GameScreen(
-                              gameMode: GameMode.twoPlayer,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    _buildMenuButton(
-                      context: context,
-                      label: '이어하기 대국',
-                      icon: Icons.smart_toy,
-                      gradientColors: const [
-                        Color(0xFF0A3B4D),
-                        Color(0xFF051218),
-                      ],
-                      neonColor: const Color(0xFF00E5FF),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                const CustomPuzzleEditorScreen(
-                              mode: CustomPuzzleEditorMode.aiContinue,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    _buildMenuButton(
-                      context: context,
-                      label: '묘수풀이',
-                      icon: Icons.extension,
-                      gradientColors: const [
-                        Color(0xFF4D0A68),
-                        Color(0xFF1A0522),
-                      ],
-                      neonColor: const Color(0xFFD900FF),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const PuzzleListScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    _buildMenuButton(
-                      context: context,
-                      label: '설정',
-                      icon: Icons.settings,
-                      gradientColors: const [
-                        Color(0xFF4D2A0A),
-                        Color(0xFF1A1005),
-                      ],
-                      neonColor: const Color(0xFFFF9900),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const SettingsScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                  ],
+                  ),
                 ),
               ),
-            ),
+              if (showMenuBanner)
+                const Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(12, 4, 12, 8),
+                    child: AdBannerSlot(placement: AdBannerPlacement.menu),
+                  ),
+                ),
+            ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTitle(BuildContext context) {
+    final titleSize =
+        (MediaQuery.sizeOf(context).width * 0.12).clamp(40.0, 60.0);
+    final subtitleSize =
+        (MediaQuery.sizeOf(context).width * 0.06).clamp(20.0, 28.0);
+
+    return Column(
+      children: [
+        Text(
+          '장기 한수',
+          style: TextStyle(
+            fontSize: titleSize,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            shadows: [
+              Shadow(
+                offset: const Offset(0, 4),
+                blurRadius: 12,
+                color: Colors.black.withValues(alpha: 0.8),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Janggi Hansu',
+          style: TextStyle(
+            fontSize: subtitleSize,
+            fontWeight: FontWeight.w300,
+            color: Colors.white70,
+            letterSpacing: 2,
+          ),
+        ),
+      ],
     );
   }
 
@@ -284,7 +281,7 @@ class MainMenu extends StatelessWidget {
     required Color neonColor,
     required VoidCallback onTap,
   }) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     final buttonWidth = (screenWidth * 0.85).clamp(280.0, 320.0);
 
     return InkWell(

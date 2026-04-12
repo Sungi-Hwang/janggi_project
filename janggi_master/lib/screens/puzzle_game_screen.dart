@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -9,6 +11,7 @@ import '../providers/settings_provider.dart';
 import '../screens/game_screen.dart' show GameMode;
 import '../services/puzzle_progress_service.dart';
 import '../utils/gib_parser.dart';
+import '../utils/gib_puzzle_locator.dart';
 import '../widgets/evaluation_bar.dart';
 import '../widgets/game_notification_overlay.dart';
 import '../widgets/janggi_board_widget.dart';
@@ -17,14 +20,14 @@ import '../widgets/player_info_bar.dart';
 /// Puzzle play screen.
 /// Player controls the side to move in the puzzle.
 /// If the player deviates from the stored line, the puzzle still succeeds
-/// as long as checkmate is delivered within the allowed number of player moves.
+/// as long as the opponent has no legal reply within the allowed player moves.
 class PuzzleGameScreen extends StatefulWidget {
-  final Map<String, dynamic> game;
-
   const PuzzleGameScreen({
     super.key,
     required this.game,
   });
+
+  final Map<String, dynamic> game;
 
   @override
   State<PuzzleGameScreen> createState() => _PuzzleGameScreenState();
@@ -37,6 +40,7 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
   bool _isAutoPlaying = false;
   bool _isResolvingWrongMove = false;
   bool _completionDialogShown = false;
+  bool _attemptResultRecorded = false;
 
   List<String> _solutionMoves = <String>[];
   int _solutionStartIndex = 0;
@@ -51,7 +55,10 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
   @override
   void initState() {
     super.initState();
-    _gameState = GameState(gameMode: GameMode.twoPlayer);
+    _gameState = GameState(
+      gameMode: GameMode.twoPlayer,
+      ruleMode: context.read<SettingsProvider>().ruleMode,
+    );
     _gameState.addListener(_onGameStateChanged);
     _initializePuzzle();
   }
@@ -79,11 +86,29 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
       return;
     }
 
-    if (_isResolvingWrongMove) return;
-    if (historyLength == _lastValidatedMoveCount) return;
-    if (historyLength == 0) return;
+    if (_isResolvingWrongMove || historyLength == _lastValidatedMoveCount) {
+      return;
+    }
+    if (historyLength == 0) {
+      return;
+    }
 
     _recomputeProgressFromHistory();
+
+    if (_isPuzzleSolvedByNoEscape()) {
+      if (mounted) {
+        setState(() {
+          _wrongMoveMessage = null;
+        });
+      }
+      _showPuzzleCompleteDialogOnce();
+      return;
+    }
+
+    if (_gameState.currentPlayerHasNoEscape) {
+      _handlePuzzleFailure();
+      return;
+    }
 
     if (_gameState.isGameOver &&
         _winnerFromReason(_gameState.gameOverReason) == _playerColor) {
@@ -112,9 +137,18 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
         _handlePuzzleFailure();
         return;
       }
-
       _playOpponentMoveIfNeeded();
     }
+  }
+
+  bool _isPuzzleSolvedByNoEscape() {
+    if (_gameState.currentPlayer == _playerColor) {
+      return false;
+    }
+    if (!_gameState.currentPlayerHasNoEscape) {
+      return false;
+    }
+    return _playerSolvedMoveCount() <= _playerTotalMoveCount();
   }
 
   Future<void> _initializePuzzle() async {
@@ -123,6 +157,7 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
       _isAutoPlaying = false;
       _isResolvingWrongMove = false;
       _completionDialogShown = false;
+      _attemptResultRecorded = false;
       _wrongMoveMessage = null;
       _lastValidatedMoveCount = 0;
       _targetPlayerMoveCount = 0;
@@ -151,19 +186,23 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
         return;
       }
 
-      final moves = List<String>.from(widget.game['moves'] ?? []);
-      if (moves.isEmpty) return;
+      final moves = List<String>.from(widget.game['moves'] ?? const <String>[]);
+      if (moves.isEmpty) {
+        return;
+      }
 
       _solutionMoves = moves;
-      _solutionStartIndex = await GibParser.findPuzzleStartPosition(moves);
+      _solutionStartIndex =
+          await GibPuzzleLocator.findPuzzleStartPosition(moves);
       _solutionIndex = _solutionStartIndex;
-      _targetPlayerMoveCount =
-          (widget.game['mateIn'] as int?) ??
+      _targetPlayerMoveCount = (widget.game['mateIn'] as int?) ??
           (((moves.length - _solutionStartIndex) + 1) ~/ 2);
 
       final board =
           GibParser.replayMovesToPosition(moves, upToMove: _solutionStartIndex);
-      if (board == null) return;
+      if (board == null) {
+        return;
+      }
 
       final nextMoveNumber = _solutionStartIndex + 1;
       _playerColor =
@@ -176,8 +215,8 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
       });
 
       _playOpponentMoveIfNeeded();
-    } catch (e) {
-      debugPrint('Error initializing puzzle: $e');
+    } catch (error) {
+      debugPrint('Error initializing puzzle: $error');
     }
   }
 
@@ -187,7 +226,6 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
     if (_gameState.currentPlayer == _playerColor) return;
 
     Move? autoMove = _expectedSolutionMoveForCurrentTurn();
-
     if (autoMove == null) {
       await _gameState.getHint();
       autoMove = _gameState.hintMove;
@@ -229,9 +267,10 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
   void _handlePuzzleFailure() {
     if (_isResolvingWrongMove) return;
     _isResolvingWrongMove = true;
+    _recordAttemptResult(solved: false);
 
     setState(() {
-      _wrongMoveMessage = '주어진 수 안에 외통을 만들지 못했습니다.';
+      _wrongMoveMessage = '주어진 수 안에 상대의 탈출수를 막지 못했습니다.';
     });
 
     Future.delayed(const Duration(milliseconds: 1200), () {
@@ -252,6 +291,7 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
       _isFollowingSolutionLine = true;
       _wrongMoveMessage = null;
       _completionDialogShown = false;
+      _attemptResultRecorded = false;
     });
     _initializePuzzle();
   }
@@ -264,7 +304,6 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
         _gameState.moveHistory.isNotEmpty) {
       _gameState.undoMove();
     }
-
     if (_gameState.moveHistory.isNotEmpty) {
       _gameState.undoMove();
     }
@@ -304,8 +343,8 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
 
     while (_solutionStartIndex + matchedMoves < _solutionMoves.length &&
         matchedMoves < history.length) {
-      final expectedMove =
-          _parseSolutionMove(_solutionMoves[_solutionStartIndex + matchedMoves]);
+      final expectedMove = _parseSolutionMove(
+          _solutionMoves[_solutionStartIndex + matchedMoves]);
       final actualMove = history[matchedMoves];
       if (expectedMove == null || expectedMove != actualMove) {
         break;
@@ -348,9 +387,11 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
     switch (reason) {
       case 'blue_wins_checkmate':
       case 'blue_wins_capture':
+      case 'blue_wins_points':
         return PieceColor.blue;
       case 'red_wins_checkmate':
       case 'red_wins_capture':
+      case 'red_wins_points':
         return PieceColor.red;
       default:
         return null;
@@ -364,16 +405,41 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
   void _showPuzzleCompleteDialogOnce() {
     if (_completionDialogShown) return;
     _completionDialogShown = true;
-
-    final puzzleId = widget.game['id'] as String?;
-    if (puzzleId != null && puzzleId.isNotEmpty) {
-      PuzzleProgressService.markSolved(puzzleId);
-    }
+    _recordAttemptResult(solved: true);
 
     Future.delayed(const Duration(milliseconds: 400), () {
       if (!mounted) return;
       _showPuzzleCompleteDialog();
     });
+  }
+
+  void _recordAttemptResult({required bool solved}) {
+    if (_attemptResultRecorded) {
+      return;
+    }
+
+    final puzzleId = widget.game['id'] as String?;
+    if (puzzleId == null || puzzleId.isEmpty) {
+      return;
+    }
+
+    _attemptResultRecorded = true;
+    final completedAt = DateTime.now();
+    if (solved) {
+      unawaited(
+        PuzzleProgressService.recordSolvedAttempt(
+          puzzleId,
+          completedAt: completedAt,
+        ),
+      );
+    } else {
+      unawaited(
+        PuzzleProgressService.recordFailedAttempt(
+          puzzleId,
+          completedAt: completedAt,
+        ),
+      );
+    }
   }
 
   void _showPuzzleCompleteDialog() {
@@ -382,7 +448,7 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         title: const Text('퍼즐 완료'),
-        content: const Text('주어진 수 안에 외통을 만들었습니다.'),
+        content: const Text('주어진 수 안에 상대의 탈출수를 모두 막았습니다.'),
         actions: [
           TextButton(
             onPressed: () {
@@ -396,7 +462,7 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
               Navigator.pop(context);
               _resetPuzzle();
             },
-            child: const Text('다시 하기'),
+            child: const Text('다시 풀기'),
           ),
         ],
       ),
@@ -449,7 +515,6 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
       _gameState.hideHint();
       return;
     }
-
     if (!_canPlayerMove()) return;
 
     final move = _expectedSolutionMoveForCurrentTurn();
@@ -466,7 +531,7 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
     return ChangeNotifierProvider<GameState>.value(
       value: _gameState,
       child: Scaffold(
-        backgroundColor: const Color(0xFFf5e6d3),
+        backgroundColor: const Color(0xFFF5E6D3),
         body: SafeArea(
           child: !_isInitialized
               ? const Center(child: CircularProgressIndicator())
@@ -574,7 +639,8 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
                                                 board: gameState.board,
                                                 selectedPosition:
                                                     gameState.selectedPosition,
-                                                validMoves: gameState.validMoves,
+                                                validMoves:
+                                                    gameState.validMoves,
                                                 onSquareTapped: _canPlayerMove()
                                                     ? _handleBoardTap
                                                     : null,
@@ -617,7 +683,7 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
                                 horizontal: 16,
                               ),
                               decoration: const BoxDecoration(
-                                color: Color(0xFF3e2723),
+                                color: Color(0xFF3E2723),
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black54,
@@ -640,11 +706,8 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
                                     icon: Icons.lightbulb,
                                     label: '힌트',
                                     color: Colors.amber,
-                                    onPressed: _canPlayerMove()
-                                        ? () {
-                                            _toggleHint();
-                                          }
-                                        : null,
+                                    onPressed:
+                                        _canPlayerMove() ? _toggleHint : null,
                                   ),
                                   _buildGameButton(
                                     icon: Icons.undo,

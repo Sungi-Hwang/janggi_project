@@ -3,6 +3,7 @@ import '../models/board.dart';
 import '../models/piece.dart';
 import '../models/position.dart';
 import '../models/move.dart';
+import '../models/rule_mode.dart';
 import '../stockfish_ffi.dart';
 import '../utils/stockfish_converter.dart';
 import '../screens/game_screen.dart' show GameMode;
@@ -39,6 +40,7 @@ class GameState extends ChangeNotifier {
 
   // Game mode
   final GameMode _gameMode;
+  final RuleMode _ruleMode;
 
   // AI settings
   int _aiDepth = 5; // Default: 중수 (Medium)
@@ -55,6 +57,8 @@ class GameState extends ChangeNotifier {
   final Map<String, int> _positionHistory = {};
   int _halfMoveClock =
       0; // For 50-move rule (counts half-moves since last capture/pawn move)
+  String _rootFen = '';
+  EnginePositionState? _engineState;
 
   // Piece setup configurations
   PieceSetup _blueSetup =
@@ -114,6 +118,13 @@ class GameState extends ChangeNotifier {
   int? get evaluationScore => _evaluationScore;
   String? get evaluationType => _evaluationType;
   bool get showEvaluation => _showEvaluation;
+  bool get canPass => _engineState?.canPass ?? false;
+  RuleMode get ruleMode => _ruleMode;
+  Move? get firstLegalMoveForCurrentPlayer =>
+      _findFirstLegalMoveForCurrentPlayer();
+  bool get currentPlayerHasLegalMove =>
+      _findFirstLegalMoveForCurrentPlayer() != null;
+  bool get currentPlayerHasNoEscape => !currentPlayerHasLegalMove;
 
   /// Set AI difficulty level (depth)
   void setAIDifficulty(int depth) {
@@ -143,7 +154,9 @@ class GameState extends ChangeNotifier {
     PieceColor aiColor = PieceColor.red,
     PieceSetup blueSetup = PieceSetup.horseElephantHorseElephant,
     PieceSetup redSetup = PieceSetup.horseElephantHorseElephant,
+    RuleMode ruleMode = RuleMode.casualDefault,
   })  : _gameMode = gameMode,
+        _ruleMode = ruleMode,
         _aiDepth = aiDifficulty,
         _aiThinkingTimeSec = aiThinkingTimeSec,
         _aiColor = aiColor {
@@ -174,9 +187,10 @@ class GameState extends ChangeNotifier {
 
     // Record initial position
     final initialFen = StockfishConverter.boardToFEN(_board, _currentPlayer);
+    _rootFen = initialFen;
     _positionHistory[initialFen] = 1;
 
-    _updateStatusMessage();
+    _syncEngineState();
     _refreshEvaluation();
     notifyListeners();
 
@@ -199,85 +213,412 @@ class GameState extends ChangeNotifier {
   // Getters for piece setup
   PieceSetup get blueSetup => _blueSetup;
   PieceSetup get redSetup => _redSetup;
+  String get _engineVariantName => _ruleMode.engineVariantName;
+  bool get _usesHistoricalEngineState => _ruleMode.usesHistoricalEngineState;
+  bool get _usesEngineLegality => _ruleMode.usesEngineLegality;
+  bool get _appliesImmediateDrawRules => _ruleMode.appliesImmediateDrawRules;
+  bool get _allowsLocalStatusSupplements =>
+      _ruleMode.allowsLocalStatusSupplements;
 
-  /// Update status message with current player and check indication
-  void _updateStatusMessage() {
-    if (_isGameOver) return; // Don't update if game is over
+  List<String> _moveHistoryUci() =>
+      _moveHistory.map((move) => move.toUCI()).toList(growable: false);
 
-    final baseMessage = _currentPlayer == PieceColor.blue
-        ? 'Blue to move (초)'
-        : 'Red to move (한)';
+  String _currentFen() => StockfishConverter.boardToFEN(_board, _currentPlayer);
+  String get _baseStatusMessage =>
+      _currentPlayer == PieceColor.blue ? 'Blue to move' : 'Red to move';
 
-    // Check for draw conditions first
+  PieceColor? _winnerColorFromEngine(String winner) {
+    switch (winner) {
+      case 'blue':
+        return PieceColor.blue;
+      case 'red':
+        return PieceColor.red;
+      default:
+        return null;
+    }
+  }
+
+  String _colorLabel(PieceColor color) {
+    return color == PieceColor.blue ? 'Blue (초)' : 'Red (한)';
+  }
+
+  String _pointsStatusMessage(PieceColor winner, String reason) {
+    final winnerLabel = _colorLabel(winner);
+    switch (reason) {
+      case 'bikjang':
+        return 'Bikjang! $winnerLabel wins on points.';
+      case 'pass':
+        return '$winnerLabel wins on points after consecutive pass.';
+      default:
+        return '$winnerLabel wins on points.';
+    }
+  }
+
+  Iterable<String> _engineLegalMoves({bool includePass = true}) sync* {
+    final legalMoves = _engineState?.legalMoves;
+    if (legalMoves == null) {
+      return;
+    }
+
+    for (final legalMove in legalMoves) {
+      if (includePass || !StockfishFFI.isPassUciMove(legalMove)) {
+        yield legalMove;
+      }
+    }
+  }
+
+  Move? _firstEnginePassMove() {
+    for (final legalMove in _engineLegalMoves()) {
+      if (StockfishFFI.isPassUciMove(legalMove)) {
+        return _parseUciMove(legalMove);
+      }
+    }
+    return null;
+  }
+
+  bool _isMovePlayableForRule(
+    Move move, {
+    required PieceColor requiredColor,
+  }) {
+    if (_usesEngineLegality) {
+      return _isEngineLegalMove(move, requiredColor: requiredColor);
+    }
+
+    if (move.isPass) {
+      final normalized = move.toUCI().toLowerCase();
+      return _engineLegalMoves().any(
+        (candidate) => candidate.toLowerCase() == normalized,
+      );
+    }
+
+    final piece = _board.getPiece(move.from);
+    if (piece == null || piece.color != requiredColor) {
+      return false;
+    }
+
+    return _getValidMovesForPosition(move.from).contains(move.to);
+  }
+
+  Move? _firstPlayableEngineMoveFor(
+    PieceColor color, {
+    bool includePass = false,
+  }) {
+    for (final legalMove in _engineLegalMoves(includePass: includePass)) {
+      final parsedMove = _parseUciMove(legalMove);
+      if (parsedMove == null) {
+        continue;
+      }
+      if (_isMovePlayableForRule(parsedMove, requiredColor: color)) {
+        return parsedMove;
+      }
+    }
+    return null;
+  }
+
+  void _clearHintState({bool refreshEvaluation = false}) {
+    _hintMove = null;
+    _showHint = false;
+    if (refreshEvaluation) {
+      _refreshEvaluation();
+    }
+  }
+
+  void _setHintState(Move move) {
+    _hintMove = move;
+    _showHint = true;
+    _refreshEvaluation();
+  }
+
+  String _winnerReason(PieceColor winner, String suffix) {
+    return winner == PieceColor.blue ? 'blue_wins_$suffix' : 'red_wins_$suffix';
+  }
+
+  String _statusMessageForGameOverReason(String reason) {
+    switch (reason) {
+      case 'blue_wins_checkmate':
+        return 'Checkmate! ${_colorLabel(PieceColor.blue)} wins!';
+      case 'blue_wins_capture':
+        return 'Game Over! ${_colorLabel(PieceColor.blue)} wins by capturing the King!';
+      case 'red_wins_checkmate':
+        return 'Checkmate! ${_colorLabel(PieceColor.red)} wins!';
+      case 'red_wins_capture':
+        return 'Game Over! ${_colorLabel(PieceColor.red)} wins by capturing the King!';
+      case 'blue_wins_points':
+        return '${_colorLabel(PieceColor.blue)} wins on points!';
+      case 'red_wins_points':
+        return '${_colorLabel(PieceColor.red)} wins on points!';
+      case 'threefold_repetition':
+        return 'Draw by threefold repetition!';
+      case 'fifty_move_rule':
+        return 'Draw by 50-move rule!';
+      case 'draw':
+        return 'Game drawn.';
+      default:
+        return _statusMessage;
+    }
+  }
+
+  void _applyGameOverStatus(String reason, {String? customMessage}) {
+    _isGameOver = true;
+    _gameOverReason = reason;
+    _statusMessage = customMessage ?? _statusMessageForGameOverReason(reason);
+  }
+
+  void _showCheckEnteredNotification() {
+    _showCheckNotification = true;
+    _soundManager.playCheck();
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      _showCheckNotification = false;
+      notifyListeners();
+    });
+  }
+
+  void _triggerEscapeCheckNotification() {
+    _showCheckNotification = false;
+    _showEscapeCheckNotification = true;
+    _soundManager.playEscapeCheck();
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      _showEscapeCheckNotification = false;
+      notifyListeners();
+    });
+  }
+
+  EnginePositionState? _fetchEngineState() {
+    if (_usesHistoricalEngineState) {
+      return StockfishFFI.getPositionState(
+        variant: _engineVariantName,
+        rootFen: _rootFen,
+        moves: _moveHistoryUci(),
+      );
+    }
+
+    return StockfishFFI.getPositionState(
+      variant: _engineVariantName,
+      rootFen: _currentFen(),
+    );
+  }
+
+  String _exactEngineUciForMove(
+    Position from,
+    Position to, {
+    bool isPass = false,
+    String? fallback,
+  }) {
+    for (final candidate in _engineLegalMoves()) {
+      final parsed = _parseUciMove(candidate);
+      if (parsed == null) {
+        continue;
+      }
+      if (parsed.from == from && parsed.to == to && parsed.isPass == isPass) {
+        return candidate;
+      }
+    }
+
+    return fallback ?? StockfishConverter.moveToUCI(from, to);
+  }
+
+  List<Position> _engineVerifiedMovesFor(Position from) {
+    final destinations = <Position>[];
+    for (final candidate in _engineLegalMoves(includePass: false)) {
+      final parsed = _parseUciMove(candidate);
+      if (parsed == null || parsed.isPass) {
+        continue;
+      }
+      if (parsed.from == from) {
+        destinations.add(parsed.to);
+      }
+    }
+
+    return destinations;
+  }
+
+  bool _isEngineLegalMove(Move move, {PieceColor? requiredColor}) {
+    final normalized = move.toUCI().toLowerCase();
+    final matches = _engineLegalMoves().any(
+      (candidate) => candidate.toLowerCase() == normalized,
+    );
+    if (!matches) {
+      return false;
+    }
+
+    if (move.isPass) {
+      return true;
+    }
+
+    final piece = _board.getPiece(move.from);
+    if (piece == null) {
+      return false;
+    }
+
+    return requiredColor == null || piece.color == requiredColor;
+  }
+
+  bool _applyCasualImmediateDrawRules() {
+    if (!_appliesImmediateDrawRules) {
+      return false;
+    }
+
     if (_isThreefoldRepetition()) {
-      _statusMessage = 'Draw by threefold repetition!';
-      _isGameOver = true;
-      _gameOverReason = 'threefold_repetition';
-      debugPrint('_updateStatusMessage: DRAW - Threefold repetition');
+      _applyGameOverStatus('threefold_repetition');
+      _isInCheck = false;
+      return true;
     }
 
     if (_isFiftyMoveRule()) {
-      _statusMessage = 'Draw by 50-move rule!';
-      _isGameOver = true;
-      _gameOverReason = 'fifty_move_rule';
-      debugPrint('_updateStatusMessage: DRAW - 50-move rule');
-      return;
+      _applyGameOverStatus('fifty_move_rule');
+      _isInCheck = false;
+      return true;
     }
 
-    // Check for checkmate
-    if (_isCheckmate(_currentPlayer)) {
-      final winner = _currentPlayer == PieceColor.blue ? 'Red (한)' : 'Blue (초)';
-      _statusMessage = 'Checkmate! $winner wins!';
-      _isGameOver = true;
-      _gameOverReason = _currentPlayer == PieceColor.blue
-          ? 'red_wins_checkmate'
-          : 'blue_wins_checkmate';
-      debugPrint(
-          '_updateStatusMessage: CHECKMATE - ${_currentPlayer.name} has no legal moves and is in check');
-      return;
-    }
+    return false;
+  }
 
-    // 장기에는 스테일메이트 없음 - 체크메이트, 왕 포획, 3수 동형, 50수만 게임 종료
-
-    // Check if current player is in check
-    final wasInCheck = _isInCheck;
-    _isInCheck = _isKingInCheck(_currentPlayer);
-
-    if (_isInCheck) {
-      _statusMessage = '$baseMessage - CHECK!';
-      debugPrint('_updateStatusMessage: ${_currentPlayer.name} is in CHECK');
-
-      // Trigger check notification if newly in check
-      if (!wasInCheck) {
-        _showCheckNotification = true;
-        _soundManager.playCheck(); // 장군 사운드
-        // Reset notification flag after animation completes (1200ms + buffer)
-        Future.delayed(const Duration(milliseconds: 1500), () {
-          _showCheckNotification = false;
-          notifyListeners();
-        });
-      }
-    } else {
-      _statusMessage = baseMessage;
-
-      // Trigger escape check notification if was in check but now escaped
-      if (wasInCheck && !_isInCheck) {
-        // Immediately clear check notification to prevent overlap
-        _showCheckNotification = false;
-
-        _showEscapeCheckNotification = true;
-        _soundManager.playEscapeCheck(); // 멍군 사운드
+  Future<String?> _requestBestMove({
+    required int depth,
+    required int movetime,
+  }) async {
+    if (_usesHistoricalEngineState) {
+      if (_engineState == null) {
         debugPrint(
-            '_updateStatusMessage: ${_currentPlayer.name} escaped check (멍군)');
+          '_requestBestMove: history-based engine state unavailable in official mode',
+        );
+        return null;
+      }
 
-        // Play escape check sound
-        SoundManager().playEscapeCheck();
+      return StockfishFFI.getBestMoveFromHistoryIsolated(
+        variant: _engineVariantName,
+        rootFen: _rootFen,
+        moves: _moveHistoryUci(),
+        depth: depth,
+        movetime: movetime,
+      );
+    }
 
-        // Reset notification flag after animation completes (1200ms + buffer)
-        Future.delayed(const Duration(milliseconds: 1500), () {
-          _showEscapeCheckNotification = false;
-          notifyListeners();
-        });
+    return StockfishFFI.getBestMoveIsolated(
+      variant: _engineVariantName,
+      fen: _currentFen(),
+      depth: depth,
+      movetime: movetime,
+    );
+  }
+
+  void _syncEngineState({bool updateStatusMessage = true}) {
+    try {
+      StockfishFFI.init(variant: _engineVariantName);
+      _engineState = _fetchEngineState();
+    } catch (e) {
+      _engineState = null;
+      debugPrint('_syncEngineState: Error: $e');
+    }
+
+    if (updateStatusMessage) {
+      _updateStatusMessage();
+    }
+  }
+
+  /// Update status message with current player and check indication
+  void _updateStatusMessage() {
+    final state = _engineState;
+    final previouslyInCheck = _isInCheck;
+
+    if (state != null) {
+      final localInCheck = _isKingInCheck(_currentPlayer);
+      final localCheckmate = localInCheck && _isCheckmate(_currentPlayer);
+      final allowLocalSupplements = _allowsLocalStatusSupplements;
+      _isInCheck = allowLocalSupplements
+          ? (localInCheck || state.inCheck)
+          : state.inCheck;
+      _isGameOver = allowLocalSupplements
+          ? (state.gameOver || localCheckmate)
+          : state.gameOver;
+
+      if (_isGameOver) {
+        if (allowLocalSupplements && localCheckmate && !state.gameOver) {
+          final winnerColor = _currentPlayer == PieceColor.blue
+              ? PieceColor.red
+              : PieceColor.blue;
+          _applyGameOverStatus(_winnerReason(winnerColor, 'checkmate'));
+          return;
+        }
+
+        final winnerColor = _winnerColorFromEngine(state.winner);
+        if (state.reason == 'checkmate' && winnerColor != null) {
+          _applyGameOverStatus(_winnerReason(winnerColor, 'checkmate'));
+        } else if (winnerColor != null) {
+          _applyGameOverStatus(
+            _winnerReason(winnerColor, 'points'),
+            customMessage: _pointsStatusMessage(winnerColor, state.reason),
+          );
+        } else {
+          _applyGameOverStatus('draw');
+        }
+        return;
+      }
+
+      if (_applyCasualImmediateDrawRules()) {
+        return;
+      }
+
+      _gameOverReason = null;
+      final baseMessage = _baseStatusMessage;
+
+      if (_isInCheck) {
+        _statusMessage = '$baseMessage - CHECK!';
+        if (!previouslyInCheck) {
+          _showCheckEnteredNotification();
+        }
+        return;
+      }
+
+      _statusMessage = state.bikjang ? '$baseMessage - BIKJANG' : baseMessage;
+
+      if (previouslyInCheck) {
+        _triggerEscapeCheckNotification();
+      }
+      return;
+    }
+
+    final localInCheck = _isKingInCheck(_currentPlayer);
+    final localCheckmate = localInCheck && _isCheckmate(_currentPlayer);
+    final statusBaseMessage = _baseStatusMessage;
+
+    _isGameOver = localCheckmate;
+    if (statusBaseMessage.isNotEmpty) {
+      final baseMessage = statusBaseMessage;
+
+      if (_isGameOver) {
+        final winnerColor = _currentPlayer == PieceColor.blue
+            ? PieceColor.red
+            : PieceColor.blue;
+        _applyGameOverStatus(_winnerReason(winnerColor, 'checkmate'));
+        debugPrint(
+            '_updateStatusMessage: CHECKMATE - ${_currentPlayer.name} has no legal moves and is in check');
+        return;
+      }
+
+      if (_applyCasualImmediateDrawRules()) {
+        return;
+      }
+
+      _gameOverReason = null;
+      final wasInCheck = previouslyInCheck;
+      _isInCheck = localInCheck;
+
+      if (_isInCheck) {
+        _statusMessage = '$baseMessage - CHECK!';
+        debugPrint('_updateStatusMessage: ${_currentPlayer.name} is in CHECK');
+
+        if (!wasInCheck) {
+          _showCheckEnteredNotification();
+        }
+      } else {
+        _statusMessage = baseMessage;
+
+        if (wasInCheck && !_isInCheck) {
+          _triggerEscapeCheckNotification();
+          debugPrint(
+              '_updateStatusMessage: ${_currentPlayer.name} escaped check');
+        }
       }
     }
   }
@@ -291,6 +632,30 @@ class GameState extends ChangeNotifier {
   /// Start a new game
   void newGame() {
     _initializeGame();
+  }
+
+  Future<void> passTurn() async {
+    if (_isGameOver || _isAnimating || _isEngineThinking) {
+      return;
+    }
+
+    if (_gameMode == GameMode.vsAI && _currentPlayer == _aiColor) {
+      return;
+    }
+
+    if (_engineState == null) {
+      return;
+    }
+
+    final passMove = _firstEnginePassMove();
+    if (passMove == null) {
+      return;
+    }
+
+    _selectedPosition = null;
+    _validMoves = [];
+    notifyListeners();
+    await _applyResolvedMove(passMove, isPlayerMove: true);
   }
 
   /// Apply custom start board if provided.
@@ -482,137 +847,107 @@ class GameState extends ChangeNotifier {
     }
   }
 
-  /// Make a move on the board with animation
-  Future<void> _makeMove(Position from, Position to,
+  Future<void> _applyResolvedMove(Move move,
       {bool isPlayerMove = false}) async {
-    final piece = _board.getPiece(from);
+    final piece = _board.getPiece(move.from);
     if (piece == null) return;
 
     _undoHistory.add(_captureUndoSnapshot());
 
-    // Clear hint when move is made
     if (_showHint) {
-      _showHint = false;
-      _hintMove = null;
+      _clearHintState();
     }
 
     debugPrint(
-        '_makeMove: Moving $piece from $from to $to (isPlayerMove: $isPlayerMove)');
+        '_applyResolvedMove: ${move.isPass ? "pass" : "${move.from} -> ${move.to}"} (${move.toUCI()})');
 
-    // Start animation - save piece info and move, but DON'T update board yet
-    _isAnimating = true;
-    _animatingPiece = piece; // Save the moving piece
-    final captured = _board.getPiece(to); // Save captured piece before move
-    _animatingMove = Move(from: from, to: to, capturedPiece: captured);
+    final resolvedEngineUci = _exactEngineUciForMove(
+      move.from,
+      move.to,
+      isPass: move.isPass,
+      fallback:
+          move.engineUci ?? StockfishConverter.moveToUCI(move.from, move.to),
+    );
+    final captured = move.isPass ? null : _board.getPiece(move.to);
 
-    // Immediately show animation start
-    notifyListeners();
+    final recordedMove = move.copyWith(
+      capturedPiece: captured,
+      engineUci: resolvedEngineUci,
+    );
 
-    // Wait for animation to complete (both player and AI)
-    await Future.delayed(const Duration(milliseconds: 300));
+    if (!move.isPass) {
+      _isAnimating = true;
+      _animatingPiece = piece;
+      _animatingMove = recordedMove;
+      notifyListeners();
+      await Future.delayed(const Duration(milliseconds: 300));
+      _board.movePiece(move.from, move.to);
+    }
 
-    // NOW make the move on the board (after animation)
-    _board.movePiece(from, to);
-    debugPrint('_makeMove: Move completed. Captured: $captured');
+    _moveHistory.add(recordedMove);
 
-    // Play move sound effect
-    _soundManager.playMove();
-
-    // Record the move
-    final move = Move(from: from, to: to, capturedPiece: captured);
-    _moveHistory.add(move);
-
-    // Track captured pieces
     if (captured != null) {
       if (piece.color == PieceColor.red) {
         _capturedByRed.add(captured);
-        debugPrint(
-            '_makeMove: Red captured ${captured.type.name} (${captured.color.name}). Total Red captures: ${_capturedByRed.length}');
       } else {
         _capturedByBlue.add(captured);
-        debugPrint(
-            '_makeMove: Blue captured ${captured.type.name} (${captured.color.name}). Total Blue captures: ${_capturedByBlue.length}');
       }
-    }
-
-    // Update 50-move rule counter
-    if (captured != null || piece.type == PieceType.soldier) {
       _halfMoveClock = 0;
       _positionHistory.clear();
-      debugPrint(
-          '_makeMove: Reset halfMoveClock and position history (capture or pawn move)');
-    } else {
-      _halfMoveClock++;
-      debugPrint('_makeMove: Incremented halfMoveClock to $_halfMoveClock');
-    }
-
-    // Play move or capture sound
-    if (captured != null) {
       _soundManager.playCapture();
+    } else if (move.isPass) {
+      _halfMoveClock++;
     } else {
+      if (piece.type == PieceType.soldier) {
+        _halfMoveClock = 0;
+        _positionHistory.clear();
+      } else {
+        _halfMoveClock++;
+      }
       _soundManager.playMove();
     }
 
-    // Check if King (General) was captured - game ends
     if (captured != null && captured.type == PieceType.general) {
-      final winner = piece.color == PieceColor.blue ? 'Blue (초)' : 'Red (한)';
-      _statusMessage = 'Game Over! $winner wins by capturing the King!';
-      _isGameOver = true;
-      _gameOverReason = piece.color == PieceColor.blue
-          ? 'blue_wins_capture'
-          : 'red_wins_capture';
-      debugPrint('_makeMove: GAME OVER - King captured by ${piece.color}');
+      _applyGameOverStatus(_winnerReason(piece.color, 'capture'));
+    } else {
+      _currentPlayer =
+          _currentPlayer == PieceColor.blue ? PieceColor.red : PieceColor.blue;
+      _recordPosition();
+      if (_applyCasualImmediateDrawRules()) {
+        _syncEngineState(updateStatusMessage: false);
+      } else {
+        _syncEngineState();
+      }
+    }
 
-      // Play win/lose sound
-      if (piece.color == _aiColor) {
-        _soundManager.playDefeat();
+    _refreshEvaluation();
+
+    final aiWon = _gameOverReason != null &&
+        ((_aiColor == PieceColor.blue &&
+                _gameOverReason!.startsWith('blue_wins')) ||
+            (_aiColor == PieceColor.red &&
+                _gameOverReason!.startsWith('red_wins')));
+    if (_isGameOver) {
+      if (_gameMode == GameMode.vsAI) {
+        if (aiWon) {
+          _soundManager.playDefeat();
+        } else {
+          _soundManager.playVictory();
+        }
       } else {
         _soundManager.playVictory();
       }
-
-      _refreshEvaluation();
-      _isAnimating = false;
-      _animatingMove = null;
-      _animatingPiece = null;
-      notifyListeners();
-      return;
     }
 
-    // Convert to UCI and log
-    final uciMove = StockfishConverter.moveToUCI(from, to);
-    debugPrint('_makeMove: UCI notation: $uciMove');
-    debugPrint(
-        '_makeMove: Full move history UCI: ${_moveHistory.map((m) => m.toUCI()).toList()}');
-
-    // Switch player
-    _currentPlayer =
-        _currentPlayer == PieceColor.blue ? PieceColor.red : PieceColor.blue;
-
-    // Record position for repetition detection
-    _recordPosition();
-
-    // Update status message
-    _updateStatusMessage();
-    _refreshEvaluation();
-
-    // Additional check: if the move just made put the opponent in check,
-    // ensure the check notification shows (it should already be set by _updateStatusMessage)
-    debugPrint(
-        '_makeMove: After status update - _isInCheck=$_isInCheck, _showCheckNotification=$_showCheckNotification');
-
-    // End animation
     _isAnimating = false;
     _animatingMove = null;
     _animatingPiece = null;
-
-    debugPrint('_makeMove: Calling notifyListeners');
     notifyListeners();
 
-    // If it's AI mode and it's now AI's turn, get AI move
-    if (_gameMode == GameMode.vsAI && _currentPlayer == _aiColor) {
+    if (!_isGameOver &&
+        _gameMode == GameMode.vsAI &&
+        _currentPlayer == _aiColor) {
       if (isPlayerMove) {
-        // Give UI time to show check notification before AI starts thinking
-        // If player's move put AI in check, show the notification for a moment
         final delayMs = _isInCheck ? 1000 : 300;
         await Future.delayed(Duration(milliseconds: delayMs));
         _getAIMove();
@@ -620,6 +955,23 @@ class GameState extends ChangeNotifier {
         await _getAIMove();
       }
     }
+  }
+
+  /// Make a move on the board with animation
+  Future<void> _makeMove(Position from, Position to,
+      {bool isPlayerMove = false}) async {
+    await _applyResolvedMove(
+      Move(
+        from: from,
+        to: to,
+        engineUci: _exactEngineUciForMove(
+          from,
+          to,
+          fallback: StockfishConverter.moveToUCI(from, to),
+        ),
+      ),
+      isPlayerMove: isPlayerMove,
+    );
   }
 
   /// Get AI move from Stockfish
@@ -631,20 +983,12 @@ class GameState extends ChangeNotifier {
     try {
       debugPrint('_getAIMove: Starting AI move calculation');
 
-      // Generate FEN from current board state
-      // This avoids "invalid move" errors from move history
-      final fen = StockfishConverter.boardToFEN(_board, _currentPlayer);
-      debugPrint('_getAIMove: Current FEN: $fen');
-      debugPrint('_getAIMove: Current player: $_currentPlayer');
-
-      // Get best move in a worker isolate to keep UI responsive.
-      final movetimeMs = _aiThinkingTimeSec * 1000;
+      final searchTimeMs = _aiThinkingTimeSec * 1000;
       debugPrint(
-          '_getAIMove: Requesting best move depth=$_aiDepth movetime=${_aiThinkingTimeSec}s...');
-      final bestMoveUCI = await StockfishFFI.getBestMoveIsolated(
-        fen: fen,
+          '_getAIMove: Requesting best move depth=$_aiDepth movetime=${_aiThinkingTimeSec}s ruleMode=${_ruleMode.name}...');
+      final preferredBestMoveUci = await _requestBestMove(
         depth: _aiDepth,
-        movetime: movetimeMs,
+        movetime: searchTimeMs,
       ).timeout(
         Duration(seconds: _aiThinkingTimeSec + 2),
         onTimeout: () {
@@ -653,90 +997,10 @@ class GameState extends ChangeNotifier {
         },
       );
 
-      debugPrint('_getAIMove: Received best move: $bestMoveUCI');
-
-      final resolvedMove = _resolveAiMove(bestMoveUCI);
-
-      if (resolvedMove != null) {
-        final from = resolvedMove.from;
-        final to = resolvedMove.to;
-        final piece = _board.getPiece(from)!;
-
-        // Start AI move animation - save piece info, but DON'T update board yet
-        _isAnimating = true;
-        _animatingPiece = piece; // Save the moving piece
-        final captured = _board.getPiece(to); // Save captured piece before move
-        _animatingMove = Move(from: from, to: to, capturedPiece: captured);
-        notifyListeners();
-
-        // Wait for animation
-        await Future.delayed(const Duration(milliseconds: 300));
-
-        // NOW make the AI move (after animation)
-        _board.movePiece(from, to);
-        debugPrint('_getAIMove: Move result - captured: $captured');
-
-        final move = Move(from: from, to: to, capturedPiece: captured);
-        _moveHistory.add(move);
-
-        // Track captured pieces
-        if (captured != null) {
-          if (piece.color == PieceColor.red) {
-            _capturedByRed.add(captured);
-            debugPrint(
-                '_getAIMove: Red captured ${captured.type.name} (${captured.color.name}). Total Red captures: ${_capturedByRed.length}');
-          } else {
-            _capturedByBlue.add(captured);
-            debugPrint(
-                '_getAIMove: Blue captured ${captured.type.name} (${captured.color.name}). Total Blue captures: ${_capturedByBlue.length}');
-          }
-        }
-
-        // Update 50-move rule counter for AI move
-        if (captured != null || piece.type == PieceType.soldier) {
-          _halfMoveClock = 0;
-          _positionHistory.clear();
-          debugPrint(
-              '_getAIMove: Reset halfMoveClock and position history (capture or pawn move)');
-        } else {
-          _halfMoveClock++;
-          debugPrint(
-              '_getAIMove: Incremented halfMoveClock to $_halfMoveClock');
-        }
-
-        // Check if King (General) was captured - game ends
-        if (captured != null && captured.type == PieceType.general) {
-          final winnerColor =
-              _aiColor == PieceColor.blue ? 'Blue (초)' : 'Red (한)';
-          _statusMessage =
-              'Game Over! $winnerColor wins by capturing the King!';
-          _isGameOver = true;
-          _gameOverReason = _aiColor == PieceColor.blue
-              ? 'blue_wins_capture'
-              : 'red_wins_capture';
-          debugPrint('_getAIMove: GAME OVER - King captured by AI');
-          _refreshEvaluation();
-          _isAnimating = false;
-          _animatingMove = null;
-          _animatingPiece = null;
-          return; // End game - no further moves
-        }
-
-        // Switch to player's color (opposite of AI)
-        _currentPlayer = _currentPlayer == PieceColor.blue
-            ? PieceColor.red
-            : PieceColor.blue;
-
-        // Record position for repetition detection
-        _recordPosition();
-
-        _updateStatusMessage();
-        _refreshEvaluation();
-
-        // End animation
-        _isAnimating = false;
-        _animatingMove = null;
-        _animatingPiece = null;
+      debugPrint('_getAIMove: Received best move: $preferredBestMoveUci');
+      final resolvedBestMove = _resolveAiMove(preferredBestMoveUci);
+      if (resolvedBestMove != null) {
+        await _applyResolvedMove(resolvedBestMove);
       } else {
         debugPrint('_getAIMove: No legal AI move could be resolved');
         _statusMessage = 'AI could not resolve a legal move';
@@ -747,7 +1011,6 @@ class GameState extends ChangeNotifier {
       _statusMessage = 'AI error: $e';
       debugPrint('AI move error: $e');
       debugPrint('Stack trace: $stackTrace');
-      // Switch to player's color (opposite of AI)
       _currentPlayer = _humanColorFromAi();
       _updateStatusMessage();
       _refreshEvaluation();
@@ -764,16 +1027,12 @@ class GameState extends ChangeNotifier {
 
   Move? _resolveAiMove(String? bestMoveUCI) {
     final engineMove = _parseUciMove(bestMoveUCI);
+    if (engineMove != null &&
+        _isMovePlayableForRule(engineMove, requiredColor: _aiColor)) {
+      return engineMove;
+    }
+
     if (engineMove != null) {
-      final piece = _board.getPiece(engineMove.from);
-      debugPrint('_resolveAiMove: Piece at ${engineMove.from}: $piece');
-
-      if (piece != null &&
-          piece.color == _aiColor &&
-          _isValidMove(piece, engineMove.from, engineMove.to)) {
-        return engineMove;
-      }
-
       debugPrint(
           '_resolveAiMove: Discarding invalid engine move $bestMoveUCI for AI=$_aiColor');
     }
@@ -787,7 +1046,12 @@ class GameState extends ChangeNotifier {
   }
 
   Move? _parseUciMove(String? uciMove) {
-    if (uciMove == null || !StockfishFFI.isUsableUciMove(uciMove)) {
+    if (uciMove == null) {
+      return null;
+    }
+
+    final isPass = StockfishFFI.isPassUciMove(uciMove);
+    if (!isPass && !StockfishFFI.isUsableUciMove(uciMove)) {
       return null;
     }
 
@@ -803,7 +1067,12 @@ class GameState extends ChangeNotifier {
       final toUCI = uciMove.substring(secondPartStart);
       final from = StockfishConverter.fromUCI(fromUCI);
       final to = StockfishConverter.fromUCI(toUCI);
-      return Move(from: from, to: to);
+      return Move(
+        from: from,
+        to: to,
+        isPass: isPass,
+        engineUci: uciMove.trim(),
+      );
     } catch (e) {
       debugPrint('_parseUciMove: Failed to parse "$uciMove": $e');
       return null;
@@ -811,6 +1080,21 @@ class GameState extends ChangeNotifier {
   }
 
   Move? _findFirstLegalMoveForCurrentPlayer() {
+    final engineMove = _firstPlayableEngineMoveFor(_currentPlayer);
+    if (engineMove != null) {
+      return engineMove;
+    }
+
+    final passMove = _firstEnginePassMove();
+    if (passMove != null &&
+        _isMovePlayableForRule(passMove, requiredColor: _currentPlayer)) {
+      return passMove;
+    }
+
+    if (_usesHistoricalEngineState) {
+      return null;
+    }
+
     for (int rank = 0; rank < 10; rank++) {
       for (int file = 0; file < 9; file++) {
         final from = Position(file: file, rank: rank);
@@ -821,7 +1105,15 @@ class GameState extends ChangeNotifier {
 
         final validMoves = _getValidMovesForPosition(from);
         if (validMoves.isNotEmpty) {
-          return Move(from: from, to: validMoves.first);
+          return Move(
+            from: from,
+            to: validMoves.first,
+            engineUci: _exactEngineUciForMove(
+              from,
+              validMoves.first,
+              fallback: StockfishConverter.moveToUCI(from, validMoves.first),
+            ),
+          );
         }
       }
     }
@@ -835,28 +1127,32 @@ class GameState extends ChangeNotifier {
     final piece = _board.getPiece(from);
     if (piece == null) return [];
 
+    final state = _engineState;
+    if (state != null && _usesEngineLegality) {
+      if (piece.color != _currentPlayer) {
+        return const <Position>[];
+      }
+      return _engineVerifiedMovesFor(from);
+    }
+
+    if (_usesEngineLegality) {
+      return const <Position>[];
+    }
+
     final moves = <Position>[];
 
-    // Check all possible destination squares
     for (int rank = 0; rank < 10; rank++) {
       for (int file = 0; file < 9; file++) {
         final to = Position(file: file, rank: rank);
         if (to == from) continue;
 
         final targetPiece = _board.getPiece(to);
-
-        // Can't capture own piece
         if (targetPiece != null && targetPiece.color == piece.color) {
           continue;
         }
 
-        // Check if this move is valid according to piece-specific rules
-        if (_isValidMove(piece, from, to)) {
-          // Additionally check if this move would leave our king in check
-          // Filter out illegal moves that would expose the king
-          if (!_wouldMoveCauseCheck(from, to)) {
-            moves.add(to);
-          }
+        if (_isValidMove(piece, from, to) && !_wouldMoveCauseCheck(from, to)) {
+          moves.add(to);
         }
       }
     }
@@ -1377,58 +1673,15 @@ class GameState extends ChangeNotifier {
 
         if (piece != null && piece.color == opponentColor) {
           if (_canAttackKingOnBoard(piece, pos, kingPosition, board)) {
-            final attackBoard = board.copy();
-            attackBoard.movePiece(pos, kingPosition);
-
-            if (!_isKingInCheckByPseudoAttacks(piece.color, attackBoard)) {
-              debugPrint(
-                  '_isKingInCheck: YES! ${piece.color.name} ${piece.type.name} at $pos can legally attack king at $kingPosition');
-              return true;
-            }
+            debugPrint(
+                '_isKingInCheck: YES! ${piece.color.name} ${piece.type.name} at $pos attacks king at $kingPosition');
+            return true;
           }
         }
       }
     }
 
     debugPrint('_isKingInCheck: No threats found to ${kingColor.name} king');
-    return false;
-  }
-
-  bool _isKingInCheckByPseudoAttacks(PieceColor kingColor, Board board) {
-    Position? kingPosition;
-    for (int rank = 0; rank < 10; rank++) {
-      for (int file = 0; file < 9; file++) {
-        final pos = Position(file: file, rank: rank);
-        final piece = board.getPiece(pos);
-        if (piece != null &&
-            piece.type == PieceType.general &&
-            piece.color == kingColor) {
-          kingPosition = pos;
-          break;
-        }
-      }
-      if (kingPosition != null) break;
-    }
-
-    if (kingPosition == null) {
-      return false;
-    }
-
-    final opponentColor =
-        kingColor == PieceColor.blue ? PieceColor.red : PieceColor.blue;
-
-    for (int rank = 0; rank < 10; rank++) {
-      for (int file = 0; file < 9; file++) {
-        final pos = Position(file: file, rank: rank);
-        final piece = board.getPiece(pos);
-        if (piece != null &&
-            piece.color == opponentColor &&
-            _canAttackKingOnBoard(piece, pos, kingPosition, board)) {
-          return true;
-        }
-      }
-    }
-
     return false;
   }
 
@@ -1541,11 +1794,11 @@ class GameState extends ChangeNotifier {
     _currentPlayer = startingPlayer;
 
     final fen = StockfishConverter.boardToFEN(_board, _currentPlayer);
+    _rootFen = fen;
     _positionHistory[fen] = 1;
 
-    if (evaluateGameState) {
-      _updateStatusMessage();
-    } else {
+    _syncEngineState(updateStatusMessage: evaluateGameState);
+    if (!evaluateGameState) {
       _statusMessage =
           _currentPlayer == PieceColor.blue ? 'Blue to move' : 'Red to move';
     }
@@ -1860,37 +2113,14 @@ class GameState extends ChangeNotifier {
     _showCheckNotification = false;
     _showEscapeCheckNotification = false;
 
-    _updateStatusMessage();
+    _syncEngineState();
     _refreshEvaluation();
     notifyListeners();
   }
 
   /// DEBUG: Test game over dialog
   void testGameOver(String reason) {
-    _isGameOver = true;
-    _gameOverReason = reason;
-
-    switch (reason) {
-      case 'blue_wins_checkmate':
-        _statusMessage = 'Checkmate! Blue (초) wins!';
-        break;
-      case 'blue_wins_capture':
-        _statusMessage = 'Game Over! Blue (초) wins by capturing the King!';
-        break;
-      case 'red_wins_checkmate':
-        _statusMessage = 'Checkmate! Red (한) wins!';
-        break;
-      case 'red_wins_capture':
-        _statusMessage = 'Game Over! Red (한) wins by capturing the King!';
-        break;
-      case 'threefold_repetition':
-        _statusMessage = 'Draw by threefold repetition!';
-        break;
-      case 'fifty_move_rule':
-        _statusMessage = 'Draw by 50-move rule!';
-        break;
-    }
-
+    _applyGameOverStatus(reason);
     notifyListeners();
   }
 
@@ -1910,13 +2140,7 @@ class GameState extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Get current position as FEN
-      final fen = StockfishConverter.boardToFEN(_board, _currentPlayer);
-
-      // Use isolated best-move path to avoid blocking the UI thread.
-      // Native analyze() path currently crashes on some devices.
-      final bestMoveUCI = await StockfishFFI.getBestMoveIsolated(
-        fen: fen,
+      final preferredBestMoveUci = await _requestBestMove(
         depth: 12,
         movetime: 1500,
       ).timeout(
@@ -1927,27 +2151,19 @@ class GameState extends ChangeNotifier {
         },
       );
 
-      if (bestMoveUCI != null && bestMoveUCI.length >= 4) {
-        debugPrint('getHint: bestmove=$bestMoveUCI');
-
-        int secondPartStart = 1;
-        while (secondPartStart < bestMoveUCI.length &&
-            bestMoveUCI[secondPartStart].codeUnitAt(0) >= '0'.codeUnitAt(0) &&
-            bestMoveUCI[secondPartStart].codeUnitAt(0) <= '9'.codeUnitAt(0)) {
-          secondPartStart++;
+      if (preferredBestMoveUci != null) {
+        debugPrint('getHint: bestmove=$preferredBestMoveUci');
+        final parsedMove = _parseUciMove(preferredBestMoveUci);
+        if (parsedMove != null && !parsedMove.isPass) {
+          final piece = _board.getPiece(parsedMove.from);
+          if (piece != null && piece.color == _currentPlayer) {
+            _setHintState(parsedMove);
+          }
+        } else {
+          _clearHintState();
         }
-
-        final fromUCI = bestMoveUCI.substring(0, secondPartStart);
-        final toUCI = bestMoveUCI.substring(secondPartStart);
-        final from = StockfishConverter.fromUCI(fromUCI);
-        final to = StockfishConverter.fromUCI(toUCI);
-
-        final piece = _board.getPiece(from);
-        if (piece != null && piece.color == _currentPlayer) {
-          _hintMove = Move(from: from, to: to);
-          _showHint = true;
-          _refreshEvaluation();
-        }
+      } else {
+        _clearHintState();
       }
     } catch (e) {
       debugPrint('getHint: Error: $e');
@@ -1959,16 +2175,13 @@ class GameState extends ChangeNotifier {
 
   /// Hide the hint arrow
   void hideHint() {
-    _showHint = false;
-    _hintMove = null;
-    _refreshEvaluation();
+    _clearHintState(refreshEvaluation: true);
     notifyListeners();
   }
 
   /// Set a manual hint move (for puzzles)
   void setManualHint(Position from, Position to) {
-    _hintMove = Move(from: from, to: to);
-    _showHint = true;
+    _setHintState(Move(from: from, to: to));
     notifyListeners();
   }
 

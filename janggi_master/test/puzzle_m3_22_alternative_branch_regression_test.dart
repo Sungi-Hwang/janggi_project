@@ -18,7 +18,7 @@ Future<void> _move(GameState state, String from, String to) async {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('m3_22 alternative d5d1 is not a checking move after e2f3', () async {
+  test('m3_22 alternative d5d1 is still check after e2f3', () async {
     const fen = '4k4/4a1P2/5a3/1pp3RB1/9/3r5/2b6/4A4/1b1cK4/9 b - - 0 1';
 
     final state = GameState(gameMode: GameMode.twoPlayer);
@@ -30,9 +30,9 @@ void main() {
 
     expect(
       state.isInCheck,
-      isFalse,
+      isTrue,
       reason:
-          'After e2f3, the defending king has already left the palace center, so d5d1 should not count as check.',
+          'After e2f3, the blue general is still on the opposite palace corner, so the diagonal d1-e2-f3 remains a checking line while the center is empty.',
     );
 
     expect(state.currentPlayer, PieceColor.blue);
@@ -40,9 +40,9 @@ void main() {
     await state.onSquareTapped(_uci('g7'));
     expect(
       state.validMoves,
-      contains(_uci('g1')),
+      isNot(contains(_uci('g1'))),
       reason:
-          'The defending blue chariot must still be able to answer with g7g1 in this branch.',
+          'Because the diagonal d1-e2-f3 check is still active, blue cannot ignore it with g7g1.',
     );
   });
 }

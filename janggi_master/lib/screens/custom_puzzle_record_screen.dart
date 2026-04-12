@@ -45,7 +45,10 @@ class _CustomPuzzleRecordScreenState extends State<CustomPuzzleRecordScreen> {
     _bottomColor = widget.bottomColor;
     _initialFen = StockfishConverter.boardToFEN(_initialBoard, _bottomColor);
 
-    _gameState = GameState(gameMode: GameMode.twoPlayer);
+    _gameState = GameState(
+      gameMode: GameMode.twoPlayer,
+      ruleMode: context.read<SettingsProvider>().ruleMode,
+    );
     _gameState.addListener(_onGameStateChanged);
     _gameState.setPuzzlePosition(_initialBoard.copy(), _bottomColor);
   }
@@ -59,20 +62,18 @@ class _CustomPuzzleRecordScreenState extends State<CustomPuzzleRecordScreen> {
 
   void _onGameStateChanged() {
     if (_saved || _isSaving) return;
-    if (!_gameState.isGameOver) return;
-
-    final reason = _gameState.gameOverReason ?? '';
-    if (reason.contains('checkmate')) {
-      _savePuzzle(autoByCheckmate: true);
+    if (_gameState.moveHistory.isEmpty) return;
+    if (_gameState.currentPlayerHasNoEscape) {
+      _savePuzzle(autoByNoEscape: true);
     }
   }
 
-  Future<void> _savePuzzle({required bool autoByCheckmate}) async {
+  Future<void> _savePuzzle({required bool autoByNoEscape}) async {
     if (_saved || _isSaving) return;
 
     final solution = _gameState.moveHistory.map((m) => m.toUCI()).toList();
     if (solution.isEmpty) {
-      if (!autoByCheckmate) {
+      if (!autoByNoEscape) {
         _showSnack('최소 1수 이상 진행 후 저장할 수 있습니다.');
       }
       return;
@@ -105,12 +106,12 @@ class _CustomPuzzleRecordScreenState extends State<CustomPuzzleRecordScreen> {
       _saved = true;
 
       if (!mounted) return;
-      if (autoByCheckmate) {
+      if (autoByNoEscape) {
         await showDialog<void>(
           context: context,
           builder: (context) => AlertDialog(
             title: const Text('자동 저장 완료'),
-            content: const Text('체크메이트가 발생하여 퍼즐이 자동 저장되었습니다.'),
+            content: const Text('상대에게 둘 수가 남지 않아 퍼즐이 자동 저장되었습니다.'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
@@ -327,7 +328,7 @@ class _CustomPuzzleRecordScreenState extends State<CustomPuzzleRecordScreen> {
                               color: Colors.greenAccent.shade200,
                               onPressed: _isSaving
                                   ? null
-                                  : () => _savePuzzle(autoByCheckmate: false),
+                                  : () => _savePuzzle(autoByNoEscape: false),
                             ),
                             _buildGameButton(
                               icon: Icons.undo,

@@ -18,6 +18,8 @@ migrate_working_dir/
 
 # VSCode
 .vscode/
+!janggi_master/.vscode/
+!janggi_master/.vscode/settings.json
 
 # Flutter/Dart/Pub related
 **/doc/api/
@@ -53,6 +55,7 @@ nul
 probe.txt
 flutter_setup.log
 setup_status.log
+janggi_master/build_stockfish.rsp
 
 # Claude AI
 .claude/

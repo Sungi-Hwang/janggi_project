@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../models/board.dart';
 import '../models/piece.dart';
 import '../models/position.dart';
+import '../models/rule_mode.dart';
 import '../providers/monetization_provider.dart';
 import '../providers/settings_provider.dart';
 import '../widgets/janggi_board_widget.dart' show BoardLinesPainter;
@@ -24,6 +25,13 @@ class _PreGameSetupScreenState extends State<PreGameSetupScreen> {
   PieceSetup _blueSetup = PieceSetup.horseElephantHorseElephant;
   PieceSetup _redSetup = PieceSetup.horseElephantHorseElephant;
   PieceColor _playerColor = PieceColor.blue;
+  RuleMode? _selectedRuleMode;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _selectedRuleMode ??= context.read<SettingsProvider>().ruleMode;
+  }
 
   Board _previewBoard() {
     final board = Board();
@@ -75,7 +83,7 @@ class _PreGameSetupScreenState extends State<PreGameSetupScreen> {
                     ),
                     IconButton(
                       icon: const Icon(Icons.settings, color: Colors.white),
-                      tooltip: '?ㅼ젙',
+                      tooltip: '설정',
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -132,6 +140,47 @@ class _PreGameSetupScreenState extends State<PreGameSetupScreen> {
                           ),
                         ],
                       ),
+                      const SizedBox(height: 12),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.06),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              '\ub8f0 \uae30\uc900',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 8),
+                            SegmentedButton<RuleMode>(
+                              segments: RuleMode.values.map((mode) {
+                                return ButtonSegment<RuleMode>(
+                                  value: mode,
+                                  label: Text(mode.shortLabel),
+                                );
+                              }).toList(),
+                              selected: <RuleMode>{
+                                _selectedRuleMode ?? settings.ruleMode,
+                              },
+                              onSelectionChanged: (selection) {
+                                setState(() {
+                                  _selectedRuleMode = selection.first;
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              (_selectedRuleMode ?? settings.ruleMode)
+                                  .description,
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -143,7 +192,7 @@ class _PreGameSetupScreenState extends State<PreGameSetupScreen> {
                       const Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          '?κ린???꾩뿉??諛붾줈 諛곗튂 ?ㅼ젙',
+                          '말 차림과 진영 배치 설정',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 16,
@@ -160,7 +209,7 @@ class _PreGameSetupScreenState extends State<PreGameSetupScreen> {
                       ),
                       const SizedBox(height: 10),
                       const Text(
-                        '留????꾩튂??媛??붿궡??<->)濡?蹂寃쏀븯怨? 媛?대뜲 ?묅넃 踰꾪듉?쇰줈 珥???諛곗튂瑜??듭㎏濡?援먰솚?⑸땲??',
+                        '좌우 화살표 버튼(<->)으로 마상 차림을 바꾸고, 가운데 교환 버튼으로 초/한 배치를 통째로 맞바꿉니다.',
                         style: TextStyle(color: Colors.white, fontSize: 12),
                         textAlign: TextAlign.center,
                       ),
@@ -265,14 +314,14 @@ class _PreGameSetupScreenState extends State<PreGameSetupScreen> {
                       child: IconButton(
                         onPressed: _swapSides,
                         icon: const Icon(Icons.swap_vert, color: Colors.white),
-                        tooltip: '珥???諛곗튂 援먰솚',
+                        tooltip: '초/한 배치 교환',
                       ),
                     ),
                     const SizedBox(width: 8),
                     ElevatedButton.icon(
                       onPressed: () => _startGame(settings, monetization),
                       icon: const Icon(Icons.play_arrow),
-                      label: const Text('?쒖옉'),
+                      label: const Text('시작'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF0A4D1A),
                         foregroundColor: Colors.white,
@@ -340,7 +389,7 @@ class _PreGameSetupScreenState extends State<PreGameSetupScreen> {
         child: IconButton(
           onPressed: onPressed,
           icon: const Icon(Icons.swap_horiz, color: Colors.white, size: 18),
-          tooltip: '留????꾩튂 援먰솚',
+          tooltip: '좌우 마상 교환',
         ),
       ),
     );
@@ -423,6 +472,7 @@ class _PreGameSetupScreenState extends State<PreGameSetupScreen> {
           aiColor: widget.gameMode == GameMode.vsAI ? aiColor : PieceColor.red,
           blueSetup: _blueSetup,
           redSetup: _redSetup,
+          ruleMode: _selectedRuleMode ?? settings.ruleMode,
         ),
       ),
     );

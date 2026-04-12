@@ -3,9 +3,9 @@ import 'package:flutter/foundation.dart';
 class MonetizationConfig {
   const MonetizationConfig._();
 
-  // Temporary guard: some Android devices/renderers show a white main canvas
-  // when a BannerAd widget is attached to the menu.
-  static const bool enableMainMenuBanner = false;
+  // Main menu banners now use a separate overlay slot so they do not alter the
+  // menu scaffold's main layout while loading.
+  static const bool enableMainMenuBanner = true;
   static const bool enableInGameTopBanner = true;
 
   static const String removeAdsProductId = 'remove_ads';

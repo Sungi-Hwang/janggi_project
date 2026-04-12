@@ -7,6 +7,7 @@ import '../game/game_state.dart';
 import '../monetization/monetization_config.dart';
 import '../models/board.dart';
 import '../models/piece.dart';
+import '../models/rule_mode.dart';
 import '../providers/monetization_provider.dart';
 import '../providers/settings_provider.dart';
 import '../screens/settings_screen.dart';
@@ -31,6 +32,7 @@ class GameScreen extends StatefulWidget {
   final PieceColor aiColor;
   final PieceSetup blueSetup;
   final PieceSetup redSetup;
+  final RuleMode ruleMode;
   final Board? initialBoard;
   final PieceColor? initialStartingPlayer;
 
@@ -42,6 +44,7 @@ class GameScreen extends StatefulWidget {
     this.aiColor = PieceColor.red,
     this.blueSetup = PieceSetup.horseElephantHorseElephant,
     this.redSetup = PieceSetup.horseElephantHorseElephant,
+    this.ruleMode = RuleMode.casualDefault,
     this.initialBoard,
     this.initialStartingPlayer,
   });
@@ -86,7 +89,9 @@ class _GameScreenState extends State<GameScreen> {
 
   Future<void> _initEngine() async {
     try {
-      await StockfishFFI.warmupIsolated();
+      await StockfishFFI.warmupIsolated(
+        variant: widget.ruleMode.engineVariantName,
+      );
       if (!mounted) return;
       setState(() {
         _engineInitialized = true;
@@ -107,6 +112,7 @@ class _GameScreenState extends State<GameScreen> {
         aiColor: _effectiveAiColor,
         blueSetup: _pendingBlueSetup,
         redSetup: _pendingRedSetup,
+        ruleMode: widget.ruleMode,
       )..applyCustomStartPosition(
           customBoard: _customInitialBoard,
           startingPlayer: _customStartingPlayer,
@@ -334,6 +340,21 @@ class _GameScreenState extends State<GameScreen> {
                                     ? null
                                     : () => _showSurrenderDialog(
                                         context, gameState),
+                              ),
+                              _buildGameButton(
+                                icon: Icons.skip_next,
+                                label: '\uD55C\uC218\uC26C',
+                                color: Colors.tealAccent,
+                                onPressed: !setupMode &&
+                                        !gameState.isGameOver &&
+                                        !gameState.isEngineThinking &&
+                                        gameState.currentPlayer !=
+                                            gameState.aiColor &&
+                                        gameState.canPass
+                                    ? () async {
+                                        await gameState.passTurn();
+                                      }
+                                    : null,
                               ),
                               _buildGameButton(
                                 icon: Icons.lightbulb,

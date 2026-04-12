@@ -1,0 +1,10 @@
+﻿기능: 묘수풀이 카테고리
+파일: screenshot.png
+원본: D:\Project\janggi-master\janggi_master\test_tmp\portfolio_puzzle_categories_fresh.png
+
+설명:
+묘수풀이 메인 진입 화면입니다. 1수 외통, 2수 외통, 3수 외통, 나만의 묘수풀이 카테고리를 현재 카드 UI로 보여줍니다.
+
+비고:
+이 폴더는 현재 UI와 맞는 최근 캡처만 다시 선별해서 구성한 묶음입니다.
+이전 beta/old 계열 스크린샷 폴더보다 최신 디자인 반영도가 높습니다.

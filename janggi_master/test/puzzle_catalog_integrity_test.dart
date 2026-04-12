@@ -26,7 +26,18 @@ void main() {
       counts[mateIn] = (counts[mateIn] ?? 0) + 1;
 
       final solution = List<String>.from(puzzle['solution'] as List<dynamic>);
-      expect(solution, isNotEmpty, reason: 'Puzzle ${puzzle['id']} has no solution');
+      expect(solution, isNotEmpty,
+          reason: 'Puzzle ${puzzle['id']} has no solution');
+      expect(
+        solution.length,
+        mateIn * 2 - 1,
+        reason: 'Puzzle ${puzzle['id']} solution length does not match mateIn',
+      );
+      expect(
+        puzzle['title'],
+        startsWith('${mateIn}수 외통 #'),
+        reason: 'Puzzle ${puzzle['id']} title does not match mateIn',
+      );
 
       final validation =
           Map<String, dynamic>.from(puzzle['validation'] as Map? ?? const {});

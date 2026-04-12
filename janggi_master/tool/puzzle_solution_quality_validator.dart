@@ -107,8 +107,9 @@ void main() {
 
       for (final puzzle in puzzles) {
         final fen = puzzle['fen'] as String;
-        final toMove =
-            (puzzle['toMove'] as String?) == 'red' ? PieceColor.red : PieceColor.blue;
+        final toMove = (puzzle['toMove'] as String?) == 'red'
+            ? PieceColor.red
+            : PieceColor.blue;
         final solution = List<String>.from(puzzle['solution'] as List<dynamic>);
         final parsedSolution = <Move>[];
         var parseFailed = false;
@@ -141,7 +142,8 @@ void main() {
 
           await state.onSquareTapped(expectedMove.from);
           final expectedIsLegal = state.validMoves.contains(expectedMove.to);
-          await state.onSquareTapped(expectedMove.from); // Deselect before branching.
+          await state
+              .onSquareTapped(expectedMove.from); // Deselect before branching.
 
           if (!expectedIsLegal) {
             invalid.add({
@@ -157,8 +159,8 @@ void main() {
           if (playerSideTurn) {
             final legalMoves = await _allLegalMoves(state);
             for (final altMove in legalMoves) {
-              final sameMove =
-                  altMove.from == expectedMove.from && altMove.to == expectedMove.to;
+              final sameMove = altMove.from == expectedMove.from &&
+                  altMove.to == expectedMove.to;
               if (sameMove) {
                 continue;
               }
@@ -170,14 +172,15 @@ void main() {
               );
               await _applyMove(altState, altMove);
 
-              if (altState.isGameOver) {
+              if (altState.currentPlayerHasNoEscape) {
                 invalid.add({
                   'id': puzzle['id'],
                   'title': puzzle['title'],
                   'reason': 'alternative_immediate_win',
                   'ply': i + 1,
                   'move': solution[i],
-                  'alternative': '${altMove.from.toAlgebraic()}${altMove.to.toAlgebraic()}',
+                  'alternative':
+                      '${altMove.from.toAlgebraic()}${altMove.to.toAlgebraic()}',
                   'alternativeReason': altState.gameOverReason,
                 });
                 break;
@@ -192,7 +195,7 @@ void main() {
           await _applyMove(state, expectedMove);
 
           final isLastMove = i == parsedSolution.length - 1;
-          if (!isLastMove && state.isGameOver) {
+          if (!isLastMove && state.currentPlayerHasNoEscape) {
             invalid.add({
               'id': puzzle['id'],
               'title': puzzle['title'],
@@ -204,11 +207,11 @@ void main() {
             break;
           }
 
-          if (isLastMove && !state.isGameOver) {
+          if (isLastMove && !state.currentPlayerHasNoEscape) {
             invalid.add({
               'id': puzzle['id'],
               'title': puzzle['title'],
-              'reason': 'final_move_not_terminal',
+              'reason': 'final_move_allows_escape',
               'ply': i + 1,
               'move': solution[i],
             });

@@ -1292,7 +1292,7 @@ inline Bitboard Position::attacks_from(Color c, PieceType pt, Square s) const {
     // uninitialized magics
     if (diagType == BISHOP) {
       Square center = (rank_of(s) <= RANK_3) ? make_square(FILE_E, RANK_2)
-                                             : make_square(FILE_E, RANK_10);
+                                             : make_square(FILE_E, RANK_9);
       if (s == center) {
         b |= (attacks_bb(c, FERS, s, pieces()) &
               diagonal_lines()); // Center attacks corners
@@ -1305,7 +1305,7 @@ inline Bitboard Position::attacks_from(Color c, PieceType pt, Square s) const {
       }
     } else if (movePt == JANGGI_CANNON) {
       Square center = (rank_of(s) <= RANK_3) ? make_square(FILE_E, RANK_2)
-                                             : make_square(FILE_E, RANK_10);
+                                             : make_square(FILE_E, RANK_9);
       // Cannon only attacks diagonally if at corner AND center is occupied
       // (hurdle)
       if (s != center && (pieces() & center)) {
@@ -1346,7 +1346,7 @@ inline Bitboard Position::moves_from(Color c, PieceType pt, Square s) const {
     // uninitialized magics
     if (diagType == BISHOP) {
       Square center = (rank_of(s) <= RANK_3) ? make_square(FILE_E, RANK_2)
-                                             : make_square(FILE_E, RANK_10);
+                                             : make_square(FILE_E, RANK_9);
       if (s == center) {
         b |= (attacks_bb(c, FERS, s, pieces()) &
               diagonal_lines()); // Center attacks corners
@@ -1359,7 +1359,7 @@ inline Bitboard Position::moves_from(Color c, PieceType pt, Square s) const {
       }
     } else if (movePt == JANGGI_CANNON) {
       Square center = (rank_of(s) <= RANK_3) ? make_square(FILE_E, RANK_2)
-                                             : make_square(FILE_E, RANK_10);
+                                             : make_square(FILE_E, RANK_9);
       // Cannon only attacks diagonally if at corner AND center is occupied
       // (hurdle)
       if (s != center && (pieces() & center)) {

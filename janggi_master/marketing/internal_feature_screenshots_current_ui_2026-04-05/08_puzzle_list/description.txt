@@ -1,0 +1,10 @@
+﻿기능: 묘수풀이 목록
+파일: screenshot.png
+원본: D:\Project\janggi-master\janggi_master\test_tmp\portfolio_puzzle_list.png
+
+설명:
+선택한 묘수풀이 카테고리의 문제 목록 화면입니다. 번호, 제목, 차례 정보가 리스트 형태로 정리된 현재 UI입니다.
+
+비고:
+이 폴더는 현재 UI와 맞는 최근 캡처만 다시 선별해서 구성한 묶음입니다.
+이전 beta/old 계열 스크린샷 폴더보다 최신 디자인 반영도가 높습니다.
