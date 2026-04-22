@@ -26,6 +26,7 @@ class MonetizationProvider extends ChangeNotifier {
   List<ProductDetails> _products = const [];
 
   bool _adSdkInitialized = false;
+  bool _adsInitializing = false;
   bool _interstitialLoading = false;
   bool _interstitialShowing = false;
   InterstitialAd? _interstitialAd;
@@ -50,29 +51,63 @@ class MonetizationProvider extends ChangeNotifier {
   Future<void> init() async {
     if (_initialized || _isInitializing) return;
     _isInitializing = true;
+    try {
+      await _service.init();
+      _removeAdsPurchased = _service.removeAdsPurchased;
+      _premiumPurchased = _service.premiumPurchased;
+      if (_premiumPurchased) {
+        _removeAdsPurchased = true;
+      }
 
-    await _service.init();
-    _removeAdsPurchased = _service.removeAdsPurchased;
-    _premiumPurchased = _service.premiumPurchased;
-    if (_premiumPurchased) {
-      _removeAdsPurchased = true;
+      _purchaseSubscription ??= _inAppPurchase.purchaseStream.listen(
+        _onPurchaseUpdates,
+        onError: (Object error) {
+          _errorMessage = 'Purchase stream error: $error';
+          _purchasePending = false;
+          notifyListeners();
+        },
+      );
+
+      await _refreshStoreState();
+    } catch (error, stackTrace) {
+      _errorMessage = 'Monetization init failed: $error';
+      if (kDebugMode) {
+        debugPrint('Monetization init failed: $error');
+        debugPrintStack(stackTrace: stackTrace);
+      }
+    } finally {
+      _isInitializing = false;
+      _initialized = true;
+      notifyListeners();
+    }
+  }
+
+  Future<void> ensureAdsInitialized() async {
+    if (_adSdkInitialized || _adsInitializing) {
+      return;
+    }
+    if (!MonetizationConfig.isAdsSupportedPlatform || isAdFree) {
+      return;
     }
 
-    _purchaseSubscription = _inAppPurchase.purchaseStream.listen(
-      _onPurchaseUpdates,
-      onError: (Object error) {
-        _errorMessage = 'Purchase stream error: $error';
-        _purchasePending = false;
-        notifyListeners();
-      },
-    );
-
-    await _refreshStoreState();
-    await _initializeAds();
-
-    _isInitializing = false;
-    _initialized = true;
-    notifyListeners();
+    _adsInitializing = true;
+    try {
+      await MobileAds.instance.initialize();
+      _adSdkInitialized = true;
+      _errorMessage = null;
+      if (canShowAds) {
+        _loadInterstitial();
+      }
+    } catch (error, stackTrace) {
+      _errorMessage = 'Ads init failed: $error';
+      if (kDebugMode) {
+        debugPrint('Ads init failed: $error');
+        debugPrintStack(stackTrace: stackTrace);
+      }
+    } finally {
+      _adsInitializing = false;
+      notifyListeners();
+    }
   }
 
   Future<void> _refreshStoreState() async {
@@ -182,12 +217,18 @@ class MonetizationProvider extends ChangeNotifier {
 
   Future<void> registerGameCompleted() async {
     await _service.registerGameCompleted();
+    if (canShowAds && !_adSdkInitialized) {
+      await ensureAdsInitialized();
+    }
     if (canShowAds && _interstitialAd == null) {
       _loadInterstitial();
     }
   }
 
   Future<bool> maybeShowEndGameInterstitial() async {
+    if (canShowAds && !_adSdkInitialized) {
+      await ensureAdsInitialized();
+    }
     if (!_adSdkInitialized || !canShowAds) {
       return false;
     }
@@ -261,19 +302,6 @@ class MonetizationProvider extends ChangeNotifier {
     _interstitialShowing = false;
     await _service.recordInterstitialShown(DateTime.now());
     _loadInterstitial();
-  }
-
-  Future<void> _initializeAds() async {
-    if (!MonetizationConfig.isAdsSupportedPlatform) {
-      return;
-    }
-
-    await MobileAds.instance.initialize();
-    _adSdkInitialized = true;
-
-    if (canShowAds) {
-      _loadInterstitial();
-    }
   }
 
   void _loadInterstitial() {

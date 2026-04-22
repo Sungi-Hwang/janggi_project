@@ -56,22 +56,41 @@ class _AdBannerSlotState extends State<AdBannerSlot> {
 
   Future<void> _ensureBannerReady() async {
     final monetization = context.read<MonetizationProvider>();
-    if (!monetization.canShowAds || !monetization.adSdkInitialized) {
+    if (!monetization.canShowAds) {
       _disposeBanner();
       return;
     }
 
-    final nextSize = await _resolveAdSize();
-    if (!mounted || nextSize == null) {
-      return;
+    if (!monetization.adSdkInitialized) {
+      await monetization.ensureAdsInitialized();
+      if (!mounted || !monetization.adSdkInitialized) {
+        _disposeBanner();
+        return;
+      }
     }
 
-    if (_adSize == nextSize && _bannerAd != null) {
-      return;
-    }
+    try {
+      final nextSize = await _resolveAdSize();
+      if (!mounted || nextSize == null) {
+        return;
+      }
 
-    _disposeBanner();
-    _loadBanner(nextSize);
+      if (_adSize == nextSize && _bannerAd != null) {
+        return;
+      }
+
+      _disposeBanner();
+      _loadBanner(nextSize);
+    } catch (error, stackTrace) {
+      if (kDebugMode) {
+        debugPrint(
+          '[AdBannerSlot] failed to prepare ${widget.placement.name} banner: '
+          '$error',
+        );
+        debugPrintStack(stackTrace: stackTrace);
+      }
+      _disposeBanner();
+    }
   }
 
   Future<AdSize?> _resolveAdSize() async {
@@ -128,46 +147,59 @@ class _AdBannerSlotState extends State<AdBannerSlot> {
       );
     }
 
-    final ad = BannerAd(
-      adUnitId: adUnitId,
-      request: const AdRequest(),
-      size: size,
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          if (!mounted) {
+    try {
+      final ad = BannerAd(
+        adUnitId: adUnitId,
+        request: const AdRequest(),
+        size: size,
+        listener: BannerAdListener(
+          onAdLoaded: (ad) {
+            if (!mounted) {
+              ad.dispose();
+              return;
+            }
+            if (kDebugMode) {
+              debugPrint(
+                '[AdBannerSlot] ${widget.placement.name} banner loaded',
+              );
+            }
+            setState(() {
+              _bannerAd = ad as BannerAd;
+              _adSize = size;
+              _isLoaded = true;
+            });
+          },
+          onAdFailedToLoad: (ad, error) {
+            if (kDebugMode) {
+              debugPrint(
+                '[AdBannerSlot] ${widget.placement.name} banner failed: $error',
+              );
+            }
             ad.dispose();
-            return;
-          }
-          if (kDebugMode) {
-            debugPrint('[AdBannerSlot] ${widget.placement.name} banner loaded');
-          }
-          setState(() {
-            _bannerAd = ad as BannerAd;
-            _adSize = size;
-            _isLoaded = true;
-          });
-        },
-        onAdFailedToLoad: (ad, error) {
-          if (kDebugMode) {
-            debugPrint(
-              '[AdBannerSlot] ${widget.placement.name} banner failed: $error',
-            );
-          }
-          ad.dispose();
-          if (!mounted) {
-            return;
-          }
-          setState(() {
-            _bannerAd = null;
-            _isLoaded = false;
-          });
-        },
-      ),
-    );
+            if (!mounted) {
+              return;
+            }
+            setState(() {
+              _bannerAd = null;
+              _isLoaded = false;
+            });
+          },
+        ),
+      );
 
-    _bannerAd = ad;
-    _adSize = size;
-    ad.load();
+      _bannerAd = ad;
+      _adSize = size;
+      ad.load();
+    } catch (error, stackTrace) {
+      if (kDebugMode) {
+        debugPrint(
+          '[AdBannerSlot] failed to load ${widget.placement.name} banner: '
+          '$error',
+        );
+        debugPrintStack(stackTrace: stackTrace);
+      }
+      _disposeBanner();
+    }
   }
 
   void _disposeBanner() {

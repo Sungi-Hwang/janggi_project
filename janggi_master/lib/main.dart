@@ -7,7 +7,6 @@ import 'providers/monetization_provider.dart';
 import 'providers/settings_provider.dart';
 import 'screens/custom_puzzle_editor_screen.dart';
 import 'screens/game_screen.dart' show GameMode, GameScreen;
-import 'screens/pre_game_setup_screen.dart';
 import 'screens/puzzle_list_screen.dart';
 import 'screens/settings_screen.dart';
 import 'services/monetization_service.dart';
@@ -89,6 +88,12 @@ class MainMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const showMenuBanner = MonetizationConfig.enableMainMenuBanner;
+    final settings = context.watch<SettingsProvider>();
+    final monetization = context.watch<MonetizationProvider>();
+    final aiDifficulty =
+        monetization.enforceDifficultyLimit(settings.aiDifficulty);
+    final aiThinkingTime =
+        monetization.enforceThinkingTimeLimit(settings.aiThinkingTime);
 
     return Scaffold(
       body: Container(
@@ -128,8 +133,13 @@ class MainMenu extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const PreGameSetupScreen(
+                                builder: (context) => GameScreen(
                                   gameMode: GameMode.vsAI,
+                                  aiDifficulty: aiDifficulty,
+                                  aiThinkingTimeSec: aiThinkingTime,
+                                  aiColor: PieceColor.red,
+                                  ruleMode: settings.ruleMode,
+                                  showInGameSetup: true,
                                 ),
                               ),
                             );
@@ -149,8 +159,10 @@ class MainMenu extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const PreGameSetupScreen(
+                                builder: (context) => GameScreen(
                                   gameMode: GameMode.twoPlayer,
+                                  ruleMode: settings.ruleMode,
+                                  showInGameSetup: true,
                                 ),
                               ),
                             );

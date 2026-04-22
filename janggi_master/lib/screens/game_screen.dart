@@ -35,6 +35,7 @@ class GameScreen extends StatefulWidget {
   final RuleMode ruleMode;
   final Board? initialBoard;
   final PieceColor? initialStartingPlayer;
+  final bool showInGameSetup;
 
   const GameScreen({
     super.key,
@@ -47,6 +48,7 @@ class GameScreen extends StatefulWidget {
     this.ruleMode = RuleMode.casualDefault,
     this.initialBoard,
     this.initialStartingPlayer,
+    this.showInGameSetup = false,
   });
 
   @override
@@ -78,7 +80,7 @@ class _GameScreenState extends State<GameScreen> {
         _effectiveAiColor == PieceColor.red ? PieceColor.blue : PieceColor.red;
     _customInitialBoard = widget.initialBoard?.copy();
     _customStartingPlayer = widget.initialStartingPlayer;
-    _setupCompleted = _hasCustomStart;
+    _setupCompleted = _hasCustomStart || !widget.showInGameSetup;
 
     if (widget.gameMode == GameMode.vsAI) {
       _initEngine();
