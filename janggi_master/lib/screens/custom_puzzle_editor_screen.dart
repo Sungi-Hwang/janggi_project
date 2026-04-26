@@ -9,6 +9,7 @@ import '../providers/monetization_provider.dart';
 import '../providers/settings_provider.dart';
 import '../screens/game_screen.dart' show GameMode, GameScreen;
 import '../services/custom_puzzle_service.dart';
+import '../services/shared_puzzle_import_service.dart';
 import '../utils/puzzle_share_codec.dart';
 import 'custom_puzzle_record_screen.dart';
 import '../widgets/janggi_board_widget.dart' show BoardLinesPainter;
@@ -951,8 +952,8 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
 
     Map<String, dynamic> decoded;
     try {
-      decoded = PuzzleShareCodec.decode(raw);
-    } catch (_) {
+      decoded = SharedPuzzleImportService.decodeShareCode(raw);
+    } on SharedPuzzleImportException {
       _showSnack('공유 코드 형식이 올바르지 않습니다.');
       return;
     }
@@ -1018,7 +1019,7 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
     final now = DateTime.now();
     final title = (payload['title'] as String?)?.trim() ?? '';
     final puzzle = <String, dynamic>{
-      'id': CustomPuzzleService.nextId(),
+      'id': CustomPuzzleService.nextImportedId(),
       'title': title.isNotEmpty
           ? title
           : '공유 퍼즐 ${now.toIso8601String().substring(5, 16)}',
@@ -1026,11 +1027,13 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
       'solution': solution,
       'mateIn': payload['mateIn'],
       'toMove': payload['toMove'],
-      'source': 'custom',
+      'source': 'imported',
+      'libraryType': CustomPuzzleService.libraryTypeImported,
+      'importSource': CustomPuzzleService.importSourceShareCode,
       'createdAt': now.toIso8601String(),
     };
 
-    await CustomPuzzleService.addPuzzle(puzzle);
+    await CustomPuzzleService.addImportedPuzzle(puzzle);
     if (!mounted) return;
     _showSnack('공유 퍼즐을 가져왔습니다.');
     Navigator.pop(context, true);

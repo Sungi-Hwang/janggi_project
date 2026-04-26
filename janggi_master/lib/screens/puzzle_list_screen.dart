@@ -6,8 +6,9 @@ import 'package:flutter/services.dart';
 import '../models/puzzle_progress.dart';
 import '../services/custom_puzzle_service.dart';
 import '../services/puzzle_progress_service.dart';
+import '../services/shared_puzzle_import_service.dart';
 import '../utils/puzzle_share_codec.dart';
-import 'custom_puzzle_editor_screen.dart';
+import 'custom_puzzle_library_screen.dart';
 import 'puzzle_game_screen.dart';
 
 class PuzzleListScreen extends StatefulWidget {
@@ -18,8 +19,11 @@ class PuzzleListScreen extends StatefulWidget {
 }
 
 class _PuzzleListScreenState extends State<PuzzleListScreen> {
+  final TextEditingController _importController = TextEditingController();
+
   Map<String, dynamic>? _puzzleData;
-  List<Map<String, dynamic>> _customPuzzles = <Map<String, dynamic>>[];
+  List<Map<String, dynamic>> _createdPuzzles = <Map<String, dynamic>>[];
+  List<Map<String, dynamic>> _importedPuzzles = <Map<String, dynamic>>[];
   PuzzleProgressSnapshot _progress = PuzzleProgressSnapshot.empty();
   bool _isLoading = true;
 
@@ -27,6 +31,12 @@ class _PuzzleListScreenState extends State<PuzzleListScreen> {
   void initState() {
     super.initState();
     _loadData();
+  }
+
+  @override
+  void dispose() {
+    _importController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadData() async {
@@ -38,13 +48,15 @@ class _PuzzleListScreenState extends State<PuzzleListScreen> {
       final jsonString =
           await rootBundle.loadString('assets/puzzles/puzzles.json');
       final data = json.decode(jsonString) as Map<String, dynamic>;
-      final custom = await CustomPuzzleService.loadPuzzles();
+      final storedPuzzles = await CustomPuzzleService.loadPuzzles();
       final progress = await PuzzleProgressService.loadSnapshot();
 
       if (!mounted) return;
       setState(() {
         _puzzleData = data;
-        _customPuzzles = custom;
+        _createdPuzzles = CustomPuzzleService.createdPuzzlesFrom(storedPuzzles);
+        _importedPuzzles =
+            CustomPuzzleService.importedPuzzlesFrom(storedPuzzles);
         _progress = progress;
         _isLoading = false;
       });
@@ -57,206 +69,257 @@ class _PuzzleListScreenState extends State<PuzzleListScreen> {
     }
   }
 
-  List<Map<String, dynamic>> _getPuzzlesByMateIn(int mateIn) {
-    if (_puzzleData == null) {
-      return <Map<String, dynamic>>[];
-    }
-
-    final puzzles = _puzzleData!['puzzles'] as List<dynamic>? ?? <dynamic>[];
+  List<Map<String, dynamic>> _builtinPuzzlesByMateIn(int mateIn) {
+    final puzzles = _puzzleData?['puzzles'] as List<dynamic>? ?? <dynamic>[];
     return puzzles
-        .where((puzzle) => puzzle['mateIn'] == mateIn)
+        .where((puzzle) => puzzle is Map && puzzle['mateIn'] == mateIn)
         .map((puzzle) => Map<String, dynamic>.from(puzzle as Map))
         .toList();
   }
 
-  int _getSolvedCount(List<Map<String, dynamic>> puzzles) {
-    return puzzles
-        .where((puzzle) => _progress.entryFor(_puzzleIdOf(puzzle)).isSolved)
-        .length;
-  }
+  _BuiltinProgressSummary _builtinProgressSummary() {
+    final puzzles = _puzzleData?['puzzles'] as List<dynamic>? ?? <dynamic>[];
+    final builtinIds = puzzles
+        .whereType<Map>()
+        .map((puzzle) => puzzle['id'] as String? ?? '')
+        .where((id) => id.isNotEmpty)
+        .toSet();
 
-  int _getAttemptCount(List<Map<String, dynamic>> puzzles) {
-    return puzzles.fold(
-      0,
-      (sum, puzzle) => sum + _progress.entryFor(_puzzleIdOf(puzzle)).attempts,
+    final entries = builtinIds.map(_progress.entryFor).toList();
+    final solvedCount = entries.where((entry) => entry.isSolved).length;
+    final totalAttempts =
+        entries.fold<int>(0, (sum, entry) => sum + entry.attempts);
+    final totalSolvedAttempts =
+        entries.fold<int>(0, (sum, entry) => sum + entry.solvedCount);
+    final successRate = totalAttempts == 0
+        ? 0.0
+        : (totalSolvedAttempts / totalAttempts) * 100;
+
+    return _BuiltinProgressSummary(
+      totalPuzzleCount: builtinIds.length,
+      solvedCount: solvedCount,
+      totalAttempts: totalAttempts,
+      successRatePercent: successRate,
     );
-  }
-
-  String _puzzleIdOf(Map<String, dynamic> puzzle) {
-    return puzzle['id'] as String? ?? '';
-  }
-
-  Future<void> _showPuzzleList({
-    required int mateIn,
-    required String title,
-    required List<Map<String, dynamic>> puzzles,
-  }) async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PuzzleCategoryScreen(
-          title: title,
-          mateIn: mateIn,
-          puzzles: puzzles,
-        ),
-      ),
-    );
-    _loadData();
   }
 
   Future<void> _openCustomCategory() async {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const CustomPuzzleCategoryScreen(),
+        builder: (context) => const CustomPuzzleLibraryScreen(),
       ),
     );
     _loadData();
   }
 
+  Future<void> _startPuzzle(Map<String, dynamic> puzzle) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PuzzleGameScreen(
+          game: _gameDataFromPuzzle(puzzle),
+        ),
+      ),
+    );
+    _loadData();
+  }
+
+  Future<void> _importSharedPuzzle() async {
+    String raw = _importController.text.trim();
+    if (raw.isEmpty) {
+      final clipboard = await Clipboard.getData('text/plain');
+      raw = clipboard?.text?.trim() ?? '';
+    }
+
+    try {
+      final decoded = SharedPuzzleImportService.decodeShareCode(raw);
+      final puzzle = SharedPuzzleImportService.buildImportedPuzzle(decoded);
+      await CustomPuzzleService.addImportedPuzzle(puzzle);
+      _importController.clear();
+      await _loadData();
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('가져온 문제 탭에 저장했습니다.')),
+      );
+    } on SharedPuzzleImportException catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error.message)),
+      );
+    }
+  }
+
+  Future<void> _copyShareCode(Map<String, dynamic> puzzle) async {
+    try {
+      final code = PuzzleShareCodec.encodePuzzle(puzzle);
+      await Clipboard.setData(ClipboardData(text: code));
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('공유 코드를 복사했습니다.')),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('공유 코드를 생성하지 못했습니다.')),
+      );
+    }
+  }
+
+  Future<void> _deletePuzzle(Map<String, dynamic> puzzle) async {
+    final id = puzzle['id'] as String? ?? '';
+    if (id.isEmpty) return;
+
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('문제 삭제'),
+        content: Text('"${puzzle['title'] ?? '이 문제'}"를 삭제할까요?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('취소'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('삭제'),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldDelete != true) return;
+    await CustomPuzzleService.deletePuzzle(id);
+    await _loadData();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final mate1 = _getPuzzlesByMateIn(1);
-    final mate2 = _getPuzzlesByMateIn(2);
-    final mate3 = _getPuzzlesByMateIn(3);
-    final totalBuiltinCount = mate1.length + mate2.length + mate3.length;
+    final mate1 = _builtinPuzzlesByMateIn(1);
+    final mate2 = _builtinPuzzlesByMateIn(2);
+    final mate3 = _builtinPuzzlesByMateIn(3);
+    final summary = _builtinProgressSummary();
 
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/background.jpg'),
-            fit: BoxFit.cover,
+    return DefaultTabController(
+      length: 4,
+      child: Scaffold(
+        body: Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/images/background.jpg'),
+              fit: BoxFit.cover,
+            ),
           ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.7),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      blurRadius: 8,
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    const SizedBox(width: 8),
-                    const Text(
-                      '묘수풀이',
-                      style: TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: _isLoading
-                    ? const Center(
-                        child: CircularProgressIndicator(color: Colors.white),
-                      )
-                    : _puzzleData == null
-                        ? const Center(
-                            child: Text(
-                              '퍼즐 데이터를 불러오지 못했습니다.',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
+          child: SafeArea(
+            child: Column(
+              children: [
+                _buildHeader(context),
+                Expanded(
+                  child: _isLoading
+                      ? const Center(
+                          child: CircularProgressIndicator(color: Colors.white),
+                        )
+                      : _puzzleData == null
+                          ? _buildLoadErrorState()
+                          : Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                children: [
+                                  _buildProgressSummaryCard(summary),
+                                  const SizedBox(height: 12),
+                                  _buildCustomLibraryCard(),
+                                  const SizedBox(height: 12),
+                                  _buildTabBar(),
+                                  const SizedBox(height: 12),
+                                  Expanded(
+                                    child: TabBarView(
+                                      children: [
+                                        _buildBuiltinTab(
+                                          puzzles: mate1,
+                                          accentColor: Colors.green,
+                                        ),
+                                        _buildBuiltinTab(
+                                          puzzles: mate2,
+                                          accentColor: Colors.orange,
+                                        ),
+                                        _buildBuiltinTab(
+                                          puzzles: mate3,
+                                          accentColor: Colors.red,
+                                        ),
+                                        _buildImportedTab(),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          )
-                        : ListView(
-                            padding: const EdgeInsets.all(16),
-                            children: [
-                              _buildProgressSummaryCard(
-                                totalBuiltinCount: totalBuiltinCount,
-                              ),
-                              const SizedBox(height: 12),
-                              _buildCategoryCard(
-                                title: '1수 외통',
-                                subtitle: '한 수 안에 탈출수를 막는 퍼즐',
-                                icon: Icons.looks_one,
-                                color: Colors.green,
-                                count: mate1.length,
-                                solvedCount: _getSolvedCount(mate1),
-                                attemptCount: _getAttemptCount(mate1),
-                                onTap: () => _showPuzzleList(
-                                  mateIn: 1,
-                                  title: '1수 외통',
-                                  puzzles: mate1,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              _buildCategoryCard(
-                                title: '2수 외통',
-                                subtitle: '두 수 안에 탈출수를 막는 퍼즐',
-                                icon: Icons.looks_two,
-                                color: Colors.orange,
-                                count: mate2.length,
-                                solvedCount: _getSolvedCount(mate2),
-                                attemptCount: _getAttemptCount(mate2),
-                                onTap: () => _showPuzzleList(
-                                  mateIn: 2,
-                                  title: '2수 외통',
-                                  puzzles: mate2,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              _buildCategoryCard(
-                                title: '3수 외통',
-                                subtitle: '세 수 안에 탈출수를 막는 퍼즐',
-                                icon: Icons.looks_3,
-                                color: Colors.red,
-                                count: mate3.length,
-                                solvedCount: _getSolvedCount(mate3),
-                                attemptCount: _getAttemptCount(mate3),
-                                onTap: () => _showPuzzleList(
-                                  mateIn: 3,
-                                  title: '3수 외통',
-                                  puzzles: mate3,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              _buildCategoryCard(
-                                title: '나만의 퍼즐',
-                                subtitle: '직접 만든 퍼즐을 이어서 풀고 관리',
-                                icon: Icons.add_box_rounded,
-                                color: Colors.indigo,
-                                count: _customPuzzles.length,
-                                solvedCount: _getSolvedCount(_customPuzzles),
-                                attemptCount: _getAttemptCount(_customPuzzles),
-                                onTap: _openCustomCategory,
-                              ),
-                            ],
-                          ),
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildProgressSummaryCard({
-    required int totalBuiltinCount,
-  }) {
-    final solvedCount = _progress.entries.values
-        .where(
-            (entry) => entry.isSolved && !entry.puzzleId.startsWith('custom_'))
-        .length;
-    final successRate = (_progress.successRate * 100).toStringAsFixed(0);
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.7),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 8,
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.pop(context),
+          ),
+          const SizedBox(width: 8),
+          const Text(
+            '문제풀이',
+            style: TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
+  Widget _buildLoadErrorState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              '문제 데이터를 불러오지 못했습니다.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white, fontSize: 18),
+            ),
+            const SizedBox(height: 12),
+            FilledButton(
+              onPressed: _loadData,
+              child: const Text('다시 시도'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProgressSummaryCard(_BuiltinProgressSummary summary) {
     return Card(
       elevation: 4,
       color: Colors.white.withValues(alpha: 0.94),
@@ -275,22 +338,22 @@ class _PuzzleListScreenState extends State<PuzzleListScreen> {
               children: [
                 Expanded(
                   child: _buildSummaryMetric(
-                    label: '해결한 퍼즐',
-                    value: '$solvedCount / $totalBuiltinCount',
+                    label: '푼 문제',
+                    value: '${summary.solvedCount} / ${summary.totalPuzzleCount}',
                     color: Colors.green,
                   ),
                 ),
                 Expanded(
                   child: _buildSummaryMetric(
                     label: '총 시도',
-                    value: '${_progress.totalAttempts}',
+                    value: '${summary.totalAttempts}',
                     color: Colors.blue,
                   ),
                 ),
                 Expanded(
                   child: _buildSummaryMetric(
                     label: '성공률',
-                    value: '$successRate%',
+                    value: '${summary.successRatePercent.toStringAsFixed(0)}%',
                     color: Colors.deepOrange,
                   ),
                 ),
@@ -320,543 +383,322 @@ class _PuzzleListScreenState extends State<PuzzleListScreen> {
         const SizedBox(height: 4),
         Text(
           label,
-          style: TextStyle(
-            fontSize: 13,
-            color: Colors.grey.shade700,
-          ),
+          style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
         ),
       ],
     );
   }
 
-  Widget _buildCategoryCard({
-    required String title,
-    required String subtitle,
-    required IconData icon,
-    required Color color,
-    required int count,
-    required int solvedCount,
-    required int attemptCount,
-    required VoidCallback onTap,
-  }) {
+  Widget _buildCustomLibraryCard() {
+    final solvedCount = _createdPuzzles
+        .where((puzzle) => _progress.entryFor(_puzzleIdOf(puzzle)).isSolved)
+        .length;
+
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, color: color, size: 32),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade700,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      '시도 $attemptCount회',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(20),
-                ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        leading: Container(
+          width: 52,
+          height: 52,
+          decoration: BoxDecoration(
+            color: Colors.indigo.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: const Icon(
+            Icons.inventory_2_rounded,
+            color: Colors.indigo,
+            size: 28,
+          ),
+        ),
+        title: const Text(
+          '내가 만든 문제',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(
+          '직접 만든 문제를 관리하고 다시 플레이할 수 있습니다. $solvedCount/${_createdPuzzles.length}',
+        ),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: _openCustomCategory,
+      ),
+    );
+  }
+
+  Widget _buildTabBar() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.92),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: TabBar(
+        labelColor: Colors.brown.shade900,
+        unselectedLabelColor: Colors.grey.shade700,
+        indicatorColor: Colors.brown.shade700,
+        tabs: const [
+          Tab(text: '1수'),
+          Tab(text: '2수'),
+          Tab(text: '3수'),
+          Tab(text: '가져온 문제'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBuiltinTab({
+    required List<Map<String, dynamic>> puzzles,
+    required Color accentColor,
+  }) {
+    if (puzzles.isEmpty) {
+      return _buildEmptyCard(
+        title: '등록된 문제가 없습니다.',
+        subtitle: '다른 탭을 먼저 둘러보거나 잠시 후 다시 확인해 주세요.',
+      );
+    }
+
+    return Card(
+      margin: EdgeInsets.zero,
+      color: Colors.white.withValues(alpha: 0.94),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      child: ListView.separated(
+        padding: const EdgeInsets.all(12),
+        itemCount: puzzles.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 8),
+        itemBuilder: (context, index) {
+          final puzzle = puzzles[index];
+          final progress = _progress.entryFor(_puzzleIdOf(puzzle));
+
+          return Card(
+            margin: EdgeInsets.zero,
+            child: ListTile(
+              leading: CircleAvatar(
+                backgroundColor: accentColor.withValues(alpha: 0.18),
                 child: Text(
-                  '$solvedCount/$count',
+                  '${index + 1}',
                   style: TextStyle(
-                    color: color,
+                    color: accentColor,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
-              Icon(Icons.chevron_right, color: Colors.grey.shade500),
-            ],
-          ),
-        ),
+              title: Text(puzzle['title'] as String? ?? '문제 ${index + 1}'),
+              subtitle: Text(
+                _progressSubtitle(puzzle: puzzle, progress: progress),
+              ),
+              trailing: Icon(
+                progress.isSolved ? Icons.check_circle : Icons.play_arrow,
+                color: progress.isSolved ? Colors.green : accentColor,
+              ),
+              onTap: () => _startPuzzle(puzzle),
+            ),
+          );
+        },
       ),
     );
   }
-}
 
-class PuzzleCategoryScreen extends StatefulWidget {
-  const PuzzleCategoryScreen({
-    super.key,
-    required this.title,
-    required this.mateIn,
-    required this.puzzles,
-  });
-
-  final String title;
-  final int mateIn;
-  final List<Map<String, dynamic>> puzzles;
-
-  @override
-  State<PuzzleCategoryScreen> createState() => _PuzzleCategoryScreenState();
-}
-
-class _PuzzleCategoryScreenState extends State<PuzzleCategoryScreen> {
-  PuzzleProgressSnapshot _progress = PuzzleProgressSnapshot.empty();
-
-  @override
-  void initState() {
-    super.initState();
-    _loadProgress();
-  }
-
-  Future<void> _loadProgress() async {
-    final progress = await PuzzleProgressService.loadSnapshot();
-    if (!mounted) return;
-    setState(() {
-      _progress = progress;
-    });
-  }
-
-  int get _solvedCount => widget.puzzles
-      .where((puzzle) => _progress.entryFor(_puzzleIdOf(puzzle)).isSolved)
-      .length;
-
-  String _puzzleIdOf(Map<String, dynamic> puzzle) {
-    return puzzle['id'] as String? ?? '';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/background.jpg'),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                color: Colors.black.withValues(alpha: 0.7),
-                child: Row(
+  Widget _buildImportedTab() {
+    return Card(
+      margin: EdgeInsets.zero,
+      color: Colors.white.withValues(alpha: 0.94),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      child: RefreshIndicator(
+        onRefresh: _loadData,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(12),
+          children: [
+            Card(
+              margin: EdgeInsets.zero,
+              color: Colors.brown.shade50,
+              child: Padding(
+                padding: const EdgeInsets.all(14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      widget.title,
-                      style: const TextStyle(
-                        fontSize: 24,
+                    const Text(
+                      '공유 코드 가져오기',
+                      style: TextStyle(
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
                       ),
                     ),
-                    const Spacer(),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _importController,
+                      minLines: 1,
+                      maxLines: 4,
+                      decoration: const InputDecoration(
+                        hintText: 'JM_PUZZLE_V1:...',
+                        labelText: '공유 코드',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.icon(
+                        onPressed: _importSharedPuzzle,
+                        icon: const Icon(Icons.file_download),
+                        label: const Text('가져온 문제에 저장'),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
                     Text(
-                      '$_solvedCount/${widget.puzzles.length}',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.white70,
+                      '정답 수순이 포함된 공유 코드만 저장됩니다. 입력이 비어 있으면 클립보드에서 바로 읽습니다.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade700,
                       ),
                     ),
                   ],
                 ),
               ),
-              Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: widget.puzzles.length,
-                  itemBuilder: (context, index) {
-                    final puzzle = widget.puzzles[index];
-                    final progress = _progress.entryFor(_puzzleIdOf(puzzle));
-                    final isSolved = progress.isSolved;
-
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: _colorForMate(widget.mateIn)
-                              .withValues(alpha: 0.2),
-                          child: Text(
-                            '${index + 1}',
-                            style: TextStyle(
-                              color: _colorForMate(widget.mateIn),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        title: Text(puzzle['title'] ?? '퍼즐 ${index + 1}'),
-                        subtitle: Text(
-                          _buildPuzzleSubtitle(
-                            toMove: puzzle['toMove'] as String?,
-                            progress: progress,
-                          ),
-                        ),
-                        trailing: Icon(
-                          isSolved ? Icons.check_circle : Icons.play_arrow,
-                          color: isSolved ? Colors.green : null,
-                        ),
-                        onTap: () => _startPuzzle(context, puzzle),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 12),
+            if (_importedPuzzles.isEmpty)
+              _buildEmptyCard(
+                title: '아직 가져온 문제가 없습니다.',
+                subtitle: '공유 코드를 붙여넣으면 이 탭에 바로 저장됩니다.',
+              )
+            else
+              ..._importedPuzzles.map(_buildImportedPuzzleCard),
+          ],
         ),
       ),
     );
   }
 
-  String _buildPuzzleSubtitle({
-    required String? toMove,
+  Widget _buildImportedPuzzleCard(Map<String, dynamic> puzzle) {
+    final progress = _progress.entryFor(_puzzleIdOf(puzzle));
+    final createdAt = (puzzle['createdAt'] as String? ?? '').trim();
+    final createdLabel = createdAt.isEmpty
+        ? '가져온 시각 정보 없음'
+        : '가져옴 ${createdAt.replaceFirst('T', ' ').substring(0, 16)}';
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        leading: Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: Colors.brown.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: const Icon(Icons.download_rounded, color: Colors.brown),
+        ),
+        title: Text(puzzle['title'] as String? ?? '가져온 문제'),
+        subtitle: Text(
+          '$createdLabel\n${_progressSubtitle(puzzle: puzzle, progress: progress)}',
+        ),
+        isThreeLine: true,
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (progress.isSolved)
+              const Padding(
+                padding: EdgeInsets.only(right: 4),
+                child: Icon(Icons.check_circle, color: Colors.green),
+              ),
+            IconButton(
+              icon: const Icon(Icons.content_copy),
+              tooltip: '공유 코드 복사',
+              onPressed: () => _copyShareCode(puzzle),
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete_outline),
+              color: Colors.red,
+              tooltip: '삭제',
+              onPressed: () => _deletePuzzle(puzzle),
+            ),
+            IconButton(
+              icon: const Icon(Icons.play_arrow),
+              tooltip: '플레이',
+              onPressed: () => _startPuzzle(puzzle),
+            ),
+          ],
+        ),
+        onTap: () => _startPuzzle(puzzle),
+      ),
+    );
+  }
+
+  Widget _buildEmptyCard({
+    required String title,
+    required String subtitle,
+  }) {
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          children: [
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              subtitle,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey.shade700),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _progressSubtitle({
+    required Map<String, dynamic> puzzle,
     required PuzzleProgressEntry progress,
   }) {
-    final side = (toMove ?? 'blue') == 'blue' ? '초 선 차례' : '한 선 차례';
+    final mateIn = (puzzle['mateIn'] as num?)?.toInt() ?? 1;
+    final toMove = puzzle['toMove'] == 'red' ? '한 차례' : '초 차례';
+
     if (progress.attempts == 0) {
-      return '$side · 아직 미도전';
+      return '$mateIn수 문제 · $toMove · 아직 도전 전';
     }
-    return '$side · 해결 ${progress.solvedCount}회 · 시도 ${progress.attempts}회';
+
+    return '$mateIn수 문제 · $toMove · 해결 ${progress.solvedCount}회 / 시도 ${progress.attempts}회';
   }
-
-  Color _colorForMate(int value) {
-    switch (value) {
-      case 1:
-        return Colors.green;
-      case 2:
-        return Colors.orange;
-      case 3:
-        return Colors.red;
-      default:
-        return Colors.purple;
-    }
-  }
-
-  Future<void> _startPuzzle(
-    BuildContext context,
-    Map<String, dynamic> puzzle,
-  ) async {
-    final gameData = <String, dynamic>{
-      'id': puzzle['id'],
-      'title': puzzle['title'],
-      'fen': puzzle['fen'],
-      'solution': puzzle['solution'],
-      'mateIn': puzzle['mateIn'],
-      'toMove': puzzle['toMove'],
-      'source': puzzle['source'],
-      'moves': <String>[],
-      'startMove': 0,
-      'totalMoves': puzzle['mateIn'] as int? ?? 1,
-    };
-
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PuzzleGameScreen(game: gameData),
-      ),
-    );
-    _loadProgress();
-  }
-}
-
-class CustomPuzzleCategoryScreen extends StatefulWidget {
-  const CustomPuzzleCategoryScreen({super.key});
-
-  @override
-  State<CustomPuzzleCategoryScreen> createState() =>
-      _CustomPuzzleCategoryScreenState();
-}
-
-class _CustomPuzzleCategoryScreenState
-    extends State<CustomPuzzleCategoryScreen> {
-  List<Map<String, dynamic>> _puzzles = <Map<String, dynamic>>[];
-  PuzzleProgressSnapshot _progress = PuzzleProgressSnapshot.empty();
-  bool _loading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadPuzzles();
-  }
-
-  Future<void> _loadPuzzles() async {
-    setState(() {
-      _loading = true;
-    });
-
-    final puzzles = await CustomPuzzleService.loadPuzzles();
-    final progress = await PuzzleProgressService.loadSnapshot();
-    puzzles.sort((a, b) {
-      final aTime = a['createdAt'] as String? ?? '';
-      final bTime = b['createdAt'] as String? ?? '';
-      return bTime.compareTo(aTime);
-    });
-
-    if (!mounted) return;
-    setState(() {
-      _puzzles = puzzles;
-      _progress = progress;
-      _loading = false;
-    });
-  }
-
-  int get _solvedCount => _puzzles
-      .where((puzzle) => _progress.entryFor(_puzzleIdOf(puzzle)).isSolved)
-      .length;
 
   String _puzzleIdOf(Map<String, dynamic> puzzle) {
     return puzzle['id'] as String? ?? '';
   }
+}
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/background.jpg'),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                color: Colors.black.withValues(alpha: 0.7),
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    const SizedBox(width: 8),
-                    const Expanded(
-                      child: Text(
-                        '나만의 퍼즐',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      '$_solvedCount/${_puzzles.length}',
-                      style: const TextStyle(color: Colors.white70),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.add_circle, color: Colors.white),
-                      tooltip: '퍼즐 생성',
-                      onPressed: _createPuzzle,
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: _loading
-                    ? const Center(
-                        child: CircularProgressIndicator(color: Colors.white),
-                      )
-                    : _puzzles.isEmpty
-                        ? const Center(
-                            child: Text(
-                              '아직 만든 퍼즐이 없습니다.\n오른쪽 상단 + 버튼으로 만들어보세요.',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                              ),
-                            ),
-                          )
-                        : RefreshIndicator(
-                            onRefresh: _loadPuzzles,
-                            child: ListView.builder(
-                              padding: const EdgeInsets.all(16),
-                              itemCount: _puzzles.length,
-                              itemBuilder: (context, index) {
-                                final puzzle = _puzzles[index];
-                                final progress =
-                                    _progress.entryFor(_puzzleIdOf(puzzle));
-                                return Card(
-                                  margin: const EdgeInsets.only(bottom: 10),
-                                  child: ListTile(
-                                    leading: CircleAvatar(
-                                      backgroundColor:
-                                          Colors.indigo.withValues(alpha: 0.15),
-                                      child: Text(
-                                        '${index + 1}',
-                                        style: const TextStyle(
-                                          color: Colors.indigo,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                    title: Text(puzzle['title'] ?? '나만의 퍼즐'),
-                                    subtitle: Text(
-                                      '${puzzle['mateIn'] ?? 1}수 외통 · '
-                                      '${(puzzle['toMove'] ?? 'blue') == 'blue' ? '초 선 차례' : '한 선 차례'}'
-                                      '${progress.attempts > 0 ? ' · 해결 ${progress.solvedCount}회 / 시도 ${progress.attempts}회' : ''}',
-                                    ),
-                                    trailing: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        if (progress.isSolved)
-                                          const Padding(
-                                            padding: EdgeInsets.only(right: 4),
-                                            child: Icon(
-                                              Icons.check_circle,
-                                              color: Colors.green,
-                                            ),
-                                          ),
-                                        IconButton(
-                                          icon: const Icon(Icons.content_copy),
-                                          color: Colors.indigo.shade400,
-                                          tooltip: '공유 코드 복사',
-                                          onPressed: () =>
-                                              _copyShareCode(puzzle),
-                                        ),
-                                        IconButton(
-                                          icon:
-                                              const Icon(Icons.delete_outline),
-                                          color: Colors.red.shade400,
-                                          tooltip: '삭제',
-                                          onPressed: () =>
-                                              _deletePuzzle(puzzle),
-                                        ),
-                                        const Icon(Icons.play_arrow),
-                                      ],
-                                    ),
-                                    onTap: () => _startPuzzle(context, puzzle),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+Map<String, dynamic> _gameDataFromPuzzle(Map<String, dynamic> puzzle) {
+  return <String, dynamic>{
+    'id': puzzle['id'],
+    'title': puzzle['title'],
+    'fen': puzzle['fen'],
+    'solution': List<String>.from(puzzle['solution'] ?? const <String>[]),
+    'mateIn': (puzzle['mateIn'] as num?)?.toInt() ?? 1,
+    'toMove': puzzle['toMove'] ?? 'blue',
+    'source': puzzle['source'] ?? 'custom',
+    'moves': <String>[],
+    'startMove': 0,
+    'totalMoves': (puzzle['mateIn'] as num?)?.toInt() ?? 1,
+  };
+}
 
-  Future<void> _createPuzzle() async {
-    final created = await Navigator.push<bool>(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const CustomPuzzleEditorScreen(),
-      ),
-    );
-    if (created == true) {
-      _loadPuzzles();
-    }
-  }
+class _BuiltinProgressSummary {
+  const _BuiltinProgressSummary({
+    required this.totalPuzzleCount,
+    required this.solvedCount,
+    required this.totalAttempts,
+    required this.successRatePercent,
+  });
 
-  Future<void> _deletePuzzle(Map<String, dynamic> puzzle) async {
-    final id = puzzle['id'] as String?;
-    if (id == null || id.isEmpty) return;
-
-    final shouldDelete = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('퍼즐 삭제'),
-        content: Text('"${puzzle['title'] ?? '이 퍼즐'}"을 삭제할까요?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('삭제'),
-          ),
-        ],
-      ),
-    );
-
-    if (shouldDelete == true) {
-      await CustomPuzzleService.deletePuzzle(id);
-      _loadPuzzles();
-    }
-  }
-
-  Future<void> _copyShareCode(Map<String, dynamic> puzzle) async {
-    try {
-      final code = PuzzleShareCodec.encodePuzzle(puzzle);
-      await Clipboard.setData(ClipboardData(text: code));
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('공유 코드가 복사되었습니다.')),
-      );
-    } catch (_) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('공유 코드 생성에 실패했습니다.')),
-      );
-    }
-  }
-
-  Future<void> _startPuzzle(
-    BuildContext context,
-    Map<String, dynamic> puzzle,
-  ) async {
-    final gameData = <String, dynamic>{
-      'id': puzzle['id'],
-      'title': puzzle['title'],
-      'fen': puzzle['fen'],
-      'solution': List<String>.from(puzzle['solution'] ?? const <String>[]),
-      'mateIn': puzzle['mateIn'] ?? 1,
-      'toMove': puzzle['toMove'] ?? 'blue',
-      'source': puzzle['source'] ?? 'custom',
-      'moves': <String>[],
-      'startMove': 0,
-      'totalMoves': puzzle['mateIn'] as int? ?? 1,
-    };
-
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PuzzleGameScreen(game: gameData),
-      ),
-    );
-    _loadPuzzles();
-  }
+  final int totalPuzzleCount;
+  final int solvedCount;
+  final int totalAttempts;
+  final double successRatePercent;
 }

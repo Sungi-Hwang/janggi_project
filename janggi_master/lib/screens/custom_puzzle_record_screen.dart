@@ -92,7 +92,7 @@ class _CustomPuzzleRecordScreenState extends State<CustomPuzzleRecordScreen> {
       final playerMoves = (solution.length + 1) ~/ 2;
 
       final puzzle = <String, dynamic>{
-        'id': CustomPuzzleService.nextId(),
+        'id': CustomPuzzleService.nextCreatedId(),
         'title': title,
         'fen': _initialFen,
         'solution': solution,
@@ -102,7 +102,7 @@ class _CustomPuzzleRecordScreenState extends State<CustomPuzzleRecordScreen> {
         'createdAt': now.toIso8601String(),
       };
 
-      await CustomPuzzleService.addPuzzle(puzzle);
+      await CustomPuzzleService.addCreatedPuzzle(puzzle);
       _saved = true;
 
       if (!mounted) return;
