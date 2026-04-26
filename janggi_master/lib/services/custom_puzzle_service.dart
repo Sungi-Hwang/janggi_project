@@ -94,6 +94,9 @@ class CustomPuzzleService {
       normalized['source'] as String?,
       fallback: 'custom',
     );
+    normalized['createdAt'] = _normalizedCreatedAt(
+      normalized['createdAt'] as String?,
+    );
     await addPuzzle(normalized);
   }
 
@@ -111,6 +114,9 @@ class CustomPuzzleService {
     normalized['source'] = _normalizedSource(
       normalized['source'] as String?,
       fallback: 'imported',
+    );
+    normalized['createdAt'] = _normalizedCreatedAt(
+      normalized['createdAt'] as String?,
     );
     await addPuzzle(normalized);
   }
@@ -195,7 +201,7 @@ class CustomPuzzleService {
 
   static String _normalizedCreatedAt(String? raw) {
     final trimmed = raw?.trim() ?? '';
-    return trimmed;
+    return trimmed.isNotEmpty ? trimmed : DateTime.now().toIso8601String();
   }
 
   static int _resolveMateIn(List<String> solution) {

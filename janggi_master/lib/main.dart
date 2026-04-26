@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'community/community_config.dart';
 import 'monetization/monetization_config.dart';
 import 'models/piece.dart' show PieceColor;
+import 'providers/community_auth_provider.dart';
 import 'providers/monetization_provider.dart';
 import 'providers/settings_provider.dart';
+import 'screens/community_puzzle_list_screen.dart';
 import 'screens/custom_puzzle_editor_screen.dart';
 import 'screens/game_screen.dart' show GameMode, GameScreen;
 import 'screens/puzzle_list_screen.dart';
@@ -21,6 +25,18 @@ const bool kAutoAiTest =
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  if (CommunityConfig.isSupabaseConfigured) {
+    try {
+      await Supabase.initialize(
+        url: CommunityConfig.supabaseUrl,
+        anonKey: CommunityConfig.supabaseAnonKey,
+      );
+      CommunityConfig.isSupabaseInitialized = true;
+    } catch (error) {
+      debugPrint('Supabase initialization failed: $error');
+    }
+  }
+
   final settingsService = SettingsService();
   await settingsService.init();
 
@@ -35,6 +51,9 @@ Future<void> main() async {
         ),
         ChangeNotifierProvider(
           create: (_) => MonetizationProvider(MonetizationService())..init(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => CommunityAuthProvider(),
         ),
       ],
       child: const MyApp(),
@@ -205,6 +224,26 @@ class MainMenu extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => const PuzzleListScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        _buildMenuButton(
+                          context: context,
+                          label: '문제 공유소',
+                          icon: Icons.public,
+                          gradientColors: const [
+                            Color(0xFF20423B),
+                            Color(0xFF071B18),
+                          ],
+                          neonColor: const Color(0xFF4DFFD2),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const CommunityPuzzleListScreen(),
                               ),
                             );
                           },
