@@ -36,11 +36,11 @@
 
 파일:
 
-- [beta_promo_board.png](/D:/Project/janggi-master/janggi_master/test_tmp/beta_promo/beta_promo_board.png)
-- [home_beta.png](/D:/Project/janggi-master/janggi_master/test_tmp/beta_promo/home_beta.png)
-- [puzzle_categories_beta.png](/D:/Project/janggi-master/janggi_master/test_tmp/beta_promo/puzzle_categories_beta.png)
-- [puzzle_play_beta.png](/D:/Project/janggi-master/janggi_master/test_tmp/beta_promo/puzzle_play_beta.png)
-- [ai_play_beta.png](/D:/Project/janggi-master/janggi_master/test_tmp/beta_promo/ai_play_beta.png)
+- [beta_promo_board.png](/D:/Project/janggi-master/janggi_master/dev/test_tmp/beta_promo/beta_promo_board.png)
+- [home_beta.png](/D:/Project/janggi-master/janggi_master/dev/test_tmp/beta_promo/home_beta.png)
+- [puzzle_categories_beta.png](/D:/Project/janggi-master/janggi_master/dev/test_tmp/beta_promo/puzzle_categories_beta.png)
+- [puzzle_play_beta.png](/D:/Project/janggi-master/janggi_master/dev/test_tmp/beta_promo/puzzle_play_beta.png)
+- [ai_play_beta.png](/D:/Project/janggi-master/janggi_master/dev/test_tmp/beta_promo/ai_play_beta.png)
 
 스크린샷 캡션 예시:
 
@@ -146,8 +146,8 @@
 
 디시용 스크린샷 묶음:
 
-- [beta_promo_board_dc.png](/D:/Project/janggi-master/janggi_master/test_tmp/beta_promo/beta_promo_board_dc.png)
-- [ai_play_beta_cropped.png](/D:/Project/janggi-master/janggi_master/test_tmp/beta_promo/ai_play_beta_cropped.png)
+- [beta_promo_board_dc.png](/D:/Project/janggi-master/janggi_master/dev/test_tmp/beta_promo/beta_promo_board_dc.png)
+- [ai_play_beta_cropped.png](/D:/Project/janggi-master/janggi_master/dev/test_tmp/beta_promo/ai_play_beta_cropped.png)
 
 첫 댓글 예시:
 

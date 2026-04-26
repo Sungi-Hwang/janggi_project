@@ -57,6 +57,6 @@ AI 훈수 + 묘수풀이 + 이어하기 분석
 
 ## 바로 쓸 수 있는 자산
 
-- 표지 이미지: [store_video_cover_1280x720.jpg](/D:/Project/janggi-master/janggi_master/test_tmp/promo_video_assets/store_video_cover_1280x720.jpg)
-- 장면 보드: [store_video_storyboard_board.jpg](/D:/Project/janggi-master/janggi_master/test_tmp/promo_video_assets/store_video_storyboard_board.jpg)
+- 표지 이미지: [store_video_cover_1280x720.jpg](/D:/Project/janggi-master/janggi_master/dev/test_tmp/promo_video_assets/store_video_cover_1280x720.jpg)
+- 장면 보드: [store_video_storyboard_board.jpg](/D:/Project/janggi-master/janggi_master/dev/test_tmp/promo_video_assets/store_video_storyboard_board.jpg)
 - 홍보 문구 모음: [promo_copy_2026-03-23.md](/D:/Project/janggi-master/janggi_master/docs/promo_copy_2026-03-23.md)

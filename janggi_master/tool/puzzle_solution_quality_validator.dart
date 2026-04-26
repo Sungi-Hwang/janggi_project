@@ -227,7 +227,7 @@ void main() {
         'invalid': invalid,
       };
 
-      final output = File('test_tmp/puzzle_solution_quality_report.json');
+      final output = File('dev/test_tmp/puzzle_solution_quality_report.json');
       await output.parent.create(recursive: true);
       await output.writeAsString(
         const JsonEncoder.withIndent('  ').convert(report),

@@ -19,7 +19,7 @@ void main() {
         Directory('${tempRoot.path}${Platform.pathSeparator}normalized')
           ..createSync(recursive: true);
 
-    final bytes = File('test_tmp/kja_83.bin').readAsBytesSync();
+    final bytes = File('dev/test_tmp/kja_83.bin').readAsBytesSync();
     final games = GibParser.parseNormalizedGamesFromBytes(
       bytes,
       sourceId: 'kja_pds:83',

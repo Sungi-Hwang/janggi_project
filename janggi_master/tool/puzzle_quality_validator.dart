@@ -42,7 +42,8 @@ class _CliOptions {
 
   static _CliOptions parse(List<String> args) {
     String inputPath = 'assets/puzzles/puzzles.json';
-    String reportPath = 'puzzle_quality_validation_v2.json';
+    String reportPath =
+        'dev/puzzle_workbench/reports/puzzle_quality_validation_v2.json';
     String strictOutputPath = 'assets/puzzles/puzzles_strict_preview.json';
     int depth = 12;
     int multiPv = 6;
@@ -119,6 +120,7 @@ Usage: dart run tool/puzzle_quality_validator.dart [options]
 Options:
   --input <path>          Input puzzle JSON (default: assets/puzzles/puzzles.json)
   --report <path>         Validation report output JSON
+                          (default: dev/puzzle_workbench/reports/puzzle_quality_validation_v2.json)
   --strict-output <path>  Strict-only preview JSON output
   --depth <n>             Engine search depth (default: 12)
   --multipv <n>           MultiPV count for uniqueness check (default: 6)

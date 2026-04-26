@@ -10,7 +10,7 @@ import 'package:janggi_master/screens/game_screen.dart' show GameMode;
 import 'package:janggi_master/stockfish_ffi.dart';
 import 'package:janggi_master/utils/gib_parser.dart';
 
-const String _normalizedPath = 'test_tmp/kja_verify/normalized/kja_pds.jsonl';
+const String _normalizedPath = 'dev/test_tmp/kja_verify/normalized/kja_pds.jsonl';
 
 Map<String, dynamic> _loadGame(String gameId) {
   final file = File(_normalizedPath);

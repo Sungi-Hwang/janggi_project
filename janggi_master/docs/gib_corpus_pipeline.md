@@ -56,7 +56,7 @@ plain text 포맷은 `1. ... 2. ...` 형태의 numbered move list만 지원한�
 ## 3. 퍼즐 후보 추출
 
 ```powershell
-dart run tool/extract_puzzle_candidates.dart --output test_tmp/puzzle_candidates.json
+dart run tool/extract_puzzle_candidates.dart --output dev/test_tmp/puzzle_candidates.json
 ```
 
 선택 옵션:
@@ -72,9 +72,9 @@ dart run tool/extract_puzzle_candidates.dart --output test_tmp/puzzle_candidates
 
 ```powershell
 dart run tool/puzzle_quality_validator.dart ^
-  --input test_tmp/puzzle_candidates.json ^
-  --report test_tmp/puzzle_candidate_report.json ^
-  --strict-output test_tmp/puzzle_candidate_strict.json ^
+  --input dev/test_tmp/puzzle_candidates.json ^
+  --report dev/test_tmp/puzzle_candidate_report.json ^
+  --strict-output dev/test_tmp/puzzle_candidate_strict.json ^
   --engine engine/src/stockfish.exe
 ```
 

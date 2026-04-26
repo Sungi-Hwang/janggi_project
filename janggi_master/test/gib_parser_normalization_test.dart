@@ -5,7 +5,7 @@ import 'package:janggi_master/utils/gib_parser.dart';
 
 void main() {
   test('normalizes KJA GIB metadata and setups from raw bytes', () {
-    final fixture = File('test_tmp/kja_83.bin');
+    final fixture = File('dev/test_tmp/kja_83.bin');
     expect(fixture.existsSync(), isTrue);
 
     final bytes = fixture.readAsBytesSync();

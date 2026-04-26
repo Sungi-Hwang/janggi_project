@@ -113,7 +113,7 @@ class _SplitOptions {
 
   static _SplitOptions parse(List<String> args) {
     var inputPath = 'assets/puzzles/puzzles.json';
-    var reportPath = 'test_tmp/puzzle_quality_validation_full_d8_m3.json';
+    var reportPath = 'dev/test_tmp/puzzle_quality_validation_full_d8_m3.json';
     var strictOutputPath = 'assets/puzzles/puzzles_strict.json';
     var relaxedOutputPath = 'assets/puzzles/puzzles_relaxed.json';
     var quarantineOutputPath = 'assets/puzzles/puzzles_quarantine.json';

@@ -11,7 +11,7 @@ import 'package:janggi_master/stockfish_ffi.dart';
 import 'package:janggi_master/utils/gib_parser.dart';
 
 const String _kjaNormalizedPath =
-    'test_tmp/kja_verify/normalized/kja_pds.jsonl';
+    'dev/test_tmp/kja_verify/normalized/kja_pds.jsonl';
 
 Map<String, dynamic> _decodeJsonLine(String line) {
   return jsonDecode(line) as Map<String, dynamic>;

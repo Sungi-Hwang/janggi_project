@@ -85,7 +85,7 @@ class _ExtractOptions {
   static _ExtractOptions parse(List<String> args) {
     String? rootPath;
     String? inputPath;
-    String outputPath = 'test_tmp/puzzle_candidates.json';
+    String outputPath = 'dev/test_tmp/puzzle_candidates.json';
     int? limitGames;
 
     for (int i = 0; i < args.length; i++) {
@@ -128,7 +128,7 @@ Usage: dart run tool/extract_puzzle_candidates.dart [options]
 Options:
   --root <path>         Corpus root (default: %USERPROFILE%\\Documents\\janggi_gib_corpus)
   --input <path>        Normalized file, directory, or simple wildcard pattern
-  --output <path>       Output JSON path (default: test_tmp/puzzle_candidates.json)
+  --output <path>       Output JSON path (default: dev/test_tmp/puzzle_candidates.json)
   --limit-games <n>     Limit number of normalized games to process
   --help                Show this help
 ''');

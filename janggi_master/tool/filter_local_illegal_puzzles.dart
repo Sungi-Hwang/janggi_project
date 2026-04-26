@@ -14,7 +14,7 @@ class _Options {
 
   static _Options parse(List<String> args) {
     var inputPath = 'assets/puzzles/puzzles.json';
-    var reportPath = 'test_tmp/puzzle_local_legality_report.json';
+    var reportPath = 'dev/test_tmp/puzzle_local_legality_report.json';
     String? backupPath;
 
     for (var i = 0; i < args.length; i++) {
@@ -52,7 +52,7 @@ Usage: dart run tool/filter_local_illegal_puzzles.dart [options]
 
 Options:
   --input <path>   Puzzle catalog JSON (default: assets/puzzles/puzzles.json)
-  --report <path>  Local legality report JSON (default: test_tmp/puzzle_local_legality_report.json)
+  --report <path>  Local legality report JSON (default: dev/test_tmp/puzzle_local_legality_report.json)
   --backup <path>  Optional backup copy path before filtering
 ''');
   }

@@ -194,8 +194,8 @@ class _Options {
 
   static _Options parse(List<String> args) {
     var inputPath = 'assets/puzzles/puzzles.json';
-    var reportPath = 'test_tmp/puzzle_quality_resumable_report.json';
-    var strictOutputPath = 'test_tmp/puzzles_resumable_strict_preview.json';
+    var reportPath = 'dev/test_tmp/puzzle_quality_resumable_report.json';
+    var strictOutputPath = 'dev/test_tmp/puzzles_resumable_strict_preview.json';
     var depth = 12;
     var multiPv = 8;
     var enginePath = Platform.isWindows

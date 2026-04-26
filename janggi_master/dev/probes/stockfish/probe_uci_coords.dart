@@ -1,4 +1,4 @@
-import 'lib/stockfish_ffi.dart';
+import 'package:janggi_master/stockfish_ffi.dart';
 
 void main() {
   print('=== UCI Coordinate Test ===\n');

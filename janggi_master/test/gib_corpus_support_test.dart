@@ -7,7 +7,7 @@ import '../tool/gib_corpus_support.dart';
 
 void main() {
   test('parses KJA data room list HTML for recent posts', () {
-    final fixture = File('test_tmp/koreajanggi_data_room.html');
+    final fixture = File('dev/test_tmp/koreajanggi_data_room.html');
     expect(fixture.existsSync(), isTrue);
 
     final html = GibParser.decodeBytes(
@@ -24,7 +24,7 @@ void main() {
   });
 
   test('parses KJA post HTML and extracts GIB attachment metadata', () {
-    final fixture = File('test_tmp/koreajanggi_post_83.html');
+    final fixture = File('dev/test_tmp/koreajanggi_post_83.html');
     expect(fixture.existsSync(), isTrue);
 
     final html = GibParser.decodeBytes(

@@ -35,7 +35,7 @@ void main() {
       );
       expect(
         puzzle['title'],
-        startsWith('${mateIn}수 외통 #'),
+        startsWith('$mateIn수 외통 #'),
         reason: 'Puzzle ${puzzle['id']} title does not match mateIn',
       );
 

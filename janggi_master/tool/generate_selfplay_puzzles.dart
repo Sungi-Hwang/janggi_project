@@ -48,7 +48,7 @@ class _CliOptions {
         ? 'engine/src/stockfish.exe'
         : 'engine/src/stockfish';
 
-    var outputPath = 'test_tmp/selfplay_puzzles.json';
+    var outputPath = 'dev/test_tmp/selfplay_puzzles.json';
     var enginePath = defaultExe;
     var targetCount = 10;
     var maxGames = 24;

@@ -56,4 +56,7 @@ app.*.map.json
 /tmpclaude-*-cwd
 /tmp_gib_test/
 /*.exe
-/test_tmp/
+/dev/engine/*.rsp
+/dev/test_tmp/
+/dev/puzzle_workbench/reports/*
+!/dev/puzzle_workbench/reports/.gitkeep

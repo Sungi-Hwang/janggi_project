@@ -32,7 +32,7 @@
 
 ## 추천 폴더 규칙
 - 새 기보 원본은 `data/gib/` 아래에 모은다.
-- 실험 결과물은 `test_tmp/` 아래에 둔다.
+- 실험 결과물은 `dev/test_tmp/` 아래에 둔다.
 - 최종 배포용 퍼즐만 `assets/puzzles/`에 반영한다.
 
 예시 구조:
@@ -43,7 +43,7 @@ data/
     kakao/
     janggidosa/
     manual/
-test_tmp/
+dev/test_tmp/
 assets/
   puzzles/
 ```
@@ -72,7 +72,7 @@ mingw32-make build COMP=mingw ARCH=x86-64-modern largeboards=yes all=yes nnue=no
 - `mate in 1~3`, 평가 급변, 유일수 가능성을 메타데이터로 함께 저장한다.
 
 추출기 출력 예시:
-- `test_tmp/puzzle_candidates.json`
+- `dev/test_tmp/puzzle_candidates.json`
 
 후보 한 건에 들어가야 할 메타데이터 예시:
 - `sourceFile`
@@ -93,9 +93,9 @@ mingw32-make build COMP=mingw ARCH=x86-64-modern largeboards=yes all=yes nnue=no
 ```powershell
 cd D:\Project\janggi-master\janggi_master
 dart run tool/puzzle_quality_validator.dart ^
-  --input test_tmp/puzzle_candidates.json ^
-  --report test_tmp/puzzle_quality_validation_fast.json ^
-  --strict-output test_tmp/puzzles_strict_preview_fast.json ^
+  --input dev/test_tmp/puzzle_candidates.json ^
+  --report dev/test_tmp/puzzle_quality_validation_fast.json ^
+  --strict-output dev/test_tmp/puzzles_strict_preview_fast.json ^
   --depth 8 ^
   --multipv 3 ^
   --engine engine/src/stockfish.exe
@@ -119,9 +119,9 @@ dart run tool/puzzle_quality_validator.dart ^
 ```powershell
 cd D:\Project\janggi-master\janggi_master
 dart run tool/puzzle_quality_validator.dart ^
-  --input test_tmp/borderline_candidates.json ^
-  --report test_tmp/puzzle_quality_validation_deep.json ^
-  --strict-output test_tmp/puzzles_strict_preview_deep.json ^
+  --input dev/test_tmp/borderline_candidates.json ^
+  --report dev/test_tmp/puzzle_quality_validation_deep.json ^
+  --strict-output dev/test_tmp/puzzles_strict_preview_deep.json ^
   --depth 12 ^
   --multipv 6 ^
   --engine engine/src/stockfish.exe
@@ -136,8 +136,8 @@ dart run tool/puzzle_quality_validator.dart ^
 ```powershell
 cd D:\Project\janggi-master\janggi_master
 dart run tool/split_puzzle_catalog.dart ^
-  --input test_tmp/puzzle_candidates.json ^
-  --report test_tmp/puzzle_quality_validation_fast.json ^
+  --input dev/test_tmp/puzzle_candidates.json ^
+  --report dev/test_tmp/puzzle_quality_validation_fast.json ^
   --strict-output assets/puzzles/puzzles.json ^
   --relaxed-output assets/puzzles/puzzles_relaxed.json ^
   --quarantine-output assets/puzzles/puzzles_quarantine.json
@@ -199,8 +199,8 @@ dart run tool/build_puzzle_release.dart --source data/gib --engine engine/src/st
 ## 10. 다음에 다시 시작할 때 바로 볼 것
 - 이 문서: [docs/puzzle_automation_manual.md](/D:/Project/janggi-master/janggi_master/docs/puzzle_automation_manual.md)
 - 전략 문서: [docs/puzzle_growth_strategy.md](/D:/Project/janggi-master/janggi_master/docs/puzzle_growth_strategy.md)
-- 최신 검증 리포트: [test_tmp/puzzle_quality_validation_full_d8_m3.json](/D:/Project/janggi-master/janggi_master/test_tmp/puzzle_quality_validation_full_d8_m3.json)
-- strict 교체 전 백업: [test_tmp/puzzles_before_strict_replace.json](/D:/Project/janggi-master/janggi_master/test_tmp/puzzles_before_strict_replace.json)
+- 최신 검증 리포트: [dev/test_tmp/puzzle_quality_validation_full_d8_m3.json](/D:/Project/janggi-master/janggi_master/dev/test_tmp/puzzle_quality_validation_full_d8_m3.json)
+- strict 교체 전 백업: [dev/test_tmp/puzzles_before_strict_replace.json](/D:/Project/janggi-master/janggi_master/dev/test_tmp/puzzles_before_strict_replace.json)
 
 ## 11. 메모
 - 현재 카카오 기보 폴더는 사실상 전수 스캔을 마친 상태다.
@@ -211,8 +211,8 @@ dart run tool/build_puzzle_release.dart --source data/gib --engine engine/src/st
 
 ### 2026-03-21 self-play 추출 실험
 - 실험 스크립트: [generate_selfplay_puzzles.dart](/D:/Project/janggi-master/janggi_master/tool/generate_selfplay_puzzles.dart)
-- 출력 파일: [selfplay_puzzles_10.json](/D:/Project/janggi-master/janggi_master/test_tmp/selfplay_puzzles_10.json)
-- 검증 리포트: [selfplay_puzzles_10_validation.json](/D:/Project/janggi-master/janggi_master/test_tmp/selfplay_puzzles_10_validation.json)
+- 출력 파일: [selfplay_puzzles_10.json](/D:/Project/janggi-master/janggi_master/dev/test_tmp/selfplay_puzzles_10.json)
+- 검증 리포트: [selfplay_puzzles_10_validation.json](/D:/Project/janggi-master/janggi_master/dev/test_tmp/selfplay_puzzles_10_validation.json)
 
 실험 내용:
 - 표준 시작 포지션 self-play

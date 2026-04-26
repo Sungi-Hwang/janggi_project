@@ -103,7 +103,7 @@ void main() {
         'invalid': invalid,
       };
 
-      final output = File('test_tmp/puzzle_local_legality_report.json');
+      final output = File('dev/test_tmp/puzzle_local_legality_report.json');
       await output.parent.create(recursive: true);
       await output.writeAsString(
         const JsonEncoder.withIndent('  ').convert(report),
