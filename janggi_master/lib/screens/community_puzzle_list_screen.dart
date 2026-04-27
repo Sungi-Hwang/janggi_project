@@ -52,8 +52,9 @@ class _CommunityPuzzleListScreenState extends State<CommunityPuzzleListScreen> {
       });
     } catch (error) {
       if (!mounted) return;
+      debugPrint('Failed to load community puzzles: $error');
       setState(() {
-        _errorMessage = '문제 공유소를 불러오지 못했습니다: $error';
+        _errorMessage = '문제 공유소를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.';
         _isLoading = false;
       });
     }

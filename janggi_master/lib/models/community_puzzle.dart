@@ -21,8 +21,9 @@ class CommunityPuzzle {
     Map<String, dynamic> json, {
     bool hasLiked = false,
   }) {
-    final profile = json['profiles'] is Map
-        ? Map<String, dynamic>.from(json['profiles'] as Map)
+    final profileJson = json['author'] ?? json['profiles'];
+    final profile = profileJson is Map
+        ? Map<String, dynamic>.from(profileJson)
         : <String, dynamic>{};
     final solution = json['solution'] is List
         ? List<String>.from(

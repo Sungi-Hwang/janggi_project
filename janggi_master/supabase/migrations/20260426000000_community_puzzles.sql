@@ -64,7 +64,11 @@ as $$
 declare
   target_puzzle_id uuid;
 begin
-  target_puzzle_id := coalesce(new.puzzle_id, old.puzzle_id);
+  if TG_OP = 'DELETE' then
+    target_puzzle_id := old.puzzle_id;
+  else
+    target_puzzle_id := new.puzzle_id;
+  end if;
 
   update public.community_puzzles
   set
@@ -104,6 +108,17 @@ drop trigger if exists refresh_report_counts
 create trigger refresh_report_counts
 after insert or delete on public.community_puzzle_reports
 for each row execute function public.refresh_community_puzzle_counts();
+
+grant usage on schema public to anon, authenticated;
+grant select on public.profiles to anon, authenticated;
+grant insert, update on public.profiles to authenticated;
+grant select on public.community_puzzles to anon, authenticated;
+grant insert, update, delete on public.community_puzzles to authenticated;
+grant select on public.community_puzzle_likes to anon, authenticated;
+grant insert, delete on public.community_puzzle_likes to authenticated;
+grant select on public.community_puzzle_imports to anon, authenticated;
+grant insert on public.community_puzzle_imports to authenticated;
+grant select, insert on public.community_puzzle_reports to authenticated;
 
 alter table public.profiles enable row level security;
 alter table public.community_puzzles enable row level security;

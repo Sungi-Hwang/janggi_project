@@ -32,7 +32,7 @@ class CommunityPuzzleService {
     import_count,
     report_count,
     created_at,
-    profiles(display_name, avatar_url)
+    author:profiles!community_puzzles_author_id_fkey(display_name, avatar_url)
   ''';
 
   bool get isConfigured => CommunityConfig.canUseSupabase;
