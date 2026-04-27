@@ -38,6 +38,22 @@ class CommunityPuzzleService {
     author:profiles!community_puzzles_author_id_fkey(display_name, avatar_url)
   ''';
 
+  static const _legacySelectColumns = '''
+    id,
+    author_id,
+    title,
+    description,
+    fen,
+    solution,
+    mate_in,
+    to_move,
+    like_count,
+    import_count,
+    report_count,
+    created_at,
+    author:profiles!community_puzzles_author_id_fkey(display_name, avatar_url)
+  ''';
+
   bool get isConfigured => CommunityConfig.canUseSupabase;
 
   Future<List<CommunityPuzzle>> fetchPuzzles({
@@ -45,20 +61,7 @@ class CommunityPuzzleService {
   }) async {
     _assertConfigured();
 
-    dynamic query = _client
-        .from('community_puzzles')
-        .select(_selectColumns)
-        .eq('status', 'published');
-
-    if (sort == CommunityPuzzleSort.likes) {
-      query = query.order('like_count', ascending: false);
-    }
-    final response = await query.order('created_at', ascending: false);
-
-    final rows = (response as List)
-        .whereType<Map>()
-        .map((row) => Map<String, dynamic>.from(row))
-        .toList();
+    final rows = await _fetchPublishedRows(sort: sort);
     final likedIds = await _likedPuzzleIds();
     return rows
         .map(
@@ -72,12 +75,18 @@ class CommunityPuzzleService {
 
   Future<CommunityPuzzle> fetchPuzzle(String puzzleId) async {
     _assertConfigured();
-    final response = await _client
-        .from('community_puzzles')
-        .select(_selectColumns)
-        .eq('id', puzzleId)
-        .eq('status', 'published')
-        .single();
+    final response = await _selectPublishedPuzzle(
+      puzzleId: puzzleId,
+      columns: _selectColumns,
+    ).onError<PostgrestException>((error, stackTrace) {
+      if (!_isMissingObjectiveColumns(error)) {
+        throw error;
+      }
+      return _selectPublishedPuzzle(
+        puzzleId: puzzleId,
+        columns: _legacySelectColumns,
+      );
+    });
     final likedIds = await _likedPuzzleIds();
     final row = Map<String, dynamic>.from(response);
     return CommunityPuzzle.fromJson(
@@ -110,7 +119,7 @@ class CommunityPuzzleService {
       throw const CommunityPuzzleException('정답 수순이 있는 문제만 올릴 수 있습니다.');
     }
 
-    await _client.from('community_puzzles').insert(<String, dynamic>{
+    final payload = <String, dynamic>{
       'author_id': user.id,
       'title': title,
       'description': description.trim(),
@@ -121,7 +130,26 @@ class CommunityPuzzleService {
       'objective_type': objectivePuzzle[PuzzleObjective.keyObjectiveType],
       'objective': objectivePuzzle[PuzzleObjective.keyObjective],
       'status': 'published',
-    });
+    };
+
+    try {
+      await _client.from('community_puzzles').insert(payload);
+    } on PostgrestException catch (error) {
+      if (!_isMissingObjectiveColumns(error)) {
+        rethrow;
+      }
+      final objectiveType =
+          objectivePuzzle[PuzzleObjective.keyObjectiveType] as String;
+      if (objectiveType != PuzzleObjective.mate) {
+        throw const CommunityPuzzleException(
+          '기물획득 문제를 올리려면 Supabase objective 마이그레이션이 필요합니다.',
+        );
+      }
+      final legacyPayload = Map<String, dynamic>.from(payload)
+        ..remove('objective_type')
+        ..remove('objective');
+      await _client.from('community_puzzles').insert(legacyPayload);
+    }
   }
 
   Future<bool> toggleLike(String puzzleId) async {
@@ -203,6 +231,64 @@ class CommunityPuzzleService {
         .map((row) => row['puzzle_id'] as String? ?? '')
         .where((id) => id.isNotEmpty)
         .toSet();
+  }
+
+  Future<List<Map<String, dynamic>>> _fetchPublishedRows({
+    required CommunityPuzzleSort sort,
+  }) async {
+    try {
+      return await _selectPublishedRows(
+        sort: sort,
+        columns: _selectColumns,
+      );
+    } on PostgrestException catch (error) {
+      if (!_isMissingObjectiveColumns(error)) {
+        rethrow;
+      }
+      return _selectPublishedRows(
+        sort: sort,
+        columns: _legacySelectColumns,
+      );
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> _selectPublishedRows({
+    required CommunityPuzzleSort sort,
+    required String columns,
+  }) async {
+    dynamic query = _client
+        .from('community_puzzles')
+        .select(columns)
+        .eq('status', 'published');
+
+    if (sort == CommunityPuzzleSort.likes) {
+      query = query.order('like_count', ascending: false);
+    }
+    final response = await query.order('created_at', ascending: false);
+
+    return (response as List)
+        .whereType<Map>()
+        .map((row) => Map<String, dynamic>.from(row))
+        .toList();
+  }
+
+  Future<Map<String, dynamic>> _selectPublishedPuzzle({
+    required String puzzleId,
+    required String columns,
+  }) async {
+    final response = await _client
+        .from('community_puzzles')
+        .select(columns)
+        .eq('id', puzzleId)
+        .eq('status', 'published')
+        .single();
+    return Map<String, dynamic>.from(response);
+  }
+
+  bool _isMissingObjectiveColumns(PostgrestException error) {
+    return error.code == '42703' &&
+        (error.message.contains('objective_type') ||
+            error.message.contains('objective'));
   }
 
   void _assertConfigured() {
