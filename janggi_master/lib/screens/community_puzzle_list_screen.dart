@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/community_puzzle.dart';
+import '../models/puzzle_objective.dart';
 import '../providers/community_auth_provider.dart';
 import '../services/community_puzzle_service.dart';
 import '../widgets/puzzle_board_preview.dart';
@@ -280,6 +281,17 @@ class _CommunityPuzzleCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final side = puzzle.toMove == 'red' ? '한 차례' : '초 차례';
     final createdAt = _formatDate(puzzle.createdAt);
+    final objectivePuzzle = <String, dynamic>{
+      'objectiveType': puzzle.objectiveType,
+      'objective': puzzle.objective,
+      'mateIn': puzzle.mateIn,
+      'solution': puzzle.solution,
+    };
+    final objectiveLabel =
+        PuzzleObjective.displayLabelForPuzzle(objectivePuzzle);
+    final summary = puzzle.objectiveType == PuzzleObjective.materialGain
+        ? objectiveLabel
+        : '${puzzle.mateIn}수';
 
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
@@ -316,7 +328,7 @@ class _CommunityPuzzleCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      '${puzzle.mateIn}수 · $side · ${puzzle.authorName} · $createdAt',
+                      '$summary · $side · ${puzzle.authorName} · $createdAt',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -328,6 +340,11 @@ class _CommunityPuzzleCard extends StatelessWidget {
                     Wrap(
                       spacing: 8,
                       children: [
+                        Chip(
+                          label: Text(objectiveLabel),
+                          visualDensity: VisualDensity.compact,
+                          padding: EdgeInsets.zero,
+                        ),
                         _MiniStat(
                           icon: puzzle.hasLiked
                               ? Icons.favorite

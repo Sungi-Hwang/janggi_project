@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../models/puzzle_objective.dart';
 import '../providers/community_auth_provider.dart';
 import '../services/community_puzzle_service.dart';
 import '../services/custom_puzzle_service.dart';
@@ -208,6 +209,11 @@ class _CommunityPuzzleUploadScreenState
   Widget _buildPuzzleOption(Map<String, dynamic> puzzle) {
     final selected = identical(_selectedPuzzle, puzzle) ||
         _selectedPuzzle?['id'] == puzzle['id'];
+    final objectiveLabel = PuzzleObjective.displayLabelForPuzzle(puzzle);
+    final subtitle =
+        PuzzleObjective.typeOf(puzzle) == PuzzleObjective.materialGain
+            ? objectiveLabel
+            : '${puzzle['mateIn'] ?? 1}수 문제';
     return Card(
       color: selected ? Colors.amber.shade50 : Colors.white,
       child: ListTile(
@@ -216,7 +222,7 @@ class _CommunityPuzzleUploadScreenState
           child: PuzzleBoardPreview(fen: puzzle['fen'] as String? ?? ''),
         ),
         title: Text(puzzle['title'] as String? ?? '내 문제'),
-        subtitle: Text('${puzzle['mateIn'] ?? 1}수 문제'),
+        subtitle: Text(subtitle),
         trailing: selected
             ? const Icon(Icons.check_circle, color: Colors.green)
             : null,

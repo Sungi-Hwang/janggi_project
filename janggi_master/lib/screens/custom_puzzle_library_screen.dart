@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../models/puzzle_progress.dart';
+import '../models/puzzle_objective.dart';
 import '../services/custom_puzzle_service.dart';
 import '../services/puzzle_progress_service.dart';
 import '../utils/puzzle_share_codec.dart';
@@ -112,6 +113,8 @@ class _CustomPuzzleLibraryScreenState extends State<CustomPuzzleLibraryScreen> {
                 List<String>.from(puzzle['solution'] ?? const <String>[]),
             'mateIn': (puzzle['mateIn'] as num?)?.toInt() ?? 1,
             'toMove': puzzle['toMove'] ?? 'blue',
+            'objectiveType': PuzzleObjective.typeOf(puzzle),
+            'objective': PuzzleObjective.objectiveOf(puzzle),
             'source': puzzle['source'] ?? 'custom',
             'moves': <String>[],
             'startMove': 0,
@@ -224,9 +227,18 @@ class _CustomPuzzleLibraryScreenState extends State<CustomPuzzleLibraryScreen> {
                                     _progress.entryFor(_puzzleIdOf(puzzle));
                                 final mateIn =
                                     (puzzle['mateIn'] as num?)?.toInt() ?? 1;
-                                final toMove = puzzle['toMove'] == 'red'
-                                    ? '한 차례'
-                                    : '초 차례';
+                                final toMove =
+                                    puzzle['toMove'] == 'red' ? '한 차례' : '초 차례';
+                                final objectiveType =
+                                    PuzzleObjective.typeOf(puzzle);
+                                final objectiveLabel =
+                                    PuzzleObjective.displayLabelForPuzzle(
+                                  puzzle,
+                                );
+                                final puzzleKind = objectiveType ==
+                                        PuzzleObjective.materialGain
+                                    ? objectiveLabel
+                                    : '$mateIn수 문제';
 
                                 return Card(
                                   margin: const EdgeInsets.only(bottom: 10),
@@ -242,10 +254,11 @@ class _CustomPuzzleLibraryScreenState extends State<CustomPuzzleLibraryScreen> {
                                         ),
                                       ),
                                     ),
-                                    title:
-                                        Text(puzzle['title'] as String? ?? '내 문제'),
+                                    title: Text(
+                                      puzzle['title'] as String? ?? '내 문제',
+                                    ),
                                     subtitle: Text(
-                                      '$mateIn수 문제 · $toMove'
+                                      '$puzzleKind · $toMove'
                                       '${progress.attempts > 0 ? ' · 해결 ${progress.solvedCount}회 / 시도 ${progress.attempts}회' : ' · 아직 도전 전'}',
                                     ),
                                     trailing: Row(
@@ -276,8 +289,7 @@ class _CustomPuzzleLibraryScreenState extends State<CustomPuzzleLibraryScreen> {
                                         IconButton(
                                           icon: const Icon(Icons.play_arrow),
                                           tooltip: '플레이',
-                                          onPressed: () =>
-                                              _startPuzzle(puzzle),
+                                          onPressed: () => _startPuzzle(puzzle),
                                         ),
                                       ],
                                     ),

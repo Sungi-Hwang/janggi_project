@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+import '../models/puzzle_objective.dart';
+
 /// 묘수풀이 퍼즐 데이터 모델
 class Puzzle {
   final String id;
@@ -12,6 +14,8 @@ class Puzzle {
   final List<String> solution; // 정답 수순
   final String toMove; // "blue" or "red"
   final String source;
+  final String objectiveType;
+  final Map<String, dynamic> objective;
 
   Puzzle({
     required this.id,
@@ -22,18 +26,25 @@ class Puzzle {
     required this.solution,
     required this.toMove,
     required this.source,
+    required this.objectiveType,
+    required this.objective,
   });
 
   factory Puzzle.fromJson(Map<String, dynamic> json) {
+    final normalized = PuzzleObjective.normalizePuzzleMap(json);
     return Puzzle(
-      id: json['id'] as String,
-      difficulty: json['difficulty'] as int,
-      mateIn: json['mateIn'] as int,
-      title: json['title'] as String,
-      fen: json['fen'] as String,
-      solution: List<String>.from(json['solution']),
-      toMove: json['toMove'] as String,
-      source: json['source'] as String,
+      id: normalized['id'] as String,
+      difficulty: normalized['difficulty'] as int,
+      mateIn: normalized['mateIn'] as int,
+      title: normalized['title'] as String,
+      fen: normalized['fen'] as String,
+      solution: List<String>.from(normalized['solution'] as List),
+      toMove: normalized['toMove'] as String,
+      source: normalized['source'] as String,
+      objectiveType: normalized[PuzzleObjective.keyObjectiveType] as String,
+      objective: Map<String, dynamic>.from(
+        normalized[PuzzleObjective.keyObjective] as Map,
+      ),
     );
   }
 
@@ -46,6 +57,8 @@ class Puzzle {
         'solution': solution,
         'toMove': toMove,
         'source': source,
+        PuzzleObjective.keyObjectiveType: objectiveType,
+        PuzzleObjective.keyObjective: objective,
       };
 }
 

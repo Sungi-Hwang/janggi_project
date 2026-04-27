@@ -2,6 +2,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../community/community_config.dart';
 import '../models/community_puzzle.dart';
+import '../models/puzzle_objective.dart';
 
 class CommunityPuzzleException implements Exception {
   const CommunityPuzzleException(this.message);
@@ -28,6 +29,8 @@ class CommunityPuzzleService {
     solution,
     mate_in,
     to_move,
+    objective_type,
+    objective,
     like_count,
     import_count,
     report_count,
@@ -91,6 +94,11 @@ class CommunityPuzzleService {
     final user = _client.auth.currentUser!;
     final title = (puzzle['title'] as String? ?? '').trim();
     final solution = List<String>.from(puzzle['solution'] ?? const <String>[]);
+    final objectivePuzzle =
+        PuzzleObjective.normalizePuzzleMap(<String, dynamic>{
+      ...puzzle,
+      'solution': solution,
+    });
 
     if (title.isEmpty) {
       throw const CommunityPuzzleException('제목을 입력해 주세요.');
@@ -110,6 +118,8 @@ class CommunityPuzzleService {
       'solution': solution,
       'mate_in': (puzzle['mateIn'] as num?)?.toInt() ?? 1,
       'to_move': puzzle['toMove'] == 'red' ? 'red' : 'blue',
+      'objective_type': objectivePuzzle[PuzzleObjective.keyObjectiveType],
+      'objective': objectivePuzzle[PuzzleObjective.keyObjective],
       'status': 'published',
     });
   }

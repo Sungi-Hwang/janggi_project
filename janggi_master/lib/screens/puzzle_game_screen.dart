@@ -7,6 +7,7 @@ import '../game/game_state.dart';
 import '../models/move.dart';
 import '../models/piece.dart';
 import '../models/position.dart';
+import '../models/puzzle_objective.dart';
 import '../providers/settings_provider.dart';
 import '../screens/game_screen.dart' show GameMode;
 import '../services/puzzle_progress_service.dart';
@@ -50,6 +51,9 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
   bool _isFollowingSolutionLine = true;
 
   PieceColor _playerColor = PieceColor.blue;
+  String _objectiveType = PuzzleObjective.mate;
+  Map<String, dynamic> _objective = <String, dynamic>{};
+  MaterialGainRuntimeResult? _materialGainResult;
   String? _wrongMoveMessage;
 
   @override
@@ -94,6 +98,10 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
     }
 
     _recomputeProgressFromHistory();
+
+    if (_handleMaterialGainProgress()) {
+      return;
+    }
 
     if (_isPuzzleSolvedByNoEscape()) {
       if (mounted) {
@@ -162,16 +170,25 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
       _lastValidatedMoveCount = 0;
       _targetPlayerMoveCount = 0;
       _isFollowingSolutionLine = true;
+      _materialGainResult = null;
 
       final fen = widget.game['fen'] as String?;
       final solution = widget.game['solution'] as List<dynamic>?;
+      final normalizedObjective = PuzzleObjective.normalizePuzzleMap(
+        widget.game,
+      );
+      _objectiveType =
+          normalizedObjective[PuzzleObjective.keyObjectiveType] as String;
+      _objective = Map<String, dynamic>.from(
+        normalizedObjective[PuzzleObjective.keyObjective] as Map,
+      );
 
       if (fen != null && solution != null && solution.isNotEmpty) {
         _solutionMoves = List<String>.from(solution);
         _solutionStartIndex = 0;
         _solutionIndex = 0;
         _targetPlayerMoveCount =
-            (widget.game['mateIn'] as int?) ?? ((solution.length + 1) ~/ 2);
+            PuzzleObjective.playerMoveCount(normalizedObjective);
 
         final toMove = widget.game['toMove'] as String? ?? 'blue';
         _playerColor = toMove == 'red' ? PieceColor.red : PieceColor.blue;
@@ -195,8 +212,8 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
       _solutionStartIndex =
           await GibPuzzleLocator.findPuzzleStartPosition(moves);
       _solutionIndex = _solutionStartIndex;
-      _targetPlayerMoveCount = (widget.game['mateIn'] as int?) ??
-          (((moves.length - _solutionStartIndex) + 1) ~/ 2);
+      _targetPlayerMoveCount =
+          PuzzleObjective.playerMoveCount(normalizedObjective);
 
       final board =
           GibParser.replayMovesToPosition(moves, upToMove: _solutionStartIndex);
@@ -226,6 +243,10 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
     if (_gameState.currentPlayer == _playerColor) return;
 
     Move? autoMove = _expectedSolutionMoveForCurrentTurn();
+    if (autoMove == null && _isMaterialGainPuzzle) {
+      _handlePuzzleFailure(message: '검증된 응수 수순을 찾지 못했습니다.');
+      return;
+    }
     if (autoMove == null) {
       await _gameState.getHint();
       autoMove = _gameState.hintMove;
@@ -264,13 +285,15 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
     }
   }
 
-  void _handlePuzzleFailure() {
+  void _handlePuzzleFailure({
+    String message = '주어진 수 안에 상대의 탈출수를 막지 못했습니다.',
+  }) {
     if (_isResolvingWrongMove) return;
     _isResolvingWrongMove = true;
     _recordAttemptResult(solved: false);
 
     setState(() {
-      _wrongMoveMessage = '주어진 수 안에 상대의 탈출수를 막지 못했습니다.';
+      _wrongMoveMessage = message;
     });
 
     Future.delayed(const Duration(milliseconds: 1200), () {
@@ -289,6 +312,7 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
       _lastValidatedMoveCount = 0;
       _targetPlayerMoveCount = 0;
       _isFollowingSolutionLine = true;
+      _materialGainResult = null;
       _wrongMoveMessage = null;
       _completionDialogShown = false;
       _attemptResultRecorded = false;
@@ -361,6 +385,51 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
     }
   }
 
+  bool get _isMaterialGainPuzzle =>
+      _objectiveType == PuzzleObjective.materialGain;
+
+  bool _handleMaterialGainProgress() {
+    if (!_isMaterialGainPuzzle) {
+      return false;
+    }
+
+    if (!_isFollowingSolutionLine) {
+      _handlePuzzleFailure(message: '정답 수순에서 벗어났습니다.');
+      return true;
+    }
+
+    if (_solutionIndex >= _solutionMoves.length) {
+      final result = PuzzleObjective.evaluateMaterialGain(
+        objective: _objective,
+        playerColor: _playerColor,
+        capturedByBlue: _gameState.capturedByBlue,
+        capturedByRed: _gameState.capturedByRed,
+      );
+      _materialGainResult = result;
+      if (result.success) {
+        if (mounted) {
+          setState(() {
+            _wrongMoveMessage = null;
+          });
+        }
+        _showPuzzleCompleteDialogOnce();
+      } else {
+        _handlePuzzleFailure(message: result.message);
+      }
+      return true;
+    }
+
+    if (_gameState.isGameOver || _gameState.currentPlayerHasNoEscape) {
+      _handlePuzzleFailure(message: '목표 기물을 얻기 전에 대국이 종료되었습니다.');
+      return true;
+    }
+
+    if (_gameState.currentPlayer != _playerColor) {
+      _playOpponentMoveIfNeeded();
+    }
+    return true;
+  }
+
   Move? _expectedSolutionMoveForCurrentTurn() {
     if (!_isFollowingSolutionLine) return null;
     if (_solutionIndex < _solutionStartIndex ||
@@ -400,6 +469,22 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
 
   String _sideLabel(PieceColor color) {
     return color == PieceColor.blue ? '초' : '한';
+  }
+
+  String get _objectiveInstruction {
+    return PuzzleObjective.instructionForPuzzle(<String, dynamic>{
+      'objectiveType': _objectiveType,
+      'objective': _objective,
+      'mateIn': widget.game['mateIn'],
+      'solution': _solutionMoves,
+    });
+  }
+
+  String get _completionMessage {
+    if (_isMaterialGainPuzzle) {
+      return _materialGainResult?.message ?? '목표 기물을 얻고 유리한 형세를 만들었습니다.';
+    }
+    return '주어진 수 안에 상대의 탈출수를 모두 막았습니다.';
   }
 
   void _showPuzzleCompleteDialogOnce() {
@@ -448,7 +533,7 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         title: const Text('퍼즐 완료'),
-        content: const Text('주어진 수 안에 상대의 탈출수를 모두 막았습니다.'),
+        content: Text(_completionMessage),
         actions: [
           TextButton(
             onPressed: () {
@@ -562,31 +647,51 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
                                 horizontal: 16,
                               ),
                               color: Colors.black.withValues(alpha: 0.8),
-                              child: Row(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  IconButton(
-                                    icon: const Icon(
-                                      Icons.arrow_back,
-                                      color: Colors.white,
-                                    ),
-                                    onPressed: () => Navigator.pop(context),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      widget.game['title'] ?? '퍼즐',
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(
+                                          Icons.arrow_back,
+                                          color: Colors.white,
+                                        ),
+                                        onPressed: () => Navigator.pop(context),
                                       ),
-                                    ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          widget.game['title'] ?? '퍼즐',
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                      Text(
+                                        '진행: ${_playerSolvedMoveCount()} / ${_playerTotalMoveCount()}',
+                                        style: const TextStyle(
+                                          color: Colors.amber,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  Text(
-                                    '진행: ${_playerSolvedMoveCount()} / ${_playerTotalMoveCount()}',
-                                    style: const TextStyle(
-                                      color: Colors.amber,
-                                      fontWeight: FontWeight.bold,
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 56,
+                                      right: 8,
+                                    ),
+                                    child: Text(
+                                      _objectiveInstruction,
+                                      style: TextStyle(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.82,
+                                        ),
+                                        fontSize: 12,
+                                      ),
                                     ),
                                   ),
                                 ],

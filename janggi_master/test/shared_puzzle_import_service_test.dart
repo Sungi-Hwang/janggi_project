@@ -51,5 +51,30 @@ void main() {
         ),
       );
     });
+
+    test('preserves material gain objective in v2 share codes', () {
+      final shareCode = PuzzleShareCodec.encodePuzzle(<String, dynamic>{
+        'title': 'Win a cannon',
+        'fen': '4k4/9/9/9/9/9/9/9/9/4K4 w - - 0 1',
+        'solution': <String>['e1e2'],
+        'mateIn': 1,
+        'toMove': 'blue',
+        'objectiveType': 'material_gain',
+        'objective': <String, dynamic>{
+          'targetPieceTypes': <String>['cannon'],
+          'maxPlayerMoves': 1,
+          'minNetMaterialGainCp': 300,
+        },
+      });
+
+      expect(shareCode.startsWith(PuzzleShareCodec.prefixV2), isTrue);
+
+      final decoded = SharedPuzzleImportService.decodeShareCode(shareCode);
+      final puzzle = SharedPuzzleImportService.buildImportedPuzzle(decoded);
+
+      expect(puzzle['objectiveType'], 'material_gain');
+      expect(puzzle['objective']['targetPieceTypes'], <String>['cannon']);
+      expect(puzzle['objective']['minNetMaterialGainCp'], 300);
+    });
   });
 }

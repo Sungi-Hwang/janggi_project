@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/community_puzzle.dart';
+import '../models/puzzle_objective.dart';
 import '../providers/community_auth_provider.dart';
 import '../services/community_puzzle_service.dart';
 import '../services/custom_puzzle_service.dart';
@@ -130,6 +131,8 @@ class _CommunityPuzzleDetailScreenState
             'solution': _puzzle.solution,
             'mateIn': _puzzle.mateIn,
             'toMove': _puzzle.toMove,
+            'objectiveType': _puzzle.objectiveType,
+            'objective': _puzzle.objective,
             'source': 'community',
             'moves': <String>[],
             'startMove': 0,
@@ -176,6 +179,17 @@ class _CommunityPuzzleDetailScreenState
   Widget build(BuildContext context) {
     final createdAt = _formatDate(_puzzle.createdAt);
     final side = _puzzle.toMove == 'red' ? '한 차례' : '초 차례';
+    final objectivePuzzle = <String, dynamic>{
+      'objectiveType': _puzzle.objectiveType,
+      'objective': _puzzle.objective,
+      'mateIn': _puzzle.mateIn,
+      'solution': _puzzle.solution,
+    };
+    final objectiveLabel =
+        PuzzleObjective.displayLabelForPuzzle(objectivePuzzle);
+    final summary = _puzzle.objectiveType == PuzzleObjective.materialGain
+        ? objectiveLabel
+        : '${_puzzle.mateIn}수 문제';
 
     return Scaffold(
       appBar: AppBar(
@@ -218,8 +232,13 @@ class _CommunityPuzzleDetailScreenState
                     Text(_puzzle.description),
                     const SizedBox(height: 10),
                     Text(
-                      '${_puzzle.mateIn}수 문제 · $side · ${_puzzle.authorName} · $createdAt',
+                      '$summary · $side · ${_puzzle.authorName} · $createdAt',
                       style: TextStyle(color: Colors.grey.shade700),
+                    ),
+                    const SizedBox(height: 8),
+                    Chip(
+                      label: Text(objectiveLabel),
+                      visualDensity: VisualDensity.compact,
                     ),
                     const SizedBox(height: 14),
                     Wrap(

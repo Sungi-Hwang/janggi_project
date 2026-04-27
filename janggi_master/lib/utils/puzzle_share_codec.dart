@@ -3,10 +3,13 @@ import 'dart:convert';
 import '../models/board.dart';
 import '../models/piece.dart';
 import '../models/position.dart';
+import '../models/puzzle_objective.dart';
 import 'stockfish_converter.dart';
 
 class PuzzleShareCodec {
-  static const String prefix = 'JM_PUZZLE_V1:';
+  static const String prefixV1 = 'JM_PUZZLE_V1:';
+  static const String prefixV2 = 'JM_PUZZLE_V2:';
+  static const String prefix = prefixV1;
   static const String _typeSetup = 'setup';
   static const String _typeFull = 'full';
 
@@ -41,16 +44,23 @@ class PuzzleShareCodec {
 
   static String encodePuzzle(Map<String, dynamic> puzzle) {
     final solution = List<String>.from(puzzle['solution'] ?? <String>[]);
+    final normalized = PuzzleObjective.normalizePuzzleMap(<String, dynamic>{
+      ...puzzle,
+      'solution': solution,
+    });
     final payload = <String, dynamic>{
-      'v': 1,
+      'v': 2,
       't': _typeFull,
       'title': (puzzle['title'] as String? ?? '').trim(),
       'fen': (puzzle['fen'] as String? ?? '').trim(),
       'solution': solution,
       'toMove': _normalizeToMove(puzzle['toMove'] as String?),
       'mateIn': _resolveMateIn(puzzle['mateIn'], solution),
+      PuzzleObjective.keyObjectiveType:
+          normalized[PuzzleObjective.keyObjectiveType],
+      PuzzleObjective.keyObjective: normalized[PuzzleObjective.keyObjective],
     };
-    return _encodePayload(payload);
+    return _encodePayload(payload, prefix: prefixV2);
   }
 
   static Map<String, dynamic> decode(String raw) {
@@ -60,8 +70,16 @@ class PuzzleShareCodec {
     }
 
     late final Map<String, dynamic> payload;
-    if (input.startsWith(prefix)) {
-      final encoded = input.substring(prefix.length);
+    if (input.startsWith(prefixV2)) {
+      final encoded = input.substring(prefixV2.length);
+      final decoded = utf8.decode(base64Url.decode(encoded));
+      final map = jsonDecode(decoded);
+      if (map is! Map) {
+        throw const FormatException('Invalid share payload.');
+      }
+      payload = Map<String, dynamic>.from(map);
+    } else if (input.startsWith(prefixV1)) {
+      final encoded = input.substring(prefixV1.length);
       final decoded = utf8.decode(base64Url.decode(encoded));
       final map = jsonDecode(decoded);
       if (map is! Map) {
@@ -87,6 +105,15 @@ class PuzzleShareCodec {
     final type = payload['t'] == _typeFull || solution.isNotEmpty
         ? _typeFull
         : _typeSetup;
+    final objectiveType = PuzzleObjective.normalizeType(
+      payload[PuzzleObjective.keyObjectiveType],
+    );
+    final objective = PuzzleObjective.normalizeObjective(
+      type: objectiveType,
+      objective: payload[PuzzleObjective.keyObjective],
+      solution: solution,
+      mateIn: _resolveMateIn(payload['mateIn'], solution),
+    );
 
     return <String, dynamic>{
       'v': payload['v'] is num ? (payload['v'] as num).toInt() : 1,
@@ -96,17 +123,26 @@ class PuzzleShareCodec {
       'toMove': _normalizeToMove(payload['toMove'] as String?),
       'solution': solution,
       'mateIn': _resolveMateIn(payload['mateIn'], solution),
+      PuzzleObjective.keyObjectiveType: objectiveType,
+      PuzzleObjective.keyObjective: objective,
     };
   }
 
   static Map<String, dynamic> toSavablePuzzle(Map<String, dynamic> decoded) {
     final solution = List<String>.from(decoded['solution'] ?? <String>[]);
+    final normalized = PuzzleObjective.normalizePuzzleMap(<String, dynamic>{
+      ...decoded,
+      'solution': solution,
+    });
     return <String, dynamic>{
       'title': (decoded['title'] as String? ?? '').trim(),
       'fen': decoded['fen'] as String,
       'solution': solution,
       'mateIn': _resolveMateIn(decoded['mateIn'], solution),
       'toMove': _normalizeToMove(decoded['toMove'] as String?),
+      PuzzleObjective.keyObjectiveType:
+          normalized[PuzzleObjective.keyObjectiveType],
+      PuzzleObjective.keyObjective: normalized[PuzzleObjective.keyObjective],
     };
   }
 
@@ -140,7 +176,10 @@ class PuzzleShareCodec {
     }
   }
 
-  static String _encodePayload(Map<String, dynamic> payload) {
+  static String _encodePayload(
+    Map<String, dynamic> payload, {
+    String prefix = prefixV1,
+  }) {
     final jsonText = jsonEncode(payload);
     final encoded = base64Url.encode(utf8.encode(jsonText));
     return '$prefix$encoded';

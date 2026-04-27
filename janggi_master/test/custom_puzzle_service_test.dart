@@ -82,5 +82,30 @@ void main() {
         CustomPuzzleService.importSourceCommunityPost,
       );
     });
+
+    test('preserves material gain objective metadata', () async {
+      SharedPreferences.setMockInitialValues(<String, Object>{});
+
+      await CustomPuzzleService.addCreatedPuzzle(<String, dynamic>{
+        'title': 'Win a chariot',
+        'fen': '4k4/9/9/9/9/9/9/9/9/4K4 w - - 0 1',
+        'solution': <String>['a1a2'],
+        'mateIn': 1,
+        'toMove': 'blue',
+        'objectiveType': 'material_gain',
+        'objective': <String, dynamic>{
+          'targetPieceTypes': <String>['chariot'],
+          'maxPlayerMoves': 1,
+        },
+      });
+
+      final created = await CustomPuzzleService.loadCreatedPuzzles();
+      expect(created.single['objectiveType'], 'material_gain');
+      expect(
+        created.single['objective']['targetPieceTypes'],
+        <String>['chariot'],
+      );
+      expect(created.single['objective']['minNetMaterialGainCp'], 450);
+    });
   });
 }

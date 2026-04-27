@@ -20,6 +20,12 @@ void main() {
         'solution': <String>['e1e2', 'e10e9'],
         'mate_in': 2,
         'to_move': 'blue',
+        'objective_type': 'material_gain',
+        'objective': <String, dynamic>{
+          'targetPieceTypes': <String>['cannon'],
+          'maxPlayerMoves': 2,
+          'minNetMaterialGainCp': 300,
+        },
         'like_count': 7,
         'import_count': 3,
         'report_count': 0,
@@ -35,6 +41,8 @@ void main() {
     expect(puzzle.authorName, 'Maker');
     expect(puzzle.hasLiked, isTrue);
     expect(puzzle.solution, <String>['e1e2', 'e10e9']);
+    expect(puzzle.objectiveType, 'material_gain');
+    expect(puzzle.objective['targetPieceTypes'], <String>['cannon']);
 
     await CustomPuzzleService.addImportedPuzzle(
       <String, dynamic>{
@@ -47,6 +55,7 @@ void main() {
     final imported = await CustomPuzzleService.loadImportedPuzzles();
     expect(imported, hasLength(1));
     expect(imported.single['communityPostId'], 'post-1');
+    expect(imported.single['objectiveType'], 'material_gain');
     expect(
       imported.single['importSource'],
       CustomPuzzleService.importSourceCommunityPost,

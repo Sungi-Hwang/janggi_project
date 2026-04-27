@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/puzzle_objective.dart';
+
 class CustomPuzzleService {
   static const String _keyCustomPuzzles = 'custom_puzzles_v1';
 
@@ -152,8 +154,12 @@ class CustomPuzzleService {
     normalized['fen'] = (normalized['fen'] as String? ?? '').trim();
     normalized['solution'] = solution;
     normalized['mateIn'] = mateInFromPayload ?? _resolveMateIn(solution);
-    normalized['toMove'] =
-        normalized['toMove'] == 'red' ? 'red' : 'blue';
+    normalized['toMove'] = normalized['toMove'] == 'red' ? 'red' : 'blue';
+    final objectivePuzzle = PuzzleObjective.normalizePuzzleMap(normalized);
+    normalized[PuzzleObjective.keyObjectiveType] =
+        objectivePuzzle[PuzzleObjective.keyObjectiveType];
+    normalized[PuzzleObjective.keyObjective] =
+        objectivePuzzle[PuzzleObjective.keyObjective];
     normalized['libraryType'] = libraryType;
     normalized['importSource'] = libraryType == libraryTypeImported
         ? _normalizeImportSource(normalized['importSource'] as String?)

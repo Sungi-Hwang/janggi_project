@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../models/puzzle_progress.dart';
+import '../models/puzzle_objective.dart';
 import '../services/custom_puzzle_service.dart';
 import '../services/puzzle_progress_service.dart';
 import '../services/shared_puzzle_import_service.dart';
@@ -91,9 +92,8 @@ class _PuzzleListScreenState extends State<PuzzleListScreen> {
         entries.fold<int>(0, (sum, entry) => sum + entry.attempts);
     final totalSolvedAttempts =
         entries.fold<int>(0, (sum, entry) => sum + entry.solvedCount);
-    final successRate = totalAttempts == 0
-        ? 0.0
-        : (totalSolvedAttempts / totalAttempts) * 100;
+    final successRate =
+        totalAttempts == 0 ? 0.0 : (totalSolvedAttempts / totalAttempts) * 100;
 
     return _BuiltinProgressSummary(
       totalPuzzleCount: builtinIds.length,
@@ -339,7 +339,8 @@ class _PuzzleListScreenState extends State<PuzzleListScreen> {
                 Expanded(
                   child: _buildSummaryMetric(
                     label: '푼 문제',
-                    value: '${summary.solvedCount} / ${summary.totalPuzzleCount}',
+                    value:
+                        '${summary.solvedCount} / ${summary.totalPuzzleCount}',
                     color: Colors.green,
                   ),
                 ),
@@ -481,7 +482,10 @@ class _PuzzleListScreenState extends State<PuzzleListScreen> {
                   ),
                 ),
               ),
-              title: Text(puzzle['title'] as String? ?? '문제 ${index + 1}'),
+              title: _PuzzleTitleWithBadge(
+                title: puzzle['title'] as String? ?? '문제 ${index + 1}',
+                puzzle: puzzle,
+              ),
               subtitle: Text(
                 _progressSubtitle(puzzle: puzzle, progress: progress),
               ),
@@ -589,7 +593,10 @@ class _PuzzleListScreenState extends State<PuzzleListScreen> {
           ),
           child: const Icon(Icons.download_rounded, color: Colors.brown),
         ),
-        title: Text(puzzle['title'] as String? ?? '가져온 문제'),
+        title: _PuzzleTitleWithBadge(
+          title: puzzle['title'] as String? ?? '가져온 문제',
+          puzzle: puzzle,
+        ),
         subtitle: Text(
           '$createdLabel\n${_progressSubtitle(puzzle: puzzle, progress: progress)}',
         ),
@@ -661,12 +668,19 @@ class _PuzzleListScreenState extends State<PuzzleListScreen> {
   }) {
     final mateIn = (puzzle['mateIn'] as num?)?.toInt() ?? 1;
     final toMove = puzzle['toMove'] == 'red' ? '한 차례' : '초 차례';
+    final objectiveType = PuzzleObjective.typeOf(puzzle);
+    final objectiveLabel = PuzzleObjective.displayLabelForPuzzle(puzzle);
 
     if (progress.attempts == 0) {
-      return '$mateIn수 문제 · $toMove · 아직 도전 전';
+      return objectiveType == PuzzleObjective.materialGain
+          ? '$objectiveLabel · $toMove · 아직 도전 전'
+          : '$mateIn수 문제 · $toMove · 아직 도전 전';
     }
 
-    return '$mateIn수 문제 · $toMove · 해결 ${progress.solvedCount}회 / 시도 ${progress.attempts}회';
+    final prefix = objectiveType == PuzzleObjective.materialGain
+        ? objectiveLabel
+        : '$mateIn수 문제';
+    return '$prefix · $toMove · 해결 ${progress.solvedCount}회 / 시도 ${progress.attempts}회';
   }
 
   String _puzzleIdOf(Map<String, dynamic> puzzle) {
@@ -682,11 +696,40 @@ Map<String, dynamic> _gameDataFromPuzzle(Map<String, dynamic> puzzle) {
     'solution': List<String>.from(puzzle['solution'] ?? const <String>[]),
     'mateIn': (puzzle['mateIn'] as num?)?.toInt() ?? 1,
     'toMove': puzzle['toMove'] ?? 'blue',
+    'objectiveType': PuzzleObjective.typeOf(puzzle),
+    'objective': PuzzleObjective.objectiveOf(puzzle),
     'source': puzzle['source'] ?? 'custom',
     'moves': <String>[],
     'startMove': 0,
     'totalMoves': (puzzle['mateIn'] as num?)?.toInt() ?? 1,
   };
+}
+
+class _PuzzleTitleWithBadge extends StatelessWidget {
+  const _PuzzleTitleWithBadge({
+    required this.title,
+    required this.puzzle,
+  });
+
+  final String title;
+  final Map<String, dynamic> puzzle;
+
+  @override
+  Widget build(BuildContext context) {
+    final label = PuzzleObjective.displayLabelForPuzzle(puzzle);
+    return Wrap(
+      spacing: 6,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        Text(title),
+        Chip(
+          label: Text(label),
+          visualDensity: VisualDensity.compact,
+          padding: EdgeInsets.zero,
+        ),
+      ],
+    );
+  }
 }
 
 class _BuiltinProgressSummary {

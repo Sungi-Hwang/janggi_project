@@ -42,13 +42,13 @@ class SharedPuzzleImportService {
 
     return <String, dynamic>{
       'id': CustomPuzzleService.nextImportedId(),
-      'title': title.isNotEmpty
-          ? title
-          : '가져온 문제 ${_timestampLabel(now)}',
+      'title': title.isNotEmpty ? title : '가져온 문제 ${_timestampLabel(now)}',
       'fen': payload['fen'],
       'solution': solution,
       'mateIn': payload['mateIn'],
       'toMove': payload['toMove'],
+      'objectiveType': payload['objectiveType'],
+      'objective': payload['objective'],
       'source': 'imported',
       'createdAt': now.toIso8601String(),
       'libraryType': CustomPuzzleService.libraryTypeImported,

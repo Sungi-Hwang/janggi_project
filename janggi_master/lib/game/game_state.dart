@@ -3,6 +3,7 @@ import '../models/board.dart';
 import '../models/piece.dart';
 import '../models/position.dart';
 import '../models/move.dart';
+import '../models/puzzle_objective.dart';
 import '../models/rule_mode.dart';
 import '../stockfish_ffi.dart';
 import '../utils/stockfish_converter.dart';
@@ -2211,21 +2212,6 @@ class GameState extends ChangeNotifier {
   }
 
   int _pieceValueCp(PieceType type) {
-    switch (type) {
-      case PieceType.general:
-        return 10000;
-      case PieceType.guard:
-        return 200;
-      case PieceType.horse:
-        return 450;
-      case PieceType.elephant:
-        return 450;
-      case PieceType.chariot:
-        return 900;
-      case PieceType.cannon:
-        return 500;
-      case PieceType.soldier:
-        return 100;
-    }
+    return PuzzleObjective.pieceValueCp(type);
   }
 }

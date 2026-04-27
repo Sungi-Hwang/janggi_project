@@ -1,3 +1,5 @@
+import 'puzzle_objective.dart';
+
 class CommunityPuzzle {
   const CommunityPuzzle({
     required this.id,
@@ -9,6 +11,8 @@ class CommunityPuzzle {
     required this.solution,
     required this.mateIn,
     required this.toMove,
+    required this.objectiveType,
+    required this.objective,
     required this.likeCount,
     required this.importCount,
     required this.reportCount,
@@ -30,6 +34,15 @@ class CommunityPuzzle {
             (json['solution'] as List).map((value) => value.toString()),
           )
         : <String>[];
+    final objectiveType = PuzzleObjective.normalizeType(
+      json['objective_type'] ?? json['objectiveType'],
+    );
+    final objective = PuzzleObjective.normalizeObjective(
+      type: objectiveType,
+      objective: json['objective'],
+      solution: solution,
+      mateIn: (json['mate_in'] as num?)?.toInt(),
+    );
 
     return CommunityPuzzle(
       id: json['id'] as String? ?? '',
@@ -42,6 +55,8 @@ class CommunityPuzzle {
       solution: solution,
       mateIn: (json['mate_in'] as num?)?.toInt() ?? 1,
       toMove: json['to_move'] == 'red' ? 'red' : 'blue',
+      objectiveType: objectiveType,
+      objective: objective,
       likeCount: (json['like_count'] as num?)?.toInt() ?? 0,
       importCount: (json['import_count'] as num?)?.toInt() ?? 0,
       reportCount: (json['report_count'] as num?)?.toInt() ?? 0,
@@ -61,6 +76,8 @@ class CommunityPuzzle {
   final List<String> solution;
   final int mateIn;
   final String toMove;
+  final String objectiveType;
+  final Map<String, dynamic> objective;
   final int likeCount;
   final int importCount;
   final int reportCount;
@@ -84,6 +101,8 @@ class CommunityPuzzle {
       solution: solution,
       mateIn: mateIn,
       toMove: toMove,
+      objectiveType: objectiveType,
+      objective: objective,
       likeCount: likeCount ?? this.likeCount,
       importCount: importCount ?? this.importCount,
       reportCount: reportCount ?? this.reportCount,
@@ -99,6 +118,8 @@ class CommunityPuzzle {
       'solution': solution,
       'mateIn': mateIn,
       'toMove': toMove,
+      'objectiveType': objectiveType,
+      'objective': objective,
       'source': 'community',
       'communityPostId': id,
     };
