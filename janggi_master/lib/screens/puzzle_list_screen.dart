@@ -436,11 +436,21 @@ class _PuzzleListScreenState extends State<PuzzleListScreen> {
         labelColor: Colors.brown.shade900,
         unselectedLabelColor: Colors.grey.shade700,
         indicatorColor: Colors.brown.shade700,
+        indicatorSize: TabBarIndicatorSize.tab,
+        labelPadding: const EdgeInsets.symmetric(horizontal: 4),
+        labelStyle: const TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w700,
+        ),
+        unselectedLabelStyle: const TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+        ),
         tabs: const [
-          Tab(text: '1수'),
-          Tab(text: '2수'),
-          Tab(text: '3수'),
-          Tab(text: '가져온 문제'),
+          Tab(child: _CompactTabLabel('1수')),
+          Tab(child: _CompactTabLabel('2수')),
+          Tab(child: _CompactTabLabel('3수')),
+          Tab(child: _CompactTabLabel('가져온 문제')),
         ],
       ),
     );
@@ -703,6 +713,26 @@ Map<String, dynamic> _gameDataFromPuzzle(Map<String, dynamic> puzzle) {
     'startMove': 0,
     'totalMoves': (puzzle['mateIn'] as num?)?.toInt() ?? 1,
   };
+}
+
+class _CompactTabLabel extends StatelessWidget {
+  const _CompactTabLabel(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          text,
+          maxLines: 1,
+          softWrap: false,
+        ),
+      ),
+    );
+  }
 }
 
 class _PuzzleTitleWithBadge extends StatelessWidget {
