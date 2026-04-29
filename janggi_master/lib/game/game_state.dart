@@ -32,6 +32,10 @@ class _UndoSnapshot {
 
 /// Manages the game state and logic
 class GameState extends ChangeNotifier {
+  static const bool _verboseInputLog = false;
+  static const bool _verboseRulesLog = false;
+  static const bool _verboseEngineLog = true;
+
   final Board _board = Board();
   PieceColor _currentPlayer = PieceColor.blue; // Blue (초) starts first
   Position? _selectedPosition;
@@ -127,17 +131,35 @@ class GameState extends ChangeNotifier {
       _findFirstLegalMoveForCurrentPlayer() != null;
   bool get currentPlayerHasNoEscape => !currentPlayerHasLegalMove;
 
+  void _logInput(String message) {
+    if (_verboseInputLog) {
+      debugPrint(message);
+    }
+  }
+
+  void _logRules(String message) {
+    if (_verboseRulesLog) {
+      debugPrint(message);
+    }
+  }
+
+  void _logEngine(String message) {
+    if (_verboseEngineLog) {
+      debugPrint(message);
+    }
+  }
+
   /// Set AI difficulty level (depth)
   void setAIDifficulty(int depth) {
     _aiDepth = depth.clamp(1, 15);
-    debugPrint('AI difficulty set to depth: $_aiDepth');
+    _logEngine('AI difficulty set to depth: $_aiDepth');
     notifyListeners();
   }
 
   /// Set AI color (which side AI plays)
   void setAIColor(PieceColor color) {
     _aiColor = color;
-    debugPrint(
+    _logEngine(
         'AI color set to: ${color == PieceColor.blue ? "초 (Blue)" : "한 (Red)"}');
     notifyListeners();
   }
@@ -480,7 +502,7 @@ class GameState extends ChangeNotifier {
   }) async {
     if (_usesHistoricalEngineState) {
       if (_engineState == null) {
-        debugPrint(
+        _logEngine(
           '_requestBestMove: history-based engine state unavailable in official mode',
         );
         return null;
@@ -592,7 +614,7 @@ class GameState extends ChangeNotifier {
             ? PieceColor.red
             : PieceColor.blue;
         _applyGameOverStatus(_winnerReason(winnerColor, 'checkmate'));
-        debugPrint(
+        _logRules(
             '_updateStatusMessage: CHECKMATE - ${_currentPlayer.name} has no legal moves and is in check');
         return;
       }
@@ -607,7 +629,7 @@ class GameState extends ChangeNotifier {
 
       if (_isInCheck) {
         _statusMessage = '$baseMessage - CHECK!';
-        debugPrint('_updateStatusMessage: ${_currentPlayer.name} is in CHECK');
+        _logRules('_updateStatusMessage: ${_currentPlayer.name} is in CHECK');
 
         if (!wasInCheck) {
           _showCheckEnteredNotification();
@@ -617,7 +639,7 @@ class GameState extends ChangeNotifier {
 
         if (wasInCheck && !_isInCheck) {
           _triggerEscapeCheckNotification();
-          debugPrint(
+          _logRules(
               '_updateStatusMessage: ${_currentPlayer.name} escaped check');
         }
       }
@@ -677,7 +699,7 @@ class GameState extends ChangeNotifier {
 
   /// Set up a puzzle position from FEN string
   void setPositionFromFen(String fen, PieceColor startingPlayer) {
-    debugPrint('setPositionFromFen: $fen');
+    _logInput('setPositionFromFen: $fen');
 
     // Parse FEN to Board
     final board = _parseFenToBoard(fen);
@@ -757,7 +779,7 @@ class GameState extends ChangeNotifier {
 
   /// Set up a puzzle position from FEN (for puzzle mode)
   void setPuzzlePosition(Board puzzleBoard, PieceColor startingPlayer) {
-    debugPrint('setPuzzlePosition: Setting up puzzle');
+    _logInput('setPuzzlePosition: Setting up puzzle');
     _setBoardPosition(
       puzzleBoard,
       startingPlayer,
@@ -768,42 +790,42 @@ class GameState extends ChangeNotifier {
 
   /// Handle square tap
   Future<void> onSquareTapped(Position position) async {
-    debugPrint('onSquareTapped: position=$position');
+    _logInput('onSquareTapped: position=$position');
 
     // Don't allow moves if game is over
     if (_isGameOver) {
-      debugPrint('onSquareTapped: Game is over, ignoring tap');
+      _logInput('onSquareTapped: Game is over, ignoring tap');
       return;
     }
 
     // Don't allow input during animation
     if (_isAnimating) {
-      debugPrint('onSquareTapped: Animation in progress, ignoring input');
+      _logInput('onSquareTapped: Animation in progress, ignoring input');
       return;
     }
 
     if (_isEngineThinking) {
-      debugPrint('onSquareTapped: engine is thinking, ignoring');
+      _logInput('onSquareTapped: engine is thinking, ignoring');
       return;
     }
 
     // In AI mode, don't allow player to move during AI's turn
     if (_gameMode == GameMode.vsAI && _currentPlayer == _aiColor) {
-      debugPrint('onSquareTapped: AI turn, ignoring player input');
+      _logInput('onSquareTapped: AI turn, ignoring player input');
       return;
     }
 
     final piece = _board.getPiece(position);
-    debugPrint('onSquareTapped: piece at position=$piece');
+    _logInput('onSquareTapped: piece at position=$piece');
 
     // If no piece selected yet
     if (_selectedPosition == null) {
       // Can only select current player's pieces
       if (piece != null && piece.color == _currentPlayer) {
-        debugPrint('onSquareTapped: selecting piece at $position');
+        _logInput('onSquareTapped: selecting piece at $position');
         _selectedPosition = position;
         _validMoves = _getValidMovesForPosition(position);
-        debugPrint('onSquareTapped: found ${_validMoves.length} valid moves');
+        _logInput('onSquareTapped: found ${_validMoves.length} valid moves');
         notifyListeners();
       }
       return;
@@ -811,7 +833,7 @@ class GameState extends ChangeNotifier {
 
     // If same square clicked, deselect
     if (_selectedPosition == position) {
-      debugPrint('onSquareTapped: deselecting piece');
+      _logInput('onSquareTapped: deselecting piece');
       _selectedPosition = null;
       _validMoves = [];
       notifyListeners();
@@ -820,20 +842,20 @@ class GameState extends ChangeNotifier {
 
     // If clicked on another piece of same color, select that instead
     if (piece != null && piece.color == _currentPlayer) {
-      debugPrint('onSquareTapped: selecting different piece at $position');
+      _logInput('onSquareTapped: selecting different piece at $position');
       _selectedPosition = position;
       _validMoves = _getValidMovesForPosition(position);
-      debugPrint(
+      _logInput(
           'onSquareTapped: found ${_validMoves.length} valid moves for new piece');
       notifyListeners();
       return;
     }
 
     // If clicked on a valid move position, make the move
-    debugPrint(
+    _logInput(
         'onSquareTapped: checking if $position is in valid moves: ${_validMoves.contains(position)}');
     if (_validMoves.contains(position)) {
-      debugPrint(
+      _logInput(
           'onSquareTapped: making move from $_selectedPosition to $position');
       // Clear highlights immediately before animation starts
       _validMoves = [];
@@ -843,7 +865,7 @@ class GameState extends ChangeNotifier {
       _selectedPosition = null;
       notifyListeners();
     } else {
-      debugPrint(
+      _logInput(
           'onSquareTapped: position $position is NOT a valid move. Valid moves are: $_validMoves');
     }
   }
@@ -859,7 +881,7 @@ class GameState extends ChangeNotifier {
       _clearHintState();
     }
 
-    debugPrint(
+    _logInput(
         '_applyResolvedMove: ${move.isPass ? "pass" : "${move.from} -> ${move.to}"} (${move.toUCI()})');
 
     final resolvedEngineUci = _exactEngineUciForMove(
@@ -982,10 +1004,10 @@ class GameState extends ChangeNotifier {
     notifyListeners();
 
     try {
-      debugPrint('_getAIMove: Starting AI move calculation');
+      _logEngine('_getAIMove: Starting AI move calculation');
 
       final searchTimeMs = _aiThinkingTimeSec * 1000;
-      debugPrint(
+      _logEngine(
           '_getAIMove: Requesting best move depth=$_aiDepth movetime=${_aiThinkingTimeSec}s ruleMode=${_ruleMode.name}...');
       final preferredBestMoveUci = await _requestBestMove(
         depth: _aiDepth,
@@ -998,12 +1020,12 @@ class GameState extends ChangeNotifier {
         },
       );
 
-      debugPrint('_getAIMove: Received best move: $preferredBestMoveUci');
+      _logEngine('_getAIMove: Received best move: $preferredBestMoveUci');
       final resolvedBestMove = _resolveAiMove(preferredBestMoveUci);
       if (resolvedBestMove != null) {
         await _applyResolvedMove(resolvedBestMove);
       } else {
-        debugPrint('_getAIMove: No legal AI move could be resolved');
+        _logEngine('_getAIMove: No legal AI move could be resolved');
         _statusMessage = 'AI could not resolve a legal move';
         _updateStatusMessage();
         _refreshEvaluation();
@@ -1017,7 +1039,7 @@ class GameState extends ChangeNotifier {
       _refreshEvaluation();
     } finally {
       _isEngineThinking = false;
-      debugPrint('_getAIMove: Calling final notifyListeners');
+      _logEngine('_getAIMove: Calling final notifyListeners');
       notifyListeners();
     }
   }
@@ -1034,13 +1056,13 @@ class GameState extends ChangeNotifier {
     }
 
     if (engineMove != null) {
-      debugPrint(
+      _logEngine(
           '_resolveAiMove: Discarding invalid engine move $bestMoveUCI for AI=$_aiColor');
     }
 
     final fallbackMove = _findFirstLegalMoveForCurrentPlayer();
     if (fallbackMove != null) {
-      debugPrint(
+      _logEngine(
           '_resolveAiMove: Falling back to first legal move ${StockfishConverter.toUCI(fallbackMove.from)} -> ${StockfishConverter.toUCI(fallbackMove.to)}');
     }
     return fallbackMove;
@@ -1661,7 +1683,7 @@ class GameState extends ChangeNotifier {
       return false;
     }
 
-    debugPrint(
+    _logRules(
         '_isKingInCheck: Checking if ${kingColor.name} king at $kingPosition is in check');
 
     final opponentColor =
@@ -1674,7 +1696,7 @@ class GameState extends ChangeNotifier {
 
         if (piece != null && piece.color == opponentColor) {
           if (_canAttackKingOnBoard(piece, pos, kingPosition, board)) {
-            debugPrint(
+            _logRules(
                 '_isKingInCheck: YES! ${piece.color.name} ${piece.type.name} at $pos attacks king at $kingPosition');
             return true;
           }
@@ -1682,7 +1704,7 @@ class GameState extends ChangeNotifier {
       }
     }
 
-    debugPrint('_isKingInCheck: No threats found to ${kingColor.name} king');
+    _logRules('_isKingInCheck: No threats found to ${kingColor.name} king');
     return false;
   }
 
@@ -1734,7 +1756,7 @@ class GameState extends ChangeNotifier {
   void _recordPosition() {
     final currentFen = StockfishConverter.boardToFEN(_board, _currentPlayer);
     _positionHistory[currentFen] = (_positionHistory[currentFen] ?? 0) + 1;
-    debugPrint(
+    _logRules(
         '_recordPosition: Position count for this FEN: ${_positionHistory[currentFen]}');
   }
 
@@ -1804,7 +1826,7 @@ class GameState extends ChangeNotifier {
           _currentPlayer == PieceColor.blue ? 'Blue to move' : 'Red to move';
     }
 
-    debugPrint(
+    _logInput(
         '_setBoardPosition: Setup complete, starting player: ${_currentPlayer.name}, evaluateGameState: $evaluateGameState');
     _refreshEvaluation();
     notifyListeners();
@@ -2132,11 +2154,11 @@ class GameState extends ChangeNotifier {
 
     // In AI mode, hints are only allowed on the human player's turn.
     if (_gameMode == GameMode.vsAI && _currentPlayer == _aiColor) {
-      debugPrint('getHint: blocked on AI turn');
+      _logEngine('getHint: blocked on AI turn');
       return;
     }
 
-    debugPrint('getHint: Requesting analysis with depth 12...');
+    _logEngine('getHint: Requesting analysis with depth 12...');
     _isEngineThinking = true;
     notifyListeners();
 
@@ -2153,7 +2175,7 @@ class GameState extends ChangeNotifier {
       );
 
       if (preferredBestMoveUci != null) {
-        debugPrint('getHint: bestmove=$preferredBestMoveUci');
+        _logEngine('getHint: bestmove=$preferredBestMoveUci');
         final parsedMove = _parseUciMove(preferredBestMoveUci);
         if (parsedMove != null && !parsedMove.isPass) {
           final piece = _board.getPiece(parsedMove.from);
