@@ -19,16 +19,26 @@ class CommunityPuzzleListScreen extends StatefulWidget {
 
 class _CommunityPuzzleListScreenState extends State<CommunityPuzzleListScreen> {
   final CommunityPuzzleService _service = CommunityPuzzleService();
+  final TextEditingController _searchController = TextEditingController();
 
   CommunityPuzzleSort _sort = CommunityPuzzleSort.latest;
+  List<CommunityPuzzle> _allPuzzles = <CommunityPuzzle>[];
   List<CommunityPuzzle> _puzzles = <CommunityPuzzle>[];
   bool _isLoading = true;
   String? _errorMessage;
+
+  bool get _hasSearch => _searchController.text.trim().isNotEmpty;
 
   @override
   void initState() {
     super.initState();
     _loadPuzzles();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadPuzzles() async {
@@ -48,7 +58,8 @@ class _CommunityPuzzleListScreenState extends State<CommunityPuzzleListScreen> {
       final puzzles = await _service.fetchPuzzles(sort: _sort);
       if (!mounted) return;
       setState(() {
-        _puzzles = puzzles;
+        _allPuzzles = puzzles;
+        _puzzles = _filterPuzzles(puzzles, _searchController.text);
         _isLoading = false;
       });
     } catch (error) {
@@ -85,6 +96,34 @@ class _CommunityPuzzleListScreenState extends State<CommunityPuzzleListScreen> {
     _loadPuzzles();
   }
 
+  void _onSearchChanged(String keyword) {
+    setState(() {
+      _puzzles = _filterPuzzles(_allPuzzles, keyword);
+    });
+  }
+
+  void _clearSearch() {
+    _searchController.clear();
+    _onSearchChanged('');
+  }
+
+  List<CommunityPuzzle> _filterPuzzles(
+    List<CommunityPuzzle> puzzles,
+    String keyword,
+  ) {
+    final normalizedKeyword = keyword.trim().toLowerCase();
+    if (normalizedKeyword.isEmpty) {
+      return puzzles;
+    }
+
+    return puzzles.where((puzzle) {
+      final title = puzzle.title.toLowerCase();
+      final author = puzzle.authorName.toLowerCase();
+      return title.contains(normalizedKeyword) ||
+          author.contains(normalizedKeyword);
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<CommunityAuthProvider>();
@@ -112,6 +151,8 @@ class _CommunityPuzzleListScreenState extends State<CommunityPuzzleListScreen> {
                   child: Column(
                     children: [
                       _buildSortBar(),
+                      const SizedBox(height: 12),
+                      _buildSearchField(),
                       const SizedBox(height: 12),
                       Expanded(child: _buildBody()),
                     ],
@@ -207,6 +248,35 @@ class _CommunityPuzzleListScreenState extends State<CommunityPuzzleListScreen> {
     );
   }
 
+  Widget _buildSearchField() {
+    return TextField(
+      controller: _searchController,
+      onChanged: _onSearchChanged,
+      textInputAction: TextInputAction.search,
+      decoration: InputDecoration(
+        hintText: '제목 또는 작성자 검색',
+        prefixIcon: const Icon(Icons.search),
+        suffixIcon: _hasSearch
+            ? IconButton(
+                tooltip: '검색어 지우기',
+                onPressed: _clearSearch,
+                icon: const Icon(Icons.close),
+              )
+            : null,
+        filled: true,
+        fillColor: Colors.white.withValues(alpha: 0.92),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: BorderSide.none,
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
+      ),
+    );
+  }
+
   Widget _buildBody() {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -235,13 +305,36 @@ class _CommunityPuzzleListScreenState extends State<CommunityPuzzleListScreen> {
       );
     }
 
-    if (_puzzles.isEmpty) {
+    if (_allPuzzles.isEmpty) {
       return const Card(
         child: Padding(
           padding: EdgeInsets.all(24),
           child: Text(
             '아직 공유된 문제가 없습니다.\n내가 만든 문제를 먼저 올려 보세요.',
             textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+
+    if (_puzzles.isEmpty && _hasSearch) {
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                '검색 결과가 없습니다.',
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: _clearSearch,
+                icon: const Icon(Icons.close),
+                label: const Text('검색어 지우기'),
+              ),
+            ],
           ),
         ),
       );

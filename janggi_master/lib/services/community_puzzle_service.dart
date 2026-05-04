@@ -216,6 +216,48 @@ class CommunityPuzzleService {
     });
   }
 
+  Future<void> softDeletePuzzle(String puzzleId) async {
+    _assertSignedIn();
+
+    try {
+      await _client.rpc(
+        'soft_delete_community_puzzle',
+        params: <String, dynamic>{'target_puzzle_id': puzzleId},
+      );
+    } on PostgrestException catch (error) {
+      if (!_isMissingSoftDeleteFunction(error)) {
+        if (error.code == '42501') {
+          throw const CommunityPuzzleException('작성자만 삭제할 수 있습니다.');
+        }
+        rethrow;
+      }
+
+      await _softDeletePuzzleDirectly(puzzleId);
+    }
+  }
+
+  Future<void> _softDeletePuzzleDirectly(String puzzleId) async {
+    final userId = _client.auth.currentUser!.id;
+
+    try {
+      await _client
+          .from('community_puzzles')
+          .update(<String, dynamic>{
+            'status': 'deleted',
+            'updated_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', puzzleId)
+          .eq('author_id', userId);
+    } on PostgrestException catch (error) {
+      if (error.code == '42501') {
+        throw const CommunityPuzzleException(
+          'Supabase 삭제 RPC 마이그레이션을 먼저 실행해 주세요.',
+        );
+      }
+      rethrow;
+    }
+  }
+
   Future<Set<String>> _likedPuzzleIds() async {
     final user = _client.auth.currentUser;
     if (user == null) {
@@ -289,6 +331,12 @@ class CommunityPuzzleService {
     return error.code == '42703' &&
         (error.message.contains('objective_type') ||
             error.message.contains('objective'));
+  }
+
+  bool _isMissingSoftDeleteFunction(PostgrestException error) {
+    return error.code == '42883' ||
+        error.code == 'PGRST202' ||
+        error.message.contains('soft_delete_community_puzzle');
   }
 
   void _assertConfigured() {

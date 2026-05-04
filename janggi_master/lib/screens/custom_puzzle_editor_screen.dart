@@ -40,6 +40,8 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
   final TextEditingController _shareCodeController = TextEditingController();
 
   bool _blueAtBottom = true;
+  Piece? _selectedPalettePiece;
+  Position? _selectedBoardPosition;
 
   static final List<PieceType> _paletteTypes = <PieceType>[
     PieceType.general,
@@ -101,42 +103,8 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (!_isAiContinueMode) ...[
-                TextField(
-                  controller: _titleController,
-                  decoration: const InputDecoration(
-                    labelText: '퍼즐 제목',
-                    hintText: '예: 초포 희생 외통',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: _shareCodeController,
-                  minLines: 1,
-                  maxLines: 3,
-                  decoration: const InputDecoration(
-                    labelText: '공유 코드 붙여넣기',
-                    hintText: 'JM_PUZZLE_V1:...',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    _buildTopActionButton(
-                      icon: Icons.file_download,
-                      label: '불러오기',
-                      onPressed: _importSharedText,
-                    ),
-                    const SizedBox(width: 6),
-                    _buildTopActionButton(
-                      icon: Icons.content_copy,
-                      label: '현재 배치 내보내기',
-                      onPressed: _copyCurrentSetupCode,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
+                _buildPuzzleMetaPanel(),
+                const SizedBox(height: 10),
               ] else ...[
                 const SizedBox(height: 6),
               ],
@@ -148,6 +116,7 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
                     onPressed: () {
                       setState(() {
                         _board.clear();
+                        _clearPlacementSelection();
                       });
                     },
                   ),
@@ -158,6 +127,7 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
                     onPressed: () {
                       setState(() {
                         _applyDefaultSetup();
+                        _clearPlacementSelection();
                       });
                     },
                   ),
@@ -168,37 +138,35 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
                     onPressed: () {
                       setState(() {
                         _flipCurrentFormation();
+                        _clearPlacementSelection();
                       });
                     },
                   ),
                 ],
               ),
-              const SizedBox(height: 6),
-              Text(
-                _blueAtBottom ? '현재 하단 진영: 초' : '현재 하단 진영: 한',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey.shade700,
-                  fontWeight: FontWeight.w600,
+              const SizedBox(height: 10),
+              _buildFormationSelector(),
+              const SizedBox(height: 10),
+              _buildPlacementHint(),
+              const SizedBox(height: 10),
+              Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 300),
+                  child: AspectRatio(
+                    aspectRatio: 9 / 10,
+                    child: _buildEditorBoard(),
+                  ),
                 ),
               ),
-              const SizedBox(height: 12),
-              _buildPaletteSection(
-                title: '초 기물 (드래그해서 배치)',
-                color: PieceColor.blue,
-              ),
-              const SizedBox(height: 8),
-              _buildPaletteSection(
-                title: '한 기물 (드래그해서 배치)',
-                color: PieceColor.red,
-              ),
+              if (_selectedPalettePiece != null ||
+                  _selectedBoardPosition != null) ...[
+                const SizedBox(height: 10),
+                _buildSelectionActions(),
+              ],
+              const SizedBox(height: 10),
+              _buildPalettePanel(),
               const SizedBox(height: 12),
               _buildTrashArea(),
-              const SizedBox(height: 12),
-              AspectRatio(
-                aspectRatio: 9 / 10,
-                child: _buildEditorBoard(),
-              ),
               const SizedBox(height: 14),
               if (_showInlineAiContinueCta)
                 SizedBox(
@@ -307,62 +275,326 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
     );
   }
 
-  Widget _buildPaletteSection({
-    required String title,
-    required PieceColor color,
-  }) {
+  Widget _buildPuzzleMetaPanel() {
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          tilePadding: const EdgeInsets.symmetric(horizontal: 12),
+          childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+          leading: const Icon(Icons.tune),
+          title: const Text(
+            '제목 / 공유 코드',
+            style: TextStyle(fontWeight: FontWeight.w800),
+          ),
+          initiallyExpanded: false,
+          children: [
+            TextField(
+              controller: _titleController,
+              decoration: const InputDecoration(
+                labelText: '퍼즐 제목',
+                hintText: '예: 초포 희생 외통',
+                border: OutlineInputBorder(),
+                isDense: true,
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _shareCodeController,
+              minLines: 1,
+              maxLines: 2,
+              decoration: const InputDecoration(
+                labelText: '공유 코드 붙여넣기',
+                hintText: 'JM_PUZZLE_V1:...',
+                border: OutlineInputBorder(),
+                isDense: true,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                _buildTopActionButton(
+                  icon: Icons.file_download,
+                  label: '불러오기',
+                  onPressed: _importSharedText,
+                ),
+                const SizedBox(width: 6),
+                _buildTopActionButton(
+                  icon: Icons.content_copy,
+                  label: '현재 배치 내보내기',
+                  onPressed: _copyCurrentSetupCode,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFormationSelector() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.76),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.brown.withValues(alpha: 0.18)),
+      ),
+      child: Row(
+        children: [
+          const Text(
+            '진영',
+            style: TextStyle(fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: SegmentedButton<bool>(
+              showSelectedIcon: false,
+              segments: const [
+                ButtonSegment<bool>(
+                  value: true,
+                  label: Text('초 아래'),
+                ),
+                ButtonSegment<bool>(
+                  value: false,
+                  label: Text('초 위'),
+                ),
+              ],
+              selected: {_blueAtBottom},
+              onSelectionChanged: (selection) {
+                setState(() {
+                  _blueAtBottom = selection.first;
+                  _clearPlacementSelection();
+                });
+              },
+              style: ButtonStyle(
+                visualDensity: VisualDensity.compact,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                padding: WidgetStateProperty.all(
+                  const EdgeInsets.symmetric(horizontal: 8),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Text(
+            _blueAtBottom ? '한 위' : '한 아래',
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey.shade700,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPlacementHint() {
+    final selectedPiece = _selectedPalettePiece;
+    final selectedPosition = _selectedBoardPosition;
+
+    IconData icon;
+    String text;
+    Color color;
+    if (selectedPiece != null) {
+      icon = Icons.touch_app;
+      color = selectedPiece.color == PieceColor.blue
+          ? Colors.blue.shade700
+          : Colors.red.shade700;
+      text =
+          '${_sideName(selectedPiece.color)} ${_pieceTypeKorean(selectedPiece.type)} 선택됨 · 보드 칸을 탭하면 배치됩니다.';
+    } else if (selectedPosition != null) {
+      final piece = _board.getPiece(selectedPosition);
+      icon = Icons.open_with;
+      color = Colors.brown.shade700;
+      text = piece == null
+          ? '옮길 기물을 선택하세요.'
+          : '${_sideName(piece.color)} ${_pieceTypeKorean(piece.type)} 선택됨 · 이동할 칸을 탭하세요.';
+    } else {
+      icon = Icons.ads_click;
+      color = Colors.brown.shade700;
+      text = '기물을 먼저 선택한 뒤 보드 칸을 탭하세요. 길게 누르면 보드 기물을 삭제합니다.';
+    }
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 140),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.82),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.35)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: color, size: 19),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                color: Colors.grey.shade800,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSelectionActions() {
+    final selectedPosition = _selectedBoardPosition;
+    final hasSelection =
+        _selectedPalettePiece != null || selectedPosition != null;
+    final canDelete =
+        selectedPosition != null && _board.getPiece(selectedPosition) != null;
+
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: hasSelection
+                ? () {
+                    setState(_clearPlacementSelection);
+                  }
+                : null,
+            icon: const Icon(Icons.close, size: 16),
+            label: const Text('선택 해제'),
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 9),
+              visualDensity: const VisualDensity(vertical: -2),
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: canDelete
+                ? () {
+                    setState(() {
+                      _board.setPiece(selectedPosition, null);
+                      _clearPlacementSelection();
+                    });
+                  }
+                : null,
+            icon: const Icon(Icons.delete_outline, size: 16),
+            label: const Text('선택 삭제'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Colors.red.shade700,
+              padding: const EdgeInsets.symmetric(vertical: 9),
+              visualDensity: const VisualDensity(vertical: -2),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPalettePanel() {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              title,
-              style: const TextStyle(fontWeight: FontWeight.w700),
+            const Text(
+              '기물 선택',
+              style: TextStyle(fontWeight: FontWeight.w800),
             ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: _paletteTypes.map((type) {
-                final piece = Piece(type: type, color: color);
-                final remaining = _remainingPieceCount(color, type);
-                final chip = _pieceChip(
-                  piece,
-                  countBadge: remaining,
-                  disabled: remaining <= 0,
-                );
-
-                if (remaining <= 0) {
-                  return Opacity(opacity: 0.35, child: chip);
-                }
-
-                return Draggable<_DragPiece>(
-                  data: _DragPiece(piece: piece, from: null),
-                  feedback: Material(
-                    color: Colors.transparent,
-                    child: _pieceChip(piece, size: 44, countBadge: remaining),
-                  ),
-                  childWhenDragging: Opacity(
-                    opacity: 0.35,
-                    child: chip,
-                  ),
-                  child: chip,
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             Text(
-              '배치 가능 수량을 초과하면 드롭이 제한됩니다.',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey.shade700,
-              ),
+              '탭해서 고른 뒤 보드 칸을 탭하세요. 드래그도 계속 사용할 수 있습니다.',
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+            ),
+            const SizedBox(height: 10),
+            _buildPaletteRow(
+              title: '초',
+              color: PieceColor.blue,
+            ),
+            const SizedBox(height: 10),
+            _buildPaletteRow(
+              title: '한',
+              color: PieceColor.red,
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildPaletteRow({
+    required String title,
+    required PieceColor color,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        SizedBox(
+          width: 28,
+          child: Text(
+            title,
+            style: TextStyle(
+              color: color == PieceColor.blue
+                  ? Colors.blue.shade700
+                  : Colors.red.shade700,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Wrap(
+            spacing: 7,
+            runSpacing: 7,
+            children: _paletteTypes.map((type) {
+              final piece = Piece(type: type, color: color);
+              final remaining = _remainingPieceCount(color, type);
+              final isSelected = _selectedPalettePiece?.color == color &&
+                  _selectedPalettePiece?.type == type;
+              final chip = _pieceChip(
+                piece,
+                size: 33,
+                countBadge: remaining,
+                disabled: remaining <= 0,
+                selected: isSelected,
+              );
+
+              final child = remaining <= 0
+                  ? Opacity(opacity: 0.35, child: chip)
+                  : GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedPalettePiece = piece;
+                          _selectedBoardPosition = null;
+                        });
+                      },
+                      child: Draggable<_DragPiece>(
+                        data: _DragPiece(piece: piece, from: null),
+                        feedback: Material(
+                          color: Colors.transparent,
+                          child: _pieceChip(
+                            piece,
+                            size: 46,
+                            countBadge: remaining,
+                            selected: true,
+                          ),
+                        ),
+                        childWhenDragging: Opacity(
+                          opacity: 0.35,
+                          child: chip,
+                        ),
+                        child: chip,
+                      ),
+                    );
+
+              return child;
+            }).toList(),
+          ),
+        ),
+      ],
     );
   }
 
@@ -498,48 +730,34 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
               gridSpacing: gridSpacing,
             );
             if (target == null) return;
-
-            final dropped = details.data;
-            final targetPiece = _board.getPiece(target);
-            final errorMessage = _validateDropRule(
-              dropped: dropped,
-              target: target,
-              targetPiece: targetPiece,
-            );
-            if (errorMessage != null) {
-              _showSnack(errorMessage);
-              return;
-            }
-
-            setState(() {
-              final source = dropped.from;
-
-              if (source != null && source != target && targetPiece != null) {
-                _board.setPiece(source, targetPiece);
-                _board.setPiece(target, dropped.piece);
-                return;
-              }
-
-              if (source != null && source != target) {
-                _board.setPiece(source, null);
-              }
-              _board.setPiece(target, dropped.piece);
-            });
+            _placeOrMovePiece(details.data, target);
           },
           builder: (context, candidateData, rejectedData) {
             final hovering = candidateData.isNotEmpty;
-            return AnimatedContainer(
-              duration: const Duration(milliseconds: 100),
-              decoration: BoxDecoration(
-                color: hovering
-                    ? Colors.yellow.withValues(alpha: 0.08)
-                    : Colors.transparent,
-                border: hovering
-                    ? Border.all(
-                        color: Colors.yellow.withValues(alpha: 0.45),
-                        width: 2,
-                      )
-                    : null,
+            return GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTapDown: (details) {
+                final target = _snapLocalToBoard(
+                  details.localPosition,
+                  gridSpacing: gridSpacing,
+                );
+                if (target != null) {
+                  _handleBoardPositionTap(target);
+                }
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 100),
+                decoration: BoxDecoration(
+                  color: hovering
+                      ? Colors.yellow.withValues(alpha: 0.08)
+                      : Colors.transparent,
+                  border: hovering
+                      ? Border.all(
+                          color: Colors.yellow.withValues(alpha: 0.45),
+                          width: 2,
+                        )
+                      : null,
+                ),
               ),
             );
           },
@@ -565,6 +783,7 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
         final centerX = startX + position.file * gridSpacing;
         final centerY = startY + displayRank * gridSpacing;
         final size = gridSpacing * 0.82;
+        final isSelected = _selectedBoardPosition == position;
 
         widgets.add(
           Positioned(
@@ -574,8 +793,12 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
             height: size,
             child: GestureDetector(
               onTap: () {
+                _handleBoardPositionTap(position);
+              },
+              onLongPress: () {
                 setState(() {
                   _board.setPiece(position, null);
+                  _clearPlacementSelection();
                 });
               },
               child: Draggable<_DragPiece>(
@@ -588,7 +811,25 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
                   opacity: 0.25,
                   child: _buildPieceToken(piece, size: size),
                 ),
-                child: _buildPieceToken(piece, size: size),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 120),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                              color: Colors.amber.withValues(alpha: 0.65),
+                              blurRadius: 12,
+                              spreadRadius: 3,
+                            ),
+                          ]
+                        : null,
+                    border: isSelected
+                        ? Border.all(color: Colors.amber.shade700, width: 2)
+                        : null,
+                  ),
+                  child: _buildPieceToken(piece, size: size),
+                ),
               ),
             ),
           ),
@@ -610,6 +851,13 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
     if (renderBox == null) return null;
 
     final local = renderBox.globalToLocal(globalOffset);
+    return _snapLocalToBoard(local, gridSpacing: gridSpacing);
+  }
+
+  Position? _snapLocalToBoard(
+    Offset local, {
+    required double gridSpacing,
+  }) {
     final tapRadius = gridSpacing * 0.52;
     final file = (((local.dx - tapRadius) / gridSpacing).round()).clamp(0, 8);
     final displayRank =
@@ -619,11 +867,107 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
     return Position(file: file, rank: rank);
   }
 
+  void _handleBoardPositionTap(Position target) {
+    final selectedPalettePiece = _selectedPalettePiece;
+    if (selectedPalettePiece != null) {
+      _placeOrMovePiece(
+        _DragPiece(piece: selectedPalettePiece, from: null),
+        target,
+      );
+      return;
+    }
+
+    final selectedBoardPosition = _selectedBoardPosition;
+    if (selectedBoardPosition != null) {
+      if (selectedBoardPosition == target) {
+        setState(() {
+          _selectedBoardPosition = null;
+        });
+        return;
+      }
+
+      final piece = _board.getPiece(selectedBoardPosition);
+      if (piece == null) {
+        setState(() {
+          _selectedBoardPosition = null;
+        });
+        return;
+      }
+
+      _placeOrMovePiece(
+        _DragPiece(piece: piece, from: selectedBoardPosition),
+        target,
+      );
+      return;
+    }
+
+    final piece = _board.getPiece(target);
+    if (piece == null) {
+      return;
+    }
+
+    setState(() {
+      _selectedBoardPosition = target;
+      _selectedPalettePiece = null;
+    });
+  }
+
+  void _placeOrMovePiece(_DragPiece dropped, Position target) {
+    final targetPiece = _board.getPiece(target);
+    final errorMessage = _validateDropRule(
+      dropped: dropped,
+      target: target,
+      targetPiece: targetPiece,
+    );
+    if (errorMessage != null) {
+      _showSnack(errorMessage);
+      return;
+    }
+
+    setState(() {
+      final source = dropped.from;
+      final fromPalette = source == null;
+
+      if (source != null && source != target && targetPiece != null) {
+        _board.setPiece(source, targetPiece);
+        _board.setPiece(target, dropped.piece);
+      } else {
+        if (source != null && source != target) {
+          _board.setPiece(source, null);
+        }
+        _board.setPiece(target, dropped.piece);
+      }
+
+      _syncFormationFromPalacePlacement(dropped.piece, target);
+      _selectedBoardPosition = null;
+      _selectedPalettePiece = fromPalette &&
+              _remainingPieceCount(dropped.piece.color, dropped.piece.type) > 0
+          ? dropped.piece
+          : null;
+    });
+  }
+
+  void _clearPlacementSelection() {
+    _selectedPalettePiece = null;
+    _selectedBoardPosition = null;
+  }
+
+  void _syncFormationFromPalacePlacement(Piece piece, Position pos) {
+    if (!_isPalaceOnlyPiece(piece.type)) {
+      return;
+    }
+    final inferred = _blueAtBottomForPieceAt(piece, pos);
+    if (inferred != null) {
+      _blueAtBottom = inferred;
+    }
+  }
+
   Widget _pieceChip(
     Piece piece, {
     double size = 34,
     int? countBadge,
     bool disabled = false,
+    bool selected = false,
   }) {
     final isBlue = piece.color == PieceColor.blue;
     final borderColor = isBlue ? Colors.blue.shade700 : Colors.red.shade700;
@@ -642,7 +986,19 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
           decoration: BoxDecoration(
             color: appliedFill,
             shape: BoxShape.circle,
-            border: Border.all(color: appliedBorder, width: 1.8),
+            border: Border.all(
+              color: selected ? Colors.amber.shade700 : appliedBorder,
+              width: selected ? 2.8 : 1.8,
+            ),
+            boxShadow: selected
+                ? [
+                    BoxShadow(
+                      color: Colors.amber.withValues(alpha: 0.45),
+                      blurRadius: 9,
+                      spreadRadius: 1.5,
+                    ),
+                  ]
+                : null,
           ),
           alignment: Alignment.center,
           child: Text(
@@ -728,6 +1084,35 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
     return _countPieces(color, PieceType.general);
   }
 
+  bool? _inferBlueAtBottomFromGenerals() {
+    final blueGeneral = _board.findPiece(PieceType.general, PieceColor.blue);
+    final redGeneral = _board.findPiece(PieceType.general, PieceColor.red);
+    final inferredValues = <bool>[];
+
+    if (blueGeneral != null) {
+      final inferred = _blueAtBottomForPieceAt(
+        const Piece(type: PieceType.general, color: PieceColor.blue),
+        blueGeneral,
+      );
+      if (inferred == null) return null;
+      inferredValues.add(inferred);
+    }
+    if (redGeneral != null) {
+      final inferred = _blueAtBottomForPieceAt(
+        const Piece(type: PieceType.general, color: PieceColor.red),
+        redGeneral,
+      );
+      if (inferred == null) return null;
+      inferredValues.add(inferred);
+    }
+
+    if (inferredValues.isEmpty) {
+      return null;
+    }
+    final first = inferredValues.first;
+    return inferredValues.every((value) => value == first) ? first : null;
+  }
+
   int _remainingPieceCount(PieceColor color, PieceType type) {
     final maxCount = _maxPieceCount[type] ?? 0;
     final current = _countPieces(color, type);
@@ -735,23 +1120,40 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
     return remaining < 0 ? 0 : remaining;
   }
 
-  bool _isInsidePalace(Position pos, PieceColor color) {
-    final inFileRange = pos.file >= 3 && pos.file <= 5;
-    final isBottomSide = (color == PieceColor.blue && _blueAtBottom) ||
-        (color == PieceColor.red && !_blueAtBottom);
-    final inRankRange = isBottomSide
-        ? (pos.rank >= 0 && pos.rank <= 2)
-        : (pos.rank >= 7 && pos.rank <= 9);
-    return inFileRange && inRankRange;
+  bool _isBottomPalace(Position pos) {
+    return pos.file >= 3 && pos.file <= 5 && pos.rank >= 0 && pos.rank <= 2;
+  }
+
+  bool _isTopPalace(Position pos) {
+    return pos.file >= 3 && pos.file <= 5 && pos.rank >= 7 && pos.rank <= 9;
+  }
+
+  bool _isAnyPalace(Position pos) {
+    return _isBottomPalace(pos) || _isTopPalace(pos);
+  }
+
+  bool? _blueAtBottomForPieceAt(Piece piece, Position pos) {
+    if (!_isAnyPalace(pos)) {
+      return null;
+    }
+    if (piece.color == PieceColor.blue) {
+      return _isBottomPalace(pos);
+    }
+    return _isTopPalace(pos);
   }
 
   bool _isPalaceOnlyPiece(PieceType type) {
     return type == PieceType.general || type == PieceType.guard;
   }
 
-  bool _isSoldierPlacementValid(PieceColor color, Position pos) {
-    final isBottomSide = (color == PieceColor.blue && _blueAtBottom) ||
-        (color == PieceColor.red && !_blueAtBottom);
+  bool _isSoldierPlacementValid(
+    PieceColor color,
+    Position pos, {
+    bool? blueAtBottom,
+  }) {
+    final formationBlueAtBottom = blueAtBottom ?? _blueAtBottom;
+    final isBottomSide = (color == PieceColor.blue && formationBlueAtBottom) ||
+        (color == PieceColor.red && !formationBlueAtBottom);
     if (isBottomSide) {
       return pos.rank >= 3;
     }
@@ -777,13 +1179,35 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
     }
   }
 
-  String? _placementRuleError(Piece piece, Position pos) {
-    if (_isPalaceOnlyPiece(piece.type) && !_isInsidePalace(pos, piece.color)) {
-      return '${_pieceTypeKorean(piece.type)}은(는) 궁성 안에만 배치할 수 있습니다.';
+  String _sideName(PieceColor color) {
+    return color == PieceColor.blue ? '초' : '한';
+  }
+
+  String? _placementRuleError(
+    Piece piece,
+    Position pos, {
+    bool? blueAtBottom,
+    bool strictPalaceSide = false,
+  }) {
+    if (_isPalaceOnlyPiece(piece.type)) {
+      if (!_isAnyPalace(pos)) {
+        return '${_pieceTypeKorean(piece.type)}은(는) 위/아래 궁성 안에만 배치할 수 있습니다.';
+      }
+      if (strictPalaceSide) {
+        final expected = blueAtBottom ?? _blueAtBottom;
+        final actual = _blueAtBottomForPieceAt(piece, pos);
+        if (actual != expected) {
+          return '${_sideName(piece.color)} ${_pieceTypeKorean(piece.type)}의 궁성 위치가 현재 진영 방향과 맞지 않습니다.';
+        }
+      }
     }
     if (piece.type == PieceType.soldier &&
-        !_isSoldierPlacementValid(piece.color, pos)) {
-      return '${piece.color == PieceColor.blue ? '초' : '한'} 졸/병은 후방 3줄에 배치할 수 없습니다.';
+        !_isSoldierPlacementValid(
+          piece.color,
+          pos,
+          blueAtBottom: blueAtBottom,
+        )) {
+      return '${_sideName(piece.color)} 졸/병은 후방 3줄에 배치할 수 없습니다.';
     }
     return null;
   }
@@ -843,25 +1267,36 @@ class _CustomPuzzleEditorScreenState extends State<CustomPuzzleEditorScreen> {
       }
     }
 
-    for (int rank = 0; rank < 10; rank++) {
-      for (int file = 0; file < 9; file++) {
-        final pos = Position(file: file, rank: rank);
-        final piece = _board.getPiece(pos);
-        if (piece == null) continue;
-
-        final placementError = _placementRuleError(piece, pos);
-        if (placementError != null) {
-          return placementError;
-        }
-      }
-    }
-
     final blueGeneralCount = _generalCount(PieceColor.blue);
     final redGeneralCount = _generalCount(PieceColor.red);
     if (blueGeneralCount != 1 || redGeneralCount != 1) {
       return '초/한 궁은 각각 1개씩 있어야 합니다.';
     }
 
+    final inferredBlueAtBottom = _inferBlueAtBottomFromGenerals();
+    if (inferredBlueAtBottom == null) {
+      return '초/한 궁 위치가 서로 맞지 않습니다. 초와 한 궁은 서로 반대쪽 궁성에 있어야 합니다.';
+    }
+
+    for (int rank = 0; rank < 10; rank++) {
+      for (int file = 0; file < 9; file++) {
+        final pos = Position(file: file, rank: rank);
+        final piece = _board.getPiece(pos);
+        if (piece == null) continue;
+
+        final placementError = _placementRuleError(
+          piece,
+          pos,
+          blueAtBottom: inferredBlueAtBottom,
+          strictPalaceSide: true,
+        );
+        if (placementError != null) {
+          return placementError;
+        }
+      }
+    }
+
+    _blueAtBottom = inferredBlueAtBottom;
     return null;
   }
 

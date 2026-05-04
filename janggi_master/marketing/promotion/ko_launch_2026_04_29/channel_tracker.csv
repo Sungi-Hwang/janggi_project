@@ -1,0 +1,7 @@
+date,day,channel,post_type,asset,copy_source,url_or_location,status,views_or_reactions,installs_notes,next_action
+2026-04-29,Day 1,지인/테스터,리뷰 요청,,review_request.md,,planned,,,10명에게 요청
+2026-04-29,Day 1,첫 커뮤니티 후보,오늘의 장기 문제,01_today_problem_beginner.png,post_templates.md,,planned,,,커뮤니티 규칙 확인 후 게시
+2026-04-30,Day 2,유튜브 댓글 후보,시청자 도전 문제,02_viewer_challenge.png,post_templates.md,,planned,,,관련 영상에만 댓글
+2026-05-01,Day 3,카카오 오픈채팅 후보,기보 복기 문제,03_replay_analysis_problem.png,post_templates.md,,planned,,,방 규칙 확인 후 공유
+2026-05-02,Day 4,네이버 블로그/포스트,AI 추천수 맞히기,04_ai_hint_challenge.png,post_templates.md,,planned,,,문제풀이 글 작성
+2026-05-03,Day 5,유튜버 후속,후속 메일,,youtuber_followups.md,,planned,,,최초 발송 후 3~5일 경과 확인

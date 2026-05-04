@@ -25,8 +25,11 @@ class SoundManager {
   /// Set global volume (0.0 to 1.0)
   void setVolume(double volume) {
     _volume = volume.clamp(0.0, 1.0);
+    final player = _player;
+    if (player == null) return;
+
     try {
-      _ensurePlayer().setVolume(_volume);
+      player.setVolume(_volume);
     } on MissingPluginException {
       _logPluginUnavailable();
     } catch (e) {
@@ -67,8 +70,11 @@ class SoundManager {
       try {
         final player = _ensurePlayer();
         await player.stop();
-        await player.setVolume(_volume);
-        await player.play(AssetSource(assetPath));
+        await player.play(
+          AssetSource(assetPath),
+          mode: PlayerMode.lowLatency,
+          volume: _volume,
+        );
         return;
       } on MissingPluginException {
         _logPluginUnavailable();

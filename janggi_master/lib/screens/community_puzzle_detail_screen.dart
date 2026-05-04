@@ -119,6 +119,56 @@ class _CommunityPuzzleDetailScreenState
     }, failureMessage: '신고에 실패했습니다.');
   }
 
+  Future<void> _deletePuzzle() async {
+    final auth = context.read<CommunityAuthProvider>();
+    final signedIn = await auth.ensureSignedIn();
+    if (!mounted) {
+      return;
+    }
+    if (!signedIn) {
+      _showSnack(auth.lastError ?? '삭제하려면 Google 로그인이 필요합니다.');
+      return;
+    }
+    if (auth.user?.id != _puzzle.authorId) {
+      _showSnack('작성자만 삭제할 수 있습니다.');
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('공유 문제 삭제'),
+        content: const Text(
+          '게시판 목록에서 보이지 않게 숨김 삭제합니다. 이미 다른 사용자가 가져간 로컬 문제는 그대로 남습니다.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('취소'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.red.shade700,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('삭제'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) {
+      return;
+    }
+
+    await _runBusy(() async {
+      await _service.softDeletePuzzle(_puzzle.id);
+      if (!mounted) return;
+      _showSnack('공유 문제를 삭제했습니다.');
+      Navigator.pop(context, true);
+    }, failureMessage: '삭제에 실패했습니다.');
+  }
+
   Future<void> _playPuzzle() async {
     await Navigator.push(
       context,
@@ -177,6 +227,8 @@ class _CommunityPuzzleDetailScreenState
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<CommunityAuthProvider>();
+    final isAuthor = auth.user?.id == _puzzle.authorId;
     final createdAt = _formatDate(_puzzle.createdAt);
     final side = _puzzle.toMove == 'red' ? '한 차례' : '초 차례';
     final objectivePuzzle = <String, dynamic>{
@@ -289,6 +341,18 @@ class _CommunityPuzzleDetailScreenState
               icon: const Icon(Icons.flag_outlined),
               label: const Text('신고'),
             ),
+            if (isAuthor) ...[
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.red.shade700,
+                  side: BorderSide(color: Colors.red.shade300),
+                ),
+                onPressed: _isBusy ? null : _deletePuzzle,
+                icon: const Icon(Icons.delete_outline),
+                label: const Text('게시판에서 삭제'),
+              ),
+            ],
           ],
         ),
       ),

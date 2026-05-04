@@ -63,6 +63,8 @@ class EnginePositionState {
 class StockfishFFI {
   static DynamicLibrary? _lib;
   static bool _initialized = false;
+  static const bool _verboseLifecycleLog = false;
+  static const bool _verboseSearchLog = true;
   static const int _defaultHashMb = 64;
   static const int _maxDefaultThreads = 4;
   static final RegExp _uciMovePattern =
@@ -73,7 +75,35 @@ class StockfishFFI {
   static String _activeVariant = RuleMode.officialKja.engineVariantName;
 
   static void _log(String message) {
+    _logLifecycle(message);
+  }
+
+  static void _logLifecycle(String message) {
+    if (_verboseLifecycleLog) {
+      debugPrint(message);
+    }
+  }
+
+  static void _logSearch(String message) {
+    if (_verboseSearchLog) {
+      debugPrint(message);
+    }
+  }
+
+  static void _logWarning(String message) {
     debugPrint(message);
+  }
+
+  static bool _isNativeUninitializedResponse(String result) {
+    return result.trim().startsWith('error: Engine not initialized');
+  }
+
+  static void _warnIfNativeUninitialized(String operation, String result) {
+    if (_isNativeUninitializedResponse(result)) {
+      _logWarning(
+        'StockfishFFI.$operation: native engine is not initialized while Dart state says initialized=$_initialized',
+      );
+    }
   }
 
   // Lazy load the library
@@ -224,7 +254,9 @@ class StockfishFFI {
       throw StateError('Stockfish not initialized. Call init() first.');
     }
 
-    return _commandUnchecked(cmd);
+    final result = _commandUnchecked(cmd);
+    _warnIfNativeUninitialized('command', result);
+    return result;
   }
 
   static void cleanup() {
@@ -258,10 +290,10 @@ class StockfishFFI {
     _ensureVariant(variant);
     String cmd = 'position ';
     if (fen != null) {
-      debugPrint('StockfishFFI.setPosition: Using FEN: $fen');
+      _logLifecycle('StockfishFFI.setPosition: Using FEN: $fen');
       cmd += 'fen $fen';
     } else {
-      debugPrint('StockfishFFI.setPosition: Using default startpos FEN');
+      _logLifecycle('StockfishFFI.setPosition: Using default startpos FEN');
       // Janggi FEN - standard mapping (rank + 1)
       // FEN reads from rank 10 (top) to rank 1 (bottom)
       // Direct mapping: Stockfish rank = Flutter rank + 1
@@ -306,18 +338,18 @@ class StockfishFFI {
       cmd += ' movetime $movetime';
     }
 
-    debugPrint('StockfishFFI.getBestMove: Sending command: $cmd');
+    _logSearch('StockfishFFI.getBestMove: Sending command: $cmd');
     final response = command(cmd);
-    debugPrint('StockfishFFI.getBestMove: Full response:\n$response');
+    _logLifecycle('StockfishFFI.getBestMove: Full response:\n$response');
     final selectedMove = _selectBestMoveFromEngineResponse(
       response,
       allowPass: allowPass,
     );
 
     if (selectedMove == null) {
-      debugPrint('StockfishFFI.getBestMove: No bestmove found in response!');
+      _logSearch('StockfishFFI.getBestMove: No bestmove found in response!');
     } else {
-      debugPrint(
+      _logSearch(
           'StockfishFFI.getBestMove: Using validated move $selectedMove');
     }
     return selectedMove;
@@ -441,6 +473,7 @@ class StockfishFFI {
     final result = resultP.cast<Utf8>().toDartString();
     malloc.free(variantP);
     malloc.free(fenP);
+    _warnIfNativeUninitialized('analyze', result);
 
     // debugPrint('StockfishFFI.analyze: Result: "$result"');
 
@@ -498,6 +531,7 @@ class StockfishFFI {
         movesP.cast<Char>(),
       );
       final result = resultP.cast<Utf8>().toDartString();
+      _warnIfNativeUninitialized('getPositionState', result);
       if (result.startsWith('error:')) {
         debugPrint('StockfishFFI.getPositionState: $result');
         return null;
@@ -530,18 +564,21 @@ class StockfishFFI {
     int? threads,
     int? hashMb,
   }) {
-    return compute<Map<String, dynamic>, String?>(
-      _getBestMoveInIsolate,
-      _buildIsolateRequest(
-        variant: variant,
-        threads: threads,
-        hashMb: hashMb,
-        extra: <String, dynamic>{
-          'fen': fen,
-          'depth': depth,
-          'movetime': movetime,
-          'allowPass': allowPass,
-        },
+    return _measureSearchFuture(
+      'getBestMoveIsolated',
+      () => compute<Map<String, dynamic>, String?>(
+        _getBestMoveInIsolate,
+        _buildIsolateRequest(
+          variant: variant,
+          threads: threads,
+          hashMb: hashMb,
+          extra: <String, dynamic>{
+            'fen': fen,
+            'depth': depth,
+            'movetime': movetime,
+            'allowPass': allowPass,
+          },
+        ),
       ),
     );
   }
@@ -555,18 +592,21 @@ class StockfishFFI {
     int? threads,
     int? hashMb,
   }) {
-    return compute<Map<String, dynamic>, String?>(
-      _getBestMoveFromHistoryInIsolate,
-      _buildIsolateRequest(
-        variant: variant,
-        threads: threads,
-        hashMb: hashMb,
-        extra: <String, dynamic>{
-          'rootFen': rootFen,
-          'moves': moves,
-          'depth': depth,
-          'movetime': movetime,
-        },
+    return _measureSearchFuture(
+      'getBestMoveFromHistoryIsolated',
+      () => compute<Map<String, dynamic>, String?>(
+        _getBestMoveFromHistoryInIsolate,
+        _buildIsolateRequest(
+          variant: variant,
+          threads: threads,
+          hashMb: hashMb,
+          extra: <String, dynamic>{
+            'rootFen': rootFen,
+            'moves': moves,
+            'depth': depth,
+            'movetime': movetime,
+          },
+        ),
       ),
     );
   }
@@ -579,16 +619,19 @@ class StockfishFFI {
     int? threads,
     int? hashMb,
   }) {
-    return compute<Map<String, dynamic>, Map<String, dynamic>?>(
-      _analyzeInIsolate,
-      _buildIsolateRequest(
-        variant: variant,
-        threads: threads,
-        hashMb: hashMb,
-        extra: <String, dynamic>{
-          'fen': fen,
-          'depth': depth,
-        },
+    return _measureSearchFuture(
+      'analyzeIsolated',
+      () => compute<Map<String, dynamic>, Map<String, dynamic>?>(
+        _analyzeInIsolate,
+        _buildIsolateRequest(
+          variant: variant,
+          threads: threads,
+          hashMb: hashMb,
+          extra: <String, dynamic>{
+            'fen': fen,
+            'depth': depth,
+          },
+        ),
       ),
     );
   }
@@ -621,6 +664,20 @@ class StockfishFFI {
       'hashMb': hashMb,
       ...extra,
     };
+  }
+
+  static Future<T> _measureSearchFuture<T>(
+    String label,
+    Future<T> Function() action,
+  ) async {
+    final stopwatch = Stopwatch()..start();
+    try {
+      return await action();
+    } finally {
+      stopwatch.stop();
+      _logSearch(
+          'StockfishFFI.$label: total=${stopwatch.elapsedMilliseconds}ms');
+    }
   }
 }
 
@@ -687,11 +744,30 @@ T _runWithInitializedEngine<T>(
   final threads = request['threads'] as int?;
   final hashMb = request['hashMb'] as int?;
   final variant = _requestVariant(request);
+  final totalWatch = Stopwatch()..start();
+  final initWatch = Stopwatch();
+  final bodyWatch = Stopwatch();
+  final cleanupWatch = Stopwatch();
 
   try {
+    initWatch.start();
     StockfishFFI.init(threads: threads, hashMb: hashMb, variant: variant);
+    initWatch.stop();
+    bodyWatch.start();
     return body();
   } finally {
+    if (initWatch.isRunning) {
+      initWatch.stop();
+    }
+    if (bodyWatch.isRunning) {
+      bodyWatch.stop();
+    }
+    cleanupWatch.start();
     StockfishFFI.cleanup();
+    cleanupWatch.stop();
+    totalWatch.stop();
+    StockfishFFI._logSearch(
+      'StockfishFFI.isolateEngine: variant=$variant init=${initWatch.elapsedMilliseconds}ms body=${bodyWatch.elapsedMilliseconds}ms cleanup=${cleanupWatch.elapsedMilliseconds}ms total=${totalWatch.elapsedMilliseconds}ms',
+    );
   }
 }
