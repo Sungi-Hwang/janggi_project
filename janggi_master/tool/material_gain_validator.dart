@@ -14,19 +14,27 @@ Future<void> main(List<String> args) async {
     document['puzzles'] as List<dynamic>? ?? const <dynamic>[],
   );
 
-  final engine = _UciEngineClient(options.enginePath);
+  var engine = _UciEngineClient(options.enginePath);
   try {
     await engine.initialize();
     final details = <Map<String, dynamic>>[];
     final strictPuzzles = <Map<String, dynamic>>[];
 
     for (final puzzle in puzzles.take(options.limit ?? puzzles.length)) {
-      final result = await _validatePuzzle(
-        puzzle,
-        engine,
-        options.depth,
-        options.uniqueFirstMoveMarginCp,
-      );
+      Map<String, dynamic> result;
+      try {
+        result = await _validatePuzzle(
+          puzzle,
+          engine,
+          options.depth,
+          options.uniqueFirstMoveMarginCp,
+        );
+      } catch (error) {
+        result = _engineErrorResult(puzzle, error);
+        await engine.dispose();
+        engine = _UciEngineClient(options.enginePath);
+        await engine.initialize();
+      }
       details.add(result);
       if (result['strictPass'] == true) {
         strictPuzzles.add(Map<String, dynamic>.from(result['puzzle'] as Map));
@@ -56,6 +64,20 @@ Future<void> main(List<String> args) async {
   } finally {
     await engine.dispose();
   }
+}
+
+Map<String, dynamic> _engineErrorResult(
+  Map<String, dynamic> puzzle,
+  Object error,
+) {
+  return <String, dynamic>{
+    'id': puzzle['id'],
+    'title': puzzle['title'],
+    'strictPass': false,
+    'failReasons': <String>['engine_error'],
+    'engineError': error.toString(),
+    'puzzle': puzzle,
+  };
 }
 
 class _Options {

@@ -1,16 +1,19 @@
 {
   "version": "1.0-community-seed-preview",
-  "generated": "2026-04-28T14:41:46.815368",
+  "generated": "2026-04-28T15:26:13.001948",
   "total": 20,
   "categories": {
     "mate1": {
-      "count": 12
+      "count": 8
     },
     "mate2": {
-      "count": 6
+      "count": 3
     },
     "mate3": {
-      "count": 2
+      "count": 1
+    },
+    "material_gain": {
+      "count": 8
     }
   },
   "puzzles": [
@@ -36,7 +39,6 @@
         "sameMateCandidates": [
           "a1a8"
         ],
-        "branchUnique": true,
         "linePerfect": true,
         "finalMateResolved": true,
         "depth": 8
@@ -64,7 +66,33 @@
         "sameMateCandidates": [
           "c8c2"
         ],
-        "branchUnique": true,
+        "linePerfect": true,
+        "finalMateResolved": true,
+        "depth": 8
+      }
+    },
+    {
+      "id": "m1_05",
+      "difficulty": 1,
+      "mateIn": 1,
+      "title": "1수 외통 #4",
+      "fen": "C4a3/1R1ak4/3ccb3/6pp1/3p1p3/9/B4NPP1/5B3/2nA5/4KA2r b - - 0 1",
+      "solution": [
+        "d6e6"
+      ],
+      "toMove": "red",
+      "source": "Game 36, Move 57",
+      "validation": {
+        "strictPass": true,
+        "relaxedPass": true,
+        "forcedMateStart": true,
+        "exactMateLengthStart": true,
+        "solutionLengthMatches": true,
+        "firstMoveMatches": true,
+        "uniqueFirstMove": true,
+        "sameMateCandidates": [
+          "d6e6"
+        ],
         "linePerfect": true,
         "finalMateResolved": true,
         "depth": 8
@@ -92,7 +120,6 @@
         "sameMateCandidates": [
           "d4c6"
         ],
-        "branchUnique": true,
         "linePerfect": true,
         "finalMateResolved": true,
         "depth": 8
@@ -120,7 +147,6 @@
         "sameMateCandidates": [
           "h2h10"
         ],
-        "branchUnique": true,
         "linePerfect": true,
         "finalMateResolved": true,
         "depth": 8
@@ -148,7 +174,6 @@
         "sameMateCandidates": [
           "a1d1"
         ],
-        "branchUnique": true,
         "linePerfect": true,
         "finalMateResolved": true,
         "depth": 8
@@ -176,7 +201,6 @@
         "sameMateCandidates": [
           "e7c8"
         ],
-        "branchUnique": true,
         "linePerfect": true,
         "finalMateResolved": true,
         "depth": 8
@@ -204,79 +228,24 @@
         "sameMateCandidates": [
           "h8h2"
         ],
-        "branchUnique": true,
         "linePerfect": true,
         "finalMateResolved": true,
         "depth": 8
       }
     },
     {
-      "id": "m1_16",
-      "difficulty": 1,
-      "mateIn": 1,
-      "title": "1수 외통 #14",
-      "fen": "9/3ka4/2Na5/p4npp1/2p6/6PP1/c1Pp5/2N1C4/1R2KA3/3A2B2 w - - 0 1",
+      "id": "m2_01",
+      "difficulty": 2,
+      "mateIn": 2,
+      "title": "2수 외통 #1",
+      "fen": "3aka1nR/6R2/2n1c4/3pb4/2r2p3/P8/2b1Bc2P/2N1CCr2/4AK3/3A3N1 b - - 0 1",
       "solution": [
-        "b2b9"
-      ],
-      "toMove": "blue",
-      "source": "Game 99, Move 66",
-      "validation": {
-        "strictPass": true,
-        "relaxedPass": true,
-        "forcedMateStart": true,
-        "exactMateLengthStart": true,
-        "solutionLengthMatches": true,
-        "firstMoveMatches": true,
-        "uniqueFirstMove": true,
-        "sameMateCandidates": [
-          "b2b9"
-        ],
-        "branchUnique": true,
-        "linePerfect": true,
-        "finalMateResolved": true,
-        "depth": 8
-      }
-    },
-    {
-      "id": "m1_17",
-      "difficulty": 1,
-      "mateIn": 1,
-      "title": "1수 외통 #15",
-      "fen": "C1bak4/3Rac3/3N5/5p3/1p4p2/4P4/4P1P2/4N4/4K4/2C5r w - - 0 1",
-      "solution": [
-        "d9d10"
-      ],
-      "toMove": "blue",
-      "source": "Game 1, Move 94",
-      "validation": {
-        "strictPass": true,
-        "relaxedPass": true,
-        "forcedMateStart": true,
-        "exactMateLengthStart": true,
-        "solutionLengthMatches": true,
-        "firstMoveMatches": true,
-        "uniqueFirstMove": true,
-        "sameMateCandidates": [
-          "d9d10"
-        ],
-        "branchUnique": true,
-        "linePerfect": true,
-        "finalMateResolved": true,
-        "depth": 8
-      }
-    },
-    {
-      "id": "m1_18",
-      "difficulty": 1,
-      "mateIn": 1,
-      "title": "1수 외통 #16",
-      "fen": "r3c4/9/4kCn2/b4R3/7p1/3n5/1P5P1/3K1B3/3A1Ar2/3N5 b - - 0 1",
-      "solution": [
-        "d5b4"
+        "g3f3",
+        "f2f3",
+        "f4f7"
       ],
       "toMove": "red",
-      "source": "Game 9, Move 79",
+      "source": "Game 1, Move 43",
       "validation": {
         "strictPass": true,
         "relaxedPass": true,
@@ -286,25 +255,26 @@
         "firstMoveMatches": true,
         "uniqueFirstMove": true,
         "sameMateCandidates": [
-          "d5b4"
+          "g3f3"
         ],
-        "branchUnique": true,
         "linePerfect": true,
         "finalMateResolved": true,
         "depth": 8
       }
     },
     {
-      "id": "m1_19",
-      "difficulty": 1,
-      "mateIn": 1,
-      "title": "1수 외통 #17",
-      "fen": "5a3/4ka2R/4cb3/9/1pp3p2/7NB/P1n1PP3/3C3B1/c8/4CK3 b - - 0 1",
+      "id": "m2_02",
+      "difficulty": 2,
+      "mateIn": 2,
+      "title": "2수 외통 #2",
+      "fen": "3ck4/4a2R1/3bca3/3pp1CN1/8r/2P6/2b3PP1/3B1K3/3AA3C/rn6R b - - 0 1",
       "solution": [
-        "c4d2"
+        "i6i3",
+        "g7g3",
+        "i3g3"
       ],
       "toMove": "red",
-      "source": "Game 11, Move 79",
+      "source": "Game 23, Move 75",
       "validation": {
         "strictPass": true,
         "relaxedPass": true,
@@ -314,37 +284,8 @@
         "firstMoveMatches": true,
         "uniqueFirstMove": true,
         "sameMateCandidates": [
-          "c4d2"
+          "i6i3"
         ],
-        "branchUnique": true,
-        "linePerfect": true,
-        "finalMateResolved": true,
-        "depth": 8
-      }
-    },
-    {
-      "id": "m1_20",
-      "difficulty": 1,
-      "mateIn": 1,
-      "title": "1수 외통 #18",
-      "fen": "5k3/4aa3/5c3/4c4/9/5p3/4p3R/9/4A4/4K4 w - - 0 1",
-      "solution": [
-        "i4i10"
-      ],
-      "toMove": "blue",
-      "source": "Game 17, Move 142",
-      "validation": {
-        "strictPass": true,
-        "relaxedPass": true,
-        "forcedMateStart": true,
-        "exactMateLengthStart": true,
-        "solutionLengthMatches": true,
-        "firstMoveMatches": true,
-        "uniqueFirstMove": true,
-        "sameMateCandidates": [
-          "i4i10"
-        ],
-        "branchUnique": true,
         "linePerfect": true,
         "finalMateResolved": true,
         "depth": 8
@@ -374,157 +315,6 @@
         "sameMateCandidates": [
           "g8g9"
         ],
-        "branchUnique": true,
-        "linePerfect": true,
-        "finalMateResolved": true,
-        "depth": 8
-      }
-    },
-    {
-      "id": "m2_05",
-      "difficulty": 2,
-      "mateIn": 2,
-      "title": "2수 외통 #5",
-      "fen": "5a3/4ka1R1/4ccr2/p4r1p1/2pP5/9/4B3P/2R2A3/4A4/5K3 b - - 0 1",
-      "solution": [
-        "f7f3",
-        "f1e1",
-        "g8g1"
-      ],
-      "toMove": "red",
-      "source": "Game 89, Move 65",
-      "validation": {
-        "strictPass": true,
-        "relaxedPass": true,
-        "forcedMateStart": true,
-        "exactMateLengthStart": true,
-        "solutionLengthMatches": true,
-        "firstMoveMatches": true,
-        "uniqueFirstMove": true,
-        "sameMateCandidates": [
-          "f7f3"
-        ],
-        "branchUnique": true,
-        "linePerfect": true,
-        "finalMateResolved": true,
-        "depth": 8
-      }
-    },
-    {
-      "id": "m2_07",
-      "difficulty": 2,
-      "mateIn": 2,
-      "title": "2수 외통 #7",
-      "fen": "9/3ka1R2/4C4/2B6/2r6/6R2/P3p2P1/9/4A4/c3KA3 w - - 0 1",
-      "solution": [
-        "g5d5",
-        "c6d6",
-        "d5d6"
-      ],
-      "toMove": "blue",
-      "source": "Game 58, Move 110",
-      "validation": {
-        "strictPass": true,
-        "relaxedPass": true,
-        "forcedMateStart": true,
-        "exactMateLengthStart": true,
-        "solutionLengthMatches": true,
-        "firstMoveMatches": true,
-        "uniqueFirstMove": true,
-        "sameMateCandidates": [
-          "g5d5"
-        ],
-        "branchUnique": true,
-        "linePerfect": true,
-        "finalMateResolved": true,
-        "depth": 8
-      }
-    },
-    {
-      "id": "m2_08",
-      "difficulty": 2,
-      "mateIn": 2,
-      "title": "2수 외통 #8",
-      "fen": "2rk1a3/4n3r/4B4/6pp1/9/p2b5/1R1n2P1P/9/3C5/4CK3 b - - 0 1",
-      "solution": [
-        "i9f9",
-        "g4f4",
-        "f9f4"
-      ],
-      "toMove": "red",
-      "source": "Game 61, Move 93",
-      "validation": {
-        "strictPass": true,
-        "relaxedPass": true,
-        "forcedMateStart": true,
-        "exactMateLengthStart": true,
-        "solutionLengthMatches": true,
-        "firstMoveMatches": true,
-        "uniqueFirstMove": true,
-        "sameMateCandidates": [
-          "i9f9"
-        ],
-        "branchUnique": true,
-        "linePerfect": true,
-        "finalMateResolved": true,
-        "depth": 8
-      }
-    },
-    {
-      "id": "m2_09",
-      "difficulty": 2,
-      "mateIn": 2,
-      "title": "2수 외통 #9",
-      "fen": "5k1r1/2C1a3R/4ca3/2B6/5p1p1/9/3PB1P2/3A5/4A4/4KC3 w - - 0 1",
-      "solution": [
-        "f1f7",
-        "e9f9",
-        "i9f9"
-      ],
-      "toMove": "blue",
-      "source": "Game 64, Move 106",
-      "validation": {
-        "strictPass": true,
-        "relaxedPass": true,
-        "forcedMateStart": true,
-        "exactMateLengthStart": true,
-        "solutionLengthMatches": true,
-        "firstMoveMatches": true,
-        "uniqueFirstMove": true,
-        "sameMateCandidates": [
-          "f1f7"
-        ],
-        "branchUnique": true,
-        "linePerfect": true,
-        "finalMateResolved": true,
-        "depth": 8
-      }
-    },
-    {
-      "id": "m2_13",
-      "difficulty": 2,
-      "mateIn": 2,
-      "title": "2수 외통 #11",
-      "fen": "1C1ab4/3a3rC/3k1cR2/N2ppn1p1/4c4/2B2p3/8R/2N6/4AA3/3K5 w - - 0 1",
-      "solution": [
-        "g8f8",
-        "e6e8",
-        "a7b9"
-      ],
-      "toMove": "blue",
-      "source": "Game 1, Move 82",
-      "validation": {
-        "strictPass": true,
-        "relaxedPass": true,
-        "forcedMateStart": true,
-        "exactMateLengthStart": true,
-        "solutionLengthMatches": true,
-        "firstMoveMatches": true,
-        "uniqueFirstMove": true,
-        "sameMateCandidates": [
-          "g8f8"
-        ],
-        "branchUnique": true,
         "linePerfect": true,
         "finalMateResolved": true,
         "depth": 8
@@ -556,42 +346,282 @@
         "sameMateCandidates": [
           "b4b1"
         ],
-        "branchUnique": true,
         "linePerfect": true,
         "finalMateResolved": true,
         "depth": 8
       }
     },
     {
-      "id": "m3_22",
-      "difficulty": 3,
-      "mateIn": 3,
-      "title": "3수 외통 #13",
-      "fen": "4k4/4a1P2/5a3/1pp3RB1/9/3r5/2b6/4A4/1b1cK4/9 b - - 0 1",
+      "id": "manual_gib__manual_gib_12__mg063_2",
+      "difficulty": 2,
+      "mateIn": 2,
+      "title": "포 획득 후보 #63",
+      "fen": "R2ack3/9/5a3/4bpp2/2pp1r3/1P4N2/3P2PP1/1C2CN3/4KAr2/5A3 w - - 0 1",
       "solution": [
-        "d2a2",
-        "e2f3",
-        "d5f5",
-        "h7f4",
-        "f5f4"
+        "a10d10",
+        "f10f9",
+        "d10e10"
+      ],
+      "toMove": "blue",
+      "source": "친선",
+      "sourceId": "manual:기보.gib",
+      "sourceType": "manual_drop",
+      "sourceUrl": null,
+      "gameId": "manual:기보.gib#12",
+      "date": "미상",
+      "moveIndex": 62,
+      "objectiveType": "material_gain",
+      "objective": {
+        "targetPieceTypes": [
+          "cannon"
+        ],
+        "maxPlayerMoves": 2,
+        "minNetMaterialGainCp": 300,
+        "minFinalEvalCp": 250,
+        "minEvalGainCp": 150,
+        "verifiedNetMaterialGainCp": 700,
+        "verifiedFinalEvalCp": 738,
+        "verifiedEvalGainCp": 507,
+        "engineDepth": 8
+      }
+    },
+    {
+      "id": "manual_gib__manual_gib_22__mg062_2",
+      "difficulty": 2,
+      "mateIn": 2,
+      "title": "차 획득 후보 #62",
+      "fen": "2r1ka3/4a2c1/4c4/p1ppn4/9/6Rbn/PP7/3CCN3/3A1A3/1B3K3 b - - 0 1",
+      "solution": [
+        "i5h7",
+        "f2e2",
+        "h7g5"
       ],
       "toMove": "red",
-      "source": "Game 86, Move 133",
-      "validation": {
-        "strictPass": true,
-        "relaxedPass": true,
-        "forcedMateStart": true,
-        "exactMateLengthStart": true,
-        "solutionLengthMatches": true,
-        "firstMoveMatches": true,
-        "uniqueFirstMove": true,
-        "sameMateCandidates": [
-          "d2a2"
+      "source": "친선",
+      "sourceId": "manual:기보.gib",
+      "sourceType": "manual_drop",
+      "sourceUrl": null,
+      "gameId": "manual:기보.gib#22",
+      "date": "미상",
+      "moveIndex": 61,
+      "objectiveType": "material_gain",
+      "objective": {
+        "targetPieceTypes": [
+          "chariot"
         ],
-        "branchUnique": true,
-        "linePerfect": true,
-        "finalMateResolved": true,
-        "depth": 8
+        "maxPlayerMoves": 2,
+        "minNetMaterialGainCp": 450,
+        "minFinalEvalCp": 250,
+        "minEvalGainCp": 150,
+        "verifiedNetMaterialGainCp": 900,
+        "verifiedFinalEvalCp": 1153,
+        "verifiedEvalGainCp": 339,
+        "engineDepth": 8
+      }
+    },
+    {
+      "id": "manual_gib__manual_gib_36__mg054_2",
+      "difficulty": 2,
+      "mateIn": 2,
+      "title": "포 획득 후보 #54",
+      "fen": "5a1C1/1R1ak4/3ccn3/6pp1/3p1p3/3n5/B4BPP1/4CN3/4A4/4KA2r b - - 0 1",
+      "solution": [
+        "d5e3",
+        "h10a10",
+        "e3c2"
+      ],
+      "toMove": "red",
+      "source": "친선",
+      "sourceId": "manual:기보.gib",
+      "sourceType": "manual_drop",
+      "sourceUrl": null,
+      "gameId": "manual:기보.gib#36",
+      "date": "미상",
+      "moveIndex": 53,
+      "objectiveType": "material_gain",
+      "objective": {
+        "targetPieceTypes": [
+          "cannon"
+        ],
+        "maxPlayerMoves": 2,
+        "minNetMaterialGainCp": 300,
+        "minFinalEvalCp": 250,
+        "minEvalGainCp": 150,
+        "verifiedNetMaterialGainCp": 500,
+        "verifiedFinalEvalCp": 100000,
+        "verifiedEvalGainCp": 98589,
+        "engineDepth": 8
+      }
+    },
+    {
+      "id": "manual_gib__manual_gib_50__mg060_2",
+      "difficulty": 2,
+      "mateIn": 2,
+      "title": "포/차 획득 후보 #60",
+      "fen": "3a1a3/4k4/2n2n3/rpp1bb1R1/4p4/9/c2P2r1P/4C4/2RA5/3CKAN2 b - - 0 1",
+      "solution": [
+        "f8h7",
+        "e3e7",
+        "c8e7"
+      ],
+      "toMove": "red",
+      "source": "친선",
+      "sourceId": "manual:기보.gib",
+      "sourceType": "manual_drop",
+      "sourceUrl": null,
+      "gameId": "manual:기보.gib#50",
+      "date": "미상",
+      "moveIndex": 59,
+      "objectiveType": "material_gain",
+      "objective": {
+        "targetPieceTypes": [
+          "cannon",
+          "chariot"
+        ],
+        "maxPlayerMoves": 2,
+        "minNetMaterialGainCp": 450,
+        "minFinalEvalCp": 250,
+        "minEvalGainCp": 150,
+        "verifiedNetMaterialGainCp": 950,
+        "verifiedFinalEvalCp": 1530,
+        "verifiedEvalGainCp": 164,
+        "engineDepth": 8
+      }
+    },
+    {
+      "id": "manual_gib__manual_gib_88__mg056_2",
+      "difficulty": 2,
+      "mateIn": 2,
+      "title": "차 획득 후보 #56",
+      "fen": "2r1kcb2/1R1aR4/3r4n/b4pp1p/c1B6/6N2/3PN1PP1/4C4/4K4/2BA1A3 b - - 0 1",
+      "solution": [
+        "d9e9",
+        "e3e9",
+        "c10c6"
+      ],
+      "toMove": "red",
+      "source": "친선",
+      "sourceId": "manual:기보.gib",
+      "sourceType": "manual_drop",
+      "sourceUrl": null,
+      "gameId": "manual:기보.gib#88",
+      "date": "미상",
+      "moveIndex": 55,
+      "objectiveType": "material_gain",
+      "objective": {
+        "targetPieceTypes": [
+          "chariot"
+        ],
+        "maxPlayerMoves": 2,
+        "minNetMaterialGainCp": 450,
+        "minFinalEvalCp": 250,
+        "minEvalGainCp": 150,
+        "verifiedNetMaterialGainCp": 1150,
+        "verifiedFinalEvalCp": 439,
+        "verifiedEvalGainCp": 635,
+        "engineDepth": 8
+      }
+    },
+    {
+      "id": "manual_10_gib__manual_10_gib_4__mg078_2",
+      "difficulty": 2,
+      "mateIn": 2,
+      "title": "포 획득 후보 #78",
+      "fen": "5k3/4aa3/4c4/R8/1p4pp1/4C4/2P1P2P1/9/3N5/2rC1K3 b - - 0 1",
+      "solution": [
+        "c1d1",
+        "f1f2",
+        "d1d2"
+      ],
+      "toMove": "red",
+      "source": "친선",
+      "sourceId": "manual:기보10.gib",
+      "sourceType": "manual_drop",
+      "sourceUrl": null,
+      "gameId": "manual:기보10.gib#4",
+      "date": "미상",
+      "moveIndex": 77,
+      "objectiveType": "material_gain",
+      "objective": {
+        "targetPieceTypes": [
+          "cannon"
+        ],
+        "maxPlayerMoves": 2,
+        "minNetMaterialGainCp": 300,
+        "minFinalEvalCp": 250,
+        "minEvalGainCp": 150,
+        "verifiedNetMaterialGainCp": 950,
+        "verifiedFinalEvalCp": 538,
+        "verifiedEvalGainCp": 439,
+        "engineDepth": 8
+      }
+    },
+    {
+      "id": "manual_10_gib__manual_10_gib_49__mg085_2",
+      "difficulty": 2,
+      "mateIn": 2,
+      "title": "차 획득 후보 #85",
+      "fen": "r5n2/5k3/4Ncn2/pB6b/3r5/9/1PP6/3A5/3KAN3/R3C4 w - - 0 1",
+      "solution": [
+        "e8d6",
+        "a10c10",
+        "a1a7"
+      ],
+      "toMove": "blue",
+      "source": "친선",
+      "sourceId": "manual:기보10.gib",
+      "sourceType": "manual_drop",
+      "sourceUrl": null,
+      "gameId": "manual:기보10.gib#49",
+      "date": "미상",
+      "moveIndex": 84,
+      "objectiveType": "material_gain",
+      "objective": {
+        "targetPieceTypes": [
+          "chariot"
+        ],
+        "maxPlayerMoves": 2,
+        "minNetMaterialGainCp": 450,
+        "minFinalEvalCp": 250,
+        "minEvalGainCp": 150,
+        "verifiedNetMaterialGainCp": 1000,
+        "verifiedFinalEvalCp": 1065,
+        "verifiedEvalGainCp": 489,
+        "engineDepth": 8
+      }
+    },
+    {
+      "id": "manual_10_gib__manual_10_gib_58__mg109_2",
+      "difficulty": 2,
+      "mateIn": 2,
+      "title": "차 획득 후보 #109",
+      "fen": "9/3ka1R2/4r4/2B6/3r5/6R2/P3p2P1/4C4/4A4/c3KA3 w - - 0 1",
+      "solution": [
+        "e3e8",
+        "d6c6",
+        "g5d5"
+      ],
+      "toMove": "blue",
+      "source": "친선",
+      "sourceId": "manual:기보10.gib",
+      "sourceType": "manual_drop",
+      "sourceUrl": null,
+      "gameId": "manual:기보10.gib#58",
+      "date": "미상",
+      "moveIndex": 108,
+      "objectiveType": "material_gain",
+      "objective": {
+        "targetPieceTypes": [
+          "chariot"
+        ],
+        "maxPlayerMoves": 2,
+        "minNetMaterialGainCp": 450,
+        "minFinalEvalCp": 250,
+        "minEvalGainCp": 150,
+        "verifiedNetMaterialGainCp": 900,
+        "verifiedFinalEvalCp": 100000,
+        "verifiedEvalGainCp": 98700,
+        "engineDepth": 8
       }
     }
   ]

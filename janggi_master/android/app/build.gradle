@@ -11,6 +11,38 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
+def googleSampleAdMobPublisherId = "ca-app-pub-3940256099942544"
+def googleSampleAdMobAppId = "${googleSampleAdMobPublisherId}~3347511713"
+def productionAdMobAppId = "ca-app-pub-5593224479644015~7853283941"
+def productionAndroidBannerAdUnitId = "ca-app-pub-5593224479644015/3813684745"
+def productionAndroidInterstitialAdUnitId = "ca-app-pub-5593224479644015/6990601711"
+
+def dartDefines = [:]
+if (project.hasProperty("dart-defines")) {
+    project.property("dart-defines").split(",").each { encodedDefine ->
+        if (!encodedDefine.trim().isEmpty()) {
+            def decodedDefine = new String(encodedDefine.decodeBase64(), "UTF-8")
+            def parts = decodedDefine.split("=", 2)
+            if (parts.length == 2) {
+                dartDefines[parts[0]] = parts[1]
+            }
+        }
+    }
+}
+
+def configuredAdMobAppId = (
+    project.findProperty("ADMOB_APP_ID")
+        ?: System.getenv("ADMOB_APP_ID")
+        ?: dartDefines["ADMOB_APP_ID"]
+        ?: productionAdMobAppId
+).toString().trim()
+
+def effectiveAdMobAppId = configuredAdMobAppId ?: productionAdMobAppId
+
+def isGoogleSampleAdId = { value ->
+    value != null && value.toString().contains(googleSampleAdMobPublisherId)
+}
+
 android {
     namespace = "com.nightsynclabs.janggihansu"
     compileSdk = flutter.compileSdkVersion
@@ -35,7 +67,7 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         manifestPlaceholders += [
-            admobAppId: project.findProperty("ADMOB_APP_ID") ?: "ca-app-pub-3940256099942544~3347511713"
+            admobAppId: effectiveAdMobAppId
         ]
 
         externalNativeBuild {
@@ -78,4 +110,46 @@ android {
 
 flutter {
     source = "../.."
+}
+
+gradle.taskGraph.whenReady { taskGraph ->
+    def isReleaseBuild = taskGraph.allTasks.any { task ->
+        task.name.toLowerCase().contains("release")
+    }
+    if (!isReleaseBuild) {
+        return
+    }
+
+    def missing = []
+    if (configuredAdMobAppId.isEmpty() || isGoogleSampleAdId(configuredAdMobAppId)) {
+        missing << "ADMOB_APP_ID"
+    }
+
+    [
+        "SUPABASE_URL",
+        "SUPABASE_ANON_KEY",
+        "GOOGLE_WEB_CLIENT_ID",
+    ].each { key ->
+        def value = (dartDefines[key] ?: "").toString().trim()
+        if (value.isEmpty()) {
+            missing << key
+        }
+    }
+
+    [
+        "ADMOB_ANDROID_BANNER_ID": productionAndroidBannerAdUnitId,
+        "ADMOB_ANDROID_INTERSTITIAL_ID": productionAndroidInterstitialAdUnitId,
+    ].each { key, productionDefault ->
+        def value = (dartDefines[key] ?: productionDefault).toString().trim()
+        if (value.isEmpty() || isGoogleSampleAdId(value)) {
+            missing << key
+        }
+    }
+
+    if (!missing.isEmpty()) {
+        throw new GradleException(
+            "Release builds require production config values: ${missing.join(', ')}. " +
+            "Pass them with --dart-define."
+        )
+    }
 }
