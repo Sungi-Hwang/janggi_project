@@ -134,16 +134,18 @@ class SettingsScreen extends StatelessWidget {
               ),
               const Divider(height: 1),
               _buildSection(
-                title: '광고',
+                title: '구독과 광고',
                 children: [
                   ListTile(
                     title: Text(
-                      monetization.isAdFree ? '광고 제거 활성화됨' : '광고 포함 버전',
+                      monetization.hasUnlimitedDailyPuzzles
+                          ? '일일 묘수풀이 플러스 활성화됨'
+                          : '무료 버전',
                     ),
                     subtitle: Text(
-                      monetization.isAdFree
-                          ? '배너와 전면 광고가 더 이상 표시되지 않습니다.'
-                          : '핵심 기능은 모두 무료이며, 원하면 광고만 제거할 수 있습니다.',
+                      monetization.hasUnlimitedDailyPuzzles
+                          ? '일일 묘수풀이 무제한과 모든 광고 제거가 적용됩니다.'
+                          : '일일 묘수풀이는 하루 3회까지 무료이며, 이후 광고 후 계속 풀 수 있습니다.',
                     ),
                     trailing: monetization.purchasePending
                         ? const SizedBox(
@@ -153,17 +155,17 @@ class SettingsScreen extends StatelessWidget {
                           )
                         : null,
                   ),
-                  if (!monetization.isAdFree)
+                  if (!monetization.hasUnlimitedDailyPuzzles)
                     ListTile(
                       title: Text(
-                        '광고 제거 (${_priceOrFallback(monetization.removeAdsProduct, '불러오는 중...')})',
+                        '일일 묘수풀이 플러스 (${_priceOrFallback(monetization.dailyPuzzlePlusProduct, '월 990원')})',
                       ),
-                      subtitle: const Text('배너와 전면 광고 제거'),
+                      subtitle: const Text('일일 묘수풀이 무제한 · 모든 광고 제거'),
                       trailing: FilledButton(
                         onPressed: monetization.purchasePending
                             ? null
-                            : monetization.buyRemoveAds,
-                        child: const Text('구매'),
+                            : monetization.buyDailyPuzzlePlus,
+                        child: const Text('구독'),
                       ),
                     ),
                   Padding(
@@ -174,7 +176,7 @@ class SettingsScreen extends StatelessWidget {
                         onPressed: monetization.purchasePending
                             ? null
                             : monetization.restorePurchases,
-                        child: const Text('구매 복원'),
+                        child: const Text('구독 복원'),
                       ),
                     ),
                   ),

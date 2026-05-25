@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'community/community_config.dart';
 import 'monetization/monetization_config.dart';
 import 'models/piece.dart' show PieceColor;
+import 'models/rule_mode.dart';
 import 'providers/community_auth_provider.dart';
 import 'providers/monetization_provider.dart';
 import 'providers/settings_provider.dart';
@@ -12,8 +13,10 @@ import 'screens/community_puzzle_list_screen.dart';
 import 'screens/custom_puzzle_editor_screen.dart';
 import 'screens/game_screen.dart' show GameMode, GameScreen;
 import 'screens/puzzle_list_screen.dart';
+import 'screens/random_puzzle_screen.dart';
 import 'screens/settings_screen.dart';
 import 'services/monetization_service.dart';
+import 'services/random_puzzle_service.dart';
 import 'services/settings_service.dart';
 import 'services/sound_manager.dart';
 import 'theme/janggi_skin.dart';
@@ -42,6 +45,7 @@ Future<void> main() async {
 
   SoundManager().setSoundEnabled(settingsService.soundEnabled);
   SoundManager().setVolume(settingsService.soundVolume);
+  RandomPuzzleService.warmUp();
 
   runApp(
     MultiProvider(
@@ -149,18 +153,11 @@ class MainMenu extends StatelessWidget {
                           ],
                           neonColor: const Color(0xFF00D9FF),
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => GameScreen(
-                                  gameMode: GameMode.vsAI,
-                                  aiDifficulty: aiDifficulty,
-                                  aiThinkingTimeSec: aiThinkingTime,
-                                  aiColor: PieceColor.red,
-                                  ruleMode: settings.ruleMode,
-                                  showInGameSetup: true,
-                                ),
-                              ),
+                            _showAiGameOptions(
+                              context: context,
+                              aiDifficulty: aiDifficulty,
+                              aiThinkingTime: aiThinkingTime,
+                              ruleMode: settings.ruleMode,
                             );
                           },
                         ),
@@ -190,21 +187,19 @@ class MainMenu extends StatelessWidget {
                         const SizedBox(height: 16),
                         _buildMenuButton(
                           context: context,
-                          label: '이어하기 대국',
-                          icon: Icons.smart_toy,
+                          label: '일일 묘수풀이',
+                          icon: Icons.casino,
                           gradientColors: const [
-                            Color(0xFF0A3B4D),
-                            Color(0xFF051218),
+                            Color(0xFF5C2E00),
+                            Color(0xFF201004),
                           ],
-                          neonColor: const Color(0xFF00E5FF),
+                          neonColor: const Color(0xFFFFC857),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    const CustomPuzzleEditorScreen(
-                                  mode: CustomPuzzleEditorMode.aiContinue,
-                                ),
+                                    const RandomPuzzleScreen(),
                               ),
                             );
                           },
@@ -284,6 +279,69 @@ class MainMenu extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  void _showAiGameOptions({
+    required BuildContext context,
+    required int aiDifficulty,
+    required int aiThinkingTime,
+    required RuleMode ruleMode,
+  }) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: const Color(0xFFF8EFE2),
+      showDragHandle: true,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 18),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.play_arrow),
+                  title: const Text('새 AI 대국'),
+                  subtitle: const Text('처음 배치에서 AI와 대국합니다.'),
+                  onTap: () {
+                    Navigator.pop(sheetContext);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => GameScreen(
+                          gameMode: GameMode.vsAI,
+                          aiDifficulty: aiDifficulty,
+                          aiThinkingTimeSec: aiThinkingTime,
+                          aiColor: PieceColor.red,
+                          ruleMode: ruleMode,
+                          showInGameSetup: true,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                const Divider(height: 8),
+                ListTile(
+                  leading: const Icon(Icons.dashboard_customize),
+                  title: const Text('배치 이어하기'),
+                  subtitle: const Text('원하는 판을 놓고 그 자리에서 AI와 이어둡니다.'),
+                  onTap: () {
+                    Navigator.pop(sheetContext);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CustomPuzzleEditorScreen(
+                          mode: CustomPuzzleEditorMode.aiContinue,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

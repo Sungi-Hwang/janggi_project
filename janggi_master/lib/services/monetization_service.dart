@@ -3,6 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class MonetizationService {
   static const String _keyRemoveAdsPurchased = 'monetization_remove_ads';
   static const String _keyPremiumPurchased = 'monetization_premium_ai';
+  static const String _keyDailyPuzzlePlusSubscribed =
+      'monetization_daily_puzzle_plus_monthly';
   static const String _keyCompletedGamesTotal = 'monetization_completed_games';
   static const String _keyGamesSinceInterstitial =
       'monetization_games_since_interstitial';
@@ -10,6 +12,9 @@ class MonetizationService {
   static const String _keyInterstitialShownToday =
       'monetization_interstitial_count_today';
   static const String _keyInterstitialDay = 'monetization_interstitial_day';
+  static const String _keyDailyPuzzleUseDay = 'monetization_daily_puzzle_day';
+  static const String _keyDailyPuzzleStartedToday =
+      'monetization_daily_puzzle_started_today';
 
   late SharedPreferences _prefs;
   bool _initialized = false;
@@ -23,6 +28,8 @@ class MonetizationService {
   bool get removeAdsPurchased =>
       _prefs.getBool(_keyRemoveAdsPurchased) ?? false;
   bool get premiumPurchased => _prefs.getBool(_keyPremiumPurchased) ?? false;
+  bool get dailyPuzzlePlusSubscribed =>
+      _prefs.getBool(_keyDailyPuzzlePlusSubscribed) ?? false;
   int get completedGamesTotal => _prefs.getInt(_keyCompletedGamesTotal) ?? 0;
   int get gamesSinceInterstitial =>
       _prefs.getInt(_keyGamesSinceInterstitial) ?? 0;
@@ -36,17 +43,32 @@ class MonetizationService {
     return DateTime.fromMillisecondsSinceEpoch(millis);
   }
 
+  int get dailyPuzzleStartedToday =>
+      _prefs.getInt(_keyDailyPuzzleStartedToday) ?? 0;
+
   Future<void> setEntitlements({
     required bool removeAdsPurchased,
     required bool premiumPurchased,
+    required bool dailyPuzzlePlusSubscribed,
   }) async {
     await _prefs.setBool(_keyRemoveAdsPurchased, removeAdsPurchased);
     await _prefs.setBool(_keyPremiumPurchased, premiumPurchased);
+    await _prefs.setBool(
+      _keyDailyPuzzlePlusSubscribed,
+      dailyPuzzlePlusSubscribed,
+    );
   }
 
   Future<void> registerGameCompleted() async {
     await _prefs.setInt(_keyCompletedGamesTotal, completedGamesTotal + 1);
     await _prefs.setInt(_keyGamesSinceInterstitial, gamesSinceInterstitial + 1);
+  }
+
+  Future<int> registerDailyPuzzleStarted(DateTime now) async {
+    await normalizeDailyPuzzleUseCounter(now);
+    final next = dailyPuzzleStartedToday + 1;
+    await _prefs.setInt(_keyDailyPuzzleStartedToday, next);
+    return next;
   }
 
   Future<void> recordInterstitialShown(DateTime now) async {
@@ -68,6 +90,17 @@ class MonetizationService {
 
     await _prefs.setString(_keyInterstitialDay, nowDay);
     await _prefs.setInt(_keyInterstitialShownToday, 0);
+  }
+
+  Future<void> normalizeDailyPuzzleUseCounter(DateTime now) async {
+    final nowDay = _toDayKey(now);
+    final currentDay = _prefs.getString(_keyDailyPuzzleUseDay);
+    if (currentDay == nowDay) {
+      return;
+    }
+
+    await _prefs.setString(_keyDailyPuzzleUseDay, nowDay);
+    await _prefs.setInt(_keyDailyPuzzleStartedToday, 0);
   }
 
   String _toDayKey(DateTime dateTime) {

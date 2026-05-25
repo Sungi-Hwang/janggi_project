@@ -30,6 +30,16 @@ class _CliOptions {
     required this.solveDepth,
     required this.multiPv,
     required this.seed,
+    required this.mode,
+    required this.targetMate,
+    required this.allowedMates,
+    required this.minPieces,
+    required this.targetMate3Percent,
+    required this.scanDuringGameEvery,
+    required this.scanRecentCount,
+    required this.richStarts,
+    required this.checkpoint,
+    required this.tailCandidatesOnly,
   });
 
   final String outputPath;
@@ -42,6 +52,16 @@ class _CliOptions {
   final int solveDepth;
   final int multiPv;
   final int seed;
+  final String mode;
+  final int targetMate;
+  final Set<int> allowedMates;
+  final int minPieces;
+  final int targetMate3Percent;
+  final int scanDuringGameEvery;
+  final int scanRecentCount;
+  final bool richStarts;
+  final bool checkpoint;
+  final bool tailCandidatesOnly;
 
   static _CliOptions parse(List<String> args) {
     final defaultExe = Platform.isWindows
@@ -56,8 +76,19 @@ class _CliOptions {
     var playDepth = 5;
     var probeDepth = 8;
     var solveDepth = 10;
-    var multiPv = 3;
+    var multiPv = 4;
     var seed = 20260321;
+    var mode = 'weak-strong';
+    var targetMate = 3;
+    var allowedMates = <int>{3};
+    var allowedMatesExplicit = false;
+    var minPieces = 10;
+    var targetMate3Percent = 100;
+    var scanDuringGameEvery = 12;
+    var scanRecentCount = 16;
+    var richStarts = true;
+    var checkpoint = true;
+    var tailCandidatesOnly = false;
 
     for (var i = 0; i < args.length; i++) {
       switch (args[i]) {
@@ -91,6 +122,68 @@ class _CliOptions {
         case '--seed':
           seed = int.parse(args[++i]);
           break;
+        case '--mode':
+          mode = args[++i];
+          if (!const {'balanced', 'weak-strong'}.contains(mode)) {
+            stderr.writeln('--mode must be balanced or weak-strong');
+            exit(64);
+          }
+          break;
+        case '--target-mate':
+          targetMate = int.parse(args[++i]);
+          if (targetMate < 1 || targetMate > 3) {
+            stderr.writeln('--target-mate must be 1, 2, or 3');
+            exit(64);
+          }
+          if (!allowedMatesExplicit) {
+            allowedMates = <int>{targetMate};
+          }
+          break;
+        case '--allowed-mates':
+          allowedMatesExplicit = true;
+          allowedMates = args[++i]
+              .split(',')
+              .map((value) => int.tryParse(value.trim()))
+              .whereType<int>()
+              .where((value) => value >= 1 && value <= 3)
+              .toSet();
+          if (allowedMates.isEmpty) {
+            stderr
+                .writeln('--allowed-mates must contain at least one of 1,2,3');
+            exit(64);
+          }
+          break;
+        case '--min-pieces':
+          minPieces = int.parse(args[++i]);
+          break;
+        case '--target-mate3-percent':
+          targetMate3Percent = int.parse(args[++i]);
+          if (targetMate3Percent < 0 || targetMate3Percent > 100) {
+            stderr.writeln('--target-mate3-percent must be between 0 and 100');
+            exit(64);
+          }
+          break;
+        case '--scan-during-game-every':
+          scanDuringGameEvery = int.parse(args[++i]);
+          break;
+        case '--scan-recent':
+          scanRecentCount = int.parse(args[++i]);
+          break;
+        case '--rich-starts':
+          richStarts = true;
+          break;
+        case '--no-rich-starts':
+          richStarts = false;
+          break;
+        case '--checkpoint':
+          checkpoint = true;
+          break;
+        case '--no-checkpoint':
+          checkpoint = false;
+          break;
+        case '--tail-candidates-only':
+          tailCandidatesOnly = true;
+          break;
         case '--help':
         case '-h':
           _printUsage();
@@ -113,6 +206,16 @@ class _CliOptions {
       solveDepth: solveDepth,
       multiPv: multiPv,
       seed: seed,
+      mode: mode,
+      targetMate: targetMate,
+      allowedMates: allowedMates,
+      minPieces: minPieces,
+      targetMate3Percent: targetMate3Percent,
+      scanDuringGameEvery: scanDuringGameEvery,
+      scanRecentCount: scanRecentCount,
+      richStarts: richStarts,
+      checkpoint: checkpoint,
+      tailCandidatesOnly: tailCandidatesOnly,
     );
   }
 
@@ -129,8 +232,28 @@ Options:
   --play-depth <n>      Search depth for self-play moves (default: 5)
   --probe-depth <n>     Search depth for mate probe (default: 8)
   --solve-depth <n>     Search depth for solution line generation (default: 10)
-  --multipv <n>         MultiPV used for move variety (default: 3)
+  --multipv <n>         MultiPV used for move variety (default: 4)
   --seed <n>            Random seed (default: 20260321)
+  --mode <name>         balanced or weak-strong (default: weak-strong)
+  --target-mate <n>     Mate length to mine when --allowed-mates is omitted
+                        (default: 3)
+  --allowed-mates <csv> Mate lengths to accept, e.g. 3 (default: 3)
+  --min-pieces <n>      Minimum total pieces in the FEN before probing
+                        (default: 10)
+  --target-mate3-percent <n>
+                        Target share of 3-move puzzles when 2 and 3 are allowed
+                        (default: 100)
+  --scan-during-game-every <n>
+                        Also scan recent positions every n plies (default: 12)
+  --scan-recent <n>     Number of recent positions to scan (default: 16)
+  --rich-starts         Keep more material in randomized starts for deeper puzzles
+  --no-rich-starts      Disable rich randomized starts
+  --checkpoint          Save checkpoint JSON whenever a puzzle is found
+                        (default: on)
+  --no-checkpoint       Only write final output
+  --tail-candidates-only
+                        Save unverified final 5-ply game tails as mate-3
+                        candidates for later engine validation
 ''');
   }
 }
@@ -147,21 +270,27 @@ class _SelfPlayPuzzleGenerator {
   final Random _random;
   final _UciEngineClient _engine;
   final Set<String> _seenPositions = <String>{};
+  final Set<String> _scannedPositions = <String>{};
   final List<Map<String, dynamic>> _puzzles = <Map<String, dynamic>>[];
 
   Future<void> run() async {
     stdout.writeln(
       'Generating ${options.targetCount} self-play puzzles '
-      '(games=${options.maxGames}, maxPly=${options.maxPly}, seed=${options.seed})...',
+      '(mode=${options.mode}, targetMate=${options.targetMate}, '
+      'games=${options.maxGames}, maxPly=${options.maxPly}, seed=${options.seed})...',
     );
 
     for (var gameIndex = 1;
-        gameIndex <= options.maxGames &&
-            _puzzles.length < options.targetCount;
+        gameIndex <= options.maxGames && _puzzles.length < options.targetCount;
         gameIndex++) {
       await _engine.dispose();
       await _engine.initialize(multiPv: max(3, options.multiPv));
-      await _playSingleGame(gameIndex);
+      try {
+        await _playSingleGame(gameIndex);
+      } on TimeoutException catch (error) {
+        stdout
+            .writeln('Game $gameIndex skipped after timeout: ${error.message}');
+      }
     }
 
     final document = _buildDocument();
@@ -184,6 +313,7 @@ class _SelfPlayPuzzleGenerator {
     final history = <_RecordedPosition>[
       _RecordedPosition(fen: currentFen, ply: 1),
     ];
+    final playedMoves = <String>[];
 
     stdout.writeln(
       'Self-play game $gameIndex started '
@@ -203,30 +333,107 @@ class _SelfPlayPuzzleGenerator {
 
       if (move == null) {
         stdout.writeln('Game $gameIndex stopped at ply $ply: no move');
-        await _scanRecentPositions(gameIndex, history);
+        if (options.tailCandidatesOnly) {
+          _addTailCandidate(
+            gameIndex: gameIndex,
+            terminalPly: ply,
+            history: history,
+            playedMoves: playedMoves,
+          );
+        } else {
+          await _scanRecentPositions(gameIndex, history);
+        }
         return;
       }
 
       final nextFen = await _engine.applyMoveAndGetFen(currentFen, move);
       if (nextFen == null) {
-        stdout.writeln('Game $gameIndex stopped at ply $ply: failed to resolve FEN');
+        stdout.writeln(
+            'Game $gameIndex stopped at ply $ply: failed to resolve FEN');
         return;
       }
 
       currentFen = nextFen;
+      playedMoves.add(move);
       history.add(_RecordedPosition(fen: currentFen, ply: ply + 1));
+
+      if (!options.tailCandidatesOnly &&
+          options.scanDuringGameEvery > 0 &&
+          ply % options.scanDuringGameEvery == 0) {
+        await _scanRecentPositions(gameIndex, history);
+      }
 
       final key = _fenKey(currentFen);
       final repetition = (seenInGame[key] ?? 0) + 1;
       seenInGame[key] = repetition;
       if (repetition >= 3) {
         stdout.writeln('Game $gameIndex stopped at ply $ply: repetition');
-        await _scanRecentPositions(gameIndex, history);
+        if (!options.tailCandidatesOnly) {
+          await _scanRecentPositions(gameIndex, history);
+        }
         return;
       }
     }
 
-    await _scanRecentPositions(gameIndex, history);
+    if (!options.tailCandidatesOnly) {
+      await _scanRecentPositions(gameIndex, history);
+    }
+  }
+
+  void _addTailCandidate({
+    required int gameIndex,
+    required int terminalPly,
+    required List<_RecordedPosition> history,
+    required List<String> playedMoves,
+  }) {
+    const tailLength = 5;
+    if (!options.allowedMates.contains(3) || playedMoves.length < tailLength) {
+      return;
+    }
+    if (!_canAcceptMateIn(3)) return;
+
+    final startMoveIndex = playedMoves.length - tailLength;
+    final startRecord = history[startMoveIndex];
+    final solution = playedMoves.sublist(startMoveIndex);
+    if (solution.length != tailLength) return;
+
+    final key = _fenKey(startRecord.fen);
+    if (!_seenPositions.add(key)) return;
+    if (options.minPieces > 0 &&
+        _pieceCountFromFen(startRecord.fen) < options.minPieces) {
+      return;
+    }
+
+    final puzzleNumber = _puzzles.length + 1;
+    final puzzle = <String, dynamic>{
+      'id': 'sp_tail_${puzzleNumber.toString().padLeft(4, '0')}',
+      'difficulty': 3,
+      'mateIn': 3,
+      'title': 'Self-play tail 3-move candidate #$puzzleNumber',
+      'fen': startRecord.fen,
+      'solution': solution,
+      'toMove': _sideFromFen(startRecord.fen),
+      'source':
+          'Weak-strong self-play Game $gameIndex, Tail before ply $terminalPly',
+      'generator': {
+        'type': 'self_play_tail_candidate',
+        'mode': options.mode,
+        'targetMate': 3,
+        'gameIndex': gameIndex,
+        'startPly': startRecord.ply,
+        'terminalPly': terminalPly,
+        'seed': options.seed,
+        'playDepth': options.playDepth,
+      },
+    };
+    _puzzles.add(puzzle);
+    if (options.checkpoint) {
+      _writeJson(options.outputPath, _buildDocument());
+    }
+    stdout.writeln(
+      'Tail candidate ${_puzzles.length}/${options.targetCount}: '
+      '${puzzle['id']} source=${puzzle['source']}',
+    );
   }
 
   Future<String> _buildStartFen(int gameIndex) async {
@@ -251,15 +458,25 @@ class _SelfPlayPuzzleGenerator {
         final piece = board.getPiece(pos);
         if (piece == null) continue;
 
-        final keepChance = switch (piece.type) {
-          PieceType.guard => 0.35,
-          PieceType.chariot => 0.35,
-          PieceType.cannon => 0.30,
-          PieceType.horse => 0.28,
-          PieceType.elephant => 0.24,
-          PieceType.soldier => 0.20,
-          PieceType.general => 1.0,
-        };
+        final keepChance = options.richStarts
+            ? switch (piece.type) {
+                PieceType.guard => 0.75,
+                PieceType.chariot => 0.72,
+                PieceType.cannon => 0.68,
+                PieceType.horse => 0.66,
+                PieceType.elephant => 0.62,
+                PieceType.soldier => 0.55,
+                PieceType.general => 1.0,
+              }
+            : switch (piece.type) {
+                PieceType.guard => 0.35,
+                PieceType.chariot => 0.35,
+                PieceType.cannon => 0.30,
+                PieceType.horse => 0.28,
+                PieceType.elephant => 0.24,
+                PieceType.soldier => 0.20,
+                PieceType.general => 1.0,
+              };
 
         if (_random.nextDouble() > keepChance) {
           board.setPiece(pos, null);
@@ -289,14 +506,17 @@ class _SelfPlayPuzzleGenerator {
       for (var file = 0; file < 9; file++) {
         final pos = Position(file: file, rank: rank);
         final piece = board.getPiece(pos);
-        if (piece == null || piece.color != color || piece.type == PieceType.general) {
+        if (piece == null ||
+            piece.color != color ||
+            piece.type == PieceType.general) {
           continue;
         }
         pieces.add(pos);
       }
     }
 
-    if (pieces.length >= 2) {
+    final requiredPieces = options.richStarts ? 4 : 2;
+    if (pieces.length >= requiredPieces) {
       return;
     }
 
@@ -306,7 +526,9 @@ class _SelfPlayPuzzleGenerator {
       for (var file = 0; file < 9; file++) {
         final pos = Position(file: file, rank: rank);
         final piece = template.getPiece(pos);
-        if (piece == null || piece.color != color || piece.type == PieceType.general) {
+        if (piece == null ||
+            piece.color != color ||
+            piece.type == PieceType.general) {
           continue;
         }
         if (board.getPiece(pos) == null) {
@@ -316,7 +538,7 @@ class _SelfPlayPuzzleGenerator {
     }
 
     reserves.shuffle(_random);
-    while (pieces.length < 2 && reserves.isNotEmpty) {
+    while (pieces.length < requiredPieces && reserves.isNotEmpty) {
       final pos = reserves.removeLast();
       final templatePiece = template.getPiece(pos);
       if (templatePiece != null) {
@@ -332,7 +554,8 @@ class _SelfPlayPuzzleGenerator {
   ) async {
     if (_puzzles.length >= options.targetCount) return;
 
-    final recent = history.reversed.take(16).toList(growable: false);
+    final recent =
+        history.reversed.take(options.scanRecentCount).toList(growable: false);
     for (final record in recent) {
       if (_puzzles.length >= options.targetCount) return;
       try {
@@ -356,12 +579,26 @@ class _SelfPlayPuzzleGenerator {
     required int ply,
   }) async {
     final key = _fenKey(fen);
-    if (_seenPositions.contains(key)) {
+    if (_seenPositions.contains(key) || _scannedPositions.contains(key)) {
+      return false;
+    }
+    _scannedPositions.add(key);
+    if (options.minPieces > 0 && _pieceCountFromFen(fen) < options.minPieces) {
+      return false;
+    }
+    final rootEval = await _engine.analyzePosition(fen, options.probeDepth);
+    final rootMateIn = _mateInFromRootScore(rootEval?.value);
+    if (rootEval?.type != 'mate' ||
+        rootMateIn == null ||
+        !options.allowedMates.contains(rootMateIn)) {
       return false;
     }
 
     final candidate = await _findShortestMateCandidate(fen);
     if (candidate == null) {
+      return false;
+    }
+    if (!_canAcceptMateIn(candidate.mateIn)) {
       return false;
     }
 
@@ -376,7 +613,7 @@ class _SelfPlayPuzzleGenerator {
 
     _seenPositions.add(key);
     final puzzleNumber = _puzzles.length + 1;
-    final title = '자가대국 ${candidate.mateIn}수 외통 #$puzzleNumber';
+    final title = 'Generated ${candidate.mateIn}-move puzzle #$puzzleNumber';
     final toMove = _sideFromFen(fen);
 
     final puzzle = <String, dynamic>{
@@ -390,6 +627,8 @@ class _SelfPlayPuzzleGenerator {
       'source': 'Self-play Game $gameIndex, Ply $ply',
       'generator': {
         'type': 'self_play',
+        'mode': options.mode,
+        'targetMate': options.targetMate,
         'gameIndex': gameIndex,
         'ply': ply,
         'seed': options.seed,
@@ -400,6 +639,9 @@ class _SelfPlayPuzzleGenerator {
     };
 
     _puzzles.add(puzzle);
+    if (options.checkpoint) {
+      _writeJson(options.outputPath, _buildDocument());
+    }
     stdout.writeln(
       'Puzzle ${_puzzles.length}/${options.targetCount}: '
       '${puzzle['id']} mateIn=${candidate.mateIn} source=${puzzle['source']}',
@@ -435,7 +677,8 @@ class _SelfPlayPuzzleGenerator {
         continue;
       }
 
-      final confirmed = await _engine.analyzePosition(nextFen, options.solveDepth);
+      final confirmed =
+          await _engine.analyzePosition(nextFen, options.solveDepth);
       if (confirmed?.type != 'mate' || confirmed?.value == null) {
         continue;
       }
@@ -454,7 +697,14 @@ class _SelfPlayPuzzleGenerator {
       );
     }
 
-    for (final mateIn in const <int>[1, 2, 3]) {
+    final mateOrder = options.allowedMates.toList()..sort();
+    for (final mateIn in mateOrder) {
+      final hasShorterMate = candidatesByMate.entries.any(
+        (entry) => entry.key < mateIn && entry.value.isNotEmpty,
+      );
+      if (hasShorterMate) {
+        return null;
+      }
       final candidates = candidatesByMate[mateIn]!;
       if (candidates.length == 1) {
         return candidates.first;
@@ -477,6 +727,52 @@ class _SelfPlayPuzzleGenerator {
     return null;
   }
 
+  int? _mateInFromRootScore(int? value) {
+    if (value == null) return null;
+    if (value >= 1 && value <= 3) {
+      return value;
+    }
+    return null;
+  }
+
+  bool _canAcceptMateIn(int mateIn) {
+    final current = _puzzles
+        .where((puzzle) => (puzzle['mateIn'] as num?)?.toInt() == mateIn)
+        .length;
+    return current < _targetCountForMateIn(mateIn);
+  }
+
+  int _targetCountForMateIn(int mateIn) {
+    if (!options.allowedMates.contains(mateIn)) {
+      return 0;
+    }
+    if (!options.allowedMates.contains(2) ||
+        !options.allowedMates.contains(3)) {
+      return options.targetCount;
+    }
+    final mate3Target =
+        (options.targetCount * options.targetMate3Percent / 100).round();
+    if (mateIn == 3) {
+      return mate3Target.clamp(0, options.targetCount);
+    }
+    if (mateIn == 2) {
+      return options.targetCount - mate3Target.clamp(0, options.targetCount);
+    }
+    return options.targetCount;
+  }
+
+  int _pieceCountFromFen(String fen) {
+    final boardPart = fen.split(RegExp(r'\s+')).first;
+    var count = 0;
+    for (final codeUnit in boardPart.codeUnits) {
+      final char = String.fromCharCode(codeUnit);
+      if (RegExp(r'[a-zA-Z]').hasMatch(char)) {
+        count++;
+      }
+    }
+    return count;
+  }
+
   Future<List<String>?> _buildSolutionLineFromFirstMove({
     required String firstMove,
     required String fenAfterFirstMove,
@@ -487,7 +783,8 @@ class _SelfPlayPuzzleGenerator {
     var currentFen = fenAfterFirstMove;
 
     for (var ply = 1; ply < solutionLength; ply++) {
-      final eval = await _engine.analyzePosition(currentFen, options.solveDepth);
+      final eval =
+          await _engine.analyzePosition(currentFen, options.solveDepth);
       final move = eval?.bestmove;
       if (move == null || move == '(none)') {
         return null;
@@ -501,7 +798,8 @@ class _SelfPlayPuzzleGenerator {
       currentFen = nextFen;
     }
 
-    final finalEval = await _engine.analyzePosition(currentFen, options.solveDepth);
+    final finalEval =
+        await _engine.analyzePosition(currentFen, options.solveDepth);
     if (finalEval?.type != 'mate' || finalEval?.value != 0) {
       return null;
     }
@@ -514,10 +812,18 @@ class _SelfPlayPuzzleGenerator {
     required int gameIndex,
     required int ply,
   }) async {
+    if (options.mode == 'weak-strong') {
+      return _chooseWeakStrongMove(
+        fen: fen,
+        gameIndex: gameIndex,
+        ply: ply,
+      );
+    }
+
     final sideToMove = _sideFromFen(fen);
     final blueWeak = gameIndex.isEven;
-    final weakSide =
-        (blueWeak && sideToMove == 'blue') || (!blueWeak && sideToMove == 'red');
+    final weakSide = (blueWeak && sideToMove == 'blue') ||
+        (!blueWeak && sideToMove == 'red');
 
     if (weakSide && ply > 6) {
       final legalMoves = await _engine.listLegalMoves(fen);
@@ -525,7 +831,8 @@ class _SelfPlayPuzzleGenerator {
         return null;
       }
 
-      final filtered = legalMoves.where((move) => !move.endsWith('e1')).toList();
+      final filtered =
+          legalMoves.where((move) => !move.endsWith('e1')).toList();
       final pool = filtered.isEmpty ? legalMoves : filtered;
       return pool[_random.nextInt(pool.length)];
     }
@@ -541,22 +848,89 @@ class _SelfPlayPuzzleGenerator {
       return null;
     }
 
-    final candidates =
-        moveChoices.where((line) => line.firstMove != null).toList(growable: false);
+    final candidates = moveChoices
+        .where((line) => line.firstMove != null)
+        .toList(growable: false);
     if (candidates.isEmpty) return null;
 
     final roll = _random.nextDouble();
     int choiceIndex;
     if (ply <= 10) {
-      choiceIndex = roll < 0.72 ? 0 : roll < 0.93 ? 1 : 2;
+      choiceIndex = roll < 0.72
+          ? 0
+          : roll < 0.93
+              ? 1
+              : 2;
     } else {
-      choiceIndex = roll < 0.82 ? 0 : roll < 0.96 ? 1 : 2;
+      choiceIndex = roll < 0.82
+          ? 0
+          : roll < 0.96
+              ? 1
+              : 2;
     }
 
     if (choiceIndex >= candidates.length) {
       choiceIndex = candidates.length - 1;
     }
     return candidates[choiceIndex].firstMove;
+  }
+
+  Future<String?> _chooseWeakStrongMove({
+    required String fen,
+    required int gameIndex,
+    required int ply,
+  }) async {
+    final sideToMove = _sideFromFen(fen);
+    final blueWeak = gameIndex.isEven;
+    final weakSide = (blueWeak && sideToMove == 'blue') ||
+        (!blueWeak && sideToMove == 'red');
+    final legalMoves = await _engine.listLegalMoves(fen);
+    if (legalMoves.isEmpty) return null;
+
+    if (weakSide && ply > 4) {
+      final roll = _random.nextDouble();
+      if (roll < 0.50) {
+        return legalMoves[_random.nextInt(legalMoves.length)];
+      }
+
+      final depth = max(1, options.playDepth - 3);
+      final weakLines = await _engine.analyzeMultiPv(
+        fen,
+        depth,
+        max(4, options.multiPv),
+      );
+      final candidates = weakLines
+          .where((line) => line.firstMove != null)
+          .map((line) => line.firstMove!)
+          .toList(growable: false);
+      if (candidates.isEmpty) {
+        return legalMoves[_random.nextInt(legalMoves.length)];
+      }
+
+      if (roll < 0.78 && candidates.length > 1) {
+        final upper = min(4, candidates.length);
+        return candidates[1 + _random.nextInt(upper - 1)];
+      }
+      return candidates.first;
+    }
+
+    final strongLines = await _engine.analyzeMultiPv(
+      fen,
+      max(options.playDepth, options.probeDepth),
+      max(3, options.multiPv),
+    );
+    final candidates = strongLines
+        .where((line) => line.firstMove != null)
+        .map((line) => line.firstMove!)
+        .toList(growable: false);
+    if (candidates.isEmpty) {
+      return legalMoves[_random.nextInt(legalMoves.length)];
+    }
+
+    final roll = _random.nextDouble();
+    if (roll < 0.84 || candidates.length == 1) return candidates.first;
+    if (roll < 0.96 || candidates.length == 2) return candidates[1];
+    return candidates[min(2, candidates.length - 1)];
   }
 
   Map<String, dynamic> _buildDocument() {
@@ -596,6 +970,10 @@ class _SelfPlayPuzzleGenerator {
       },
       'generator': {
         'type': 'self_play',
+        'mode': options.mode,
+        'targetMate': options.targetMate,
+        'checkpoint': options.checkpoint,
+        'tailCandidatesOnly': options.tailCandidatesOnly,
         'seed': options.seed,
         'targetCount': options.targetCount,
         'maxGames': options.maxGames,
@@ -604,6 +982,12 @@ class _SelfPlayPuzzleGenerator {
         'probeDepth': options.probeDepth,
         'solveDepth': options.solveDepth,
         'multiPv': options.multiPv,
+        'allowedMates': options.allowedMates.toList()..sort(),
+        'minPieces': options.minPieces,
+        'targetMate3Percent': options.targetMate3Percent,
+        'scanDuringGameEvery': options.scanDuringGameEvery,
+        'scanRecentCount': options.scanRecentCount,
+        'richStarts': options.richStarts,
       },
       'puzzles': _puzzles,
     };

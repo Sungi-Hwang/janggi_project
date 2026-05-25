@@ -36,12 +36,16 @@ class MonetizationConfig {
   static const bool enableMainMenuBanner = true;
   static const bool enableInGameTopBanner = true;
 
+  static const String dailyPuzzlePlusMonthlyProductId =
+      'daily_puzzle_plus_monthly';
   static const String removeAdsProductId = 'remove_ads';
   // Legacy product kept for restore/migration only.
   static const String premiumAiProductId = 'premium_ai';
   static const Set<String> productIds = {
-    removeAdsProductId,
+    dailyPuzzlePlusMonthlyProductId,
   };
+
+  static const int freeDailyPuzzleLimit = 3;
 
   static const int maxDifficulty = 15;
   static const int maxThinkingTimeSec = 30;

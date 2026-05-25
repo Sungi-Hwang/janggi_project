@@ -131,6 +131,13 @@ class GameState extends ChangeNotifier {
       _findFirstLegalMoveForCurrentPlayer() != null;
   bool get currentPlayerHasNoEscape => !currentPlayerHasLegalMove;
 
+  bool canPlayMove(Move move, {PieceColor? requiredColor}) {
+    return _isMovePlayableForRule(
+      move,
+      requiredColor: requiredColor ?? _currentPlayer,
+    );
+  }
+
   void _logInput(String message) {
     if (_verboseInputLog) {
       debugPrint(message);

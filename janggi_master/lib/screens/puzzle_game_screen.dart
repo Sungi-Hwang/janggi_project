@@ -11,12 +11,62 @@ import '../models/puzzle_objective.dart';
 import '../providers/settings_provider.dart';
 import '../screens/game_screen.dart' show GameMode;
 import '../services/puzzle_progress_service.dart';
+import '../services/random_puzzle_service.dart';
 import '../utils/gib_parser.dart';
 import '../utils/gib_puzzle_locator.dart';
 import '../widgets/evaluation_bar.dart';
 import '../widgets/game_notification_overlay.dart';
 import '../widgets/janggi_board_widget.dart';
 import '../widgets/player_info_bar.dart';
+
+enum PuzzleTerminalStatus {
+  none,
+  solved,
+  failed,
+}
+
+PieceColor? puzzleWinnerFromReason(String? reason) {
+  switch (reason) {
+    case 'blue_wins_checkmate':
+    case 'blue_wins_capture':
+    case 'blue_wins_points':
+      return PieceColor.blue;
+    case 'red_wins_checkmate':
+    case 'red_wins_capture':
+    case 'red_wins_points':
+      return PieceColor.red;
+    default:
+      return null;
+  }
+}
+
+PuzzleTerminalStatus evaluatePuzzleTerminalStatus({
+  required GameState gameState,
+  required PieceColor playerColor,
+  required int playerSolvedMoveCount,
+  required int playerTotalMoveCount,
+}) {
+  final withinMoveLimit = playerSolvedMoveCount <= playerTotalMoveCount;
+  if (gameState.isGameOver) {
+    final winner = puzzleWinnerFromReason(gameState.gameOverReason);
+    if (winner == playerColor && withinMoveLimit) {
+      return PuzzleTerminalStatus.solved;
+    }
+    return PuzzleTerminalStatus.failed;
+  }
+
+  if (gameState.currentPlayer != playerColor &&
+      gameState.currentPlayerHasNoEscape &&
+      withinMoveLimit) {
+    return PuzzleTerminalStatus.solved;
+  }
+
+  if (gameState.currentPlayerHasNoEscape) {
+    return PuzzleTerminalStatus.failed;
+  }
+
+  return PuzzleTerminalStatus.none;
+}
 
 /// Puzzle play screen.
 /// Player controls the side to move in the puzzle.
@@ -103,35 +153,26 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
       return;
     }
 
-    if (_isPuzzleSolvedByNoEscape()) {
-      if (mounted) {
-        setState(() {
-          _wrongMoveMessage = null;
-        });
-      }
-      _showPuzzleCompleteDialogOnce();
-      return;
-    }
-
-    if (_gameState.currentPlayerHasNoEscape) {
-      _handlePuzzleFailure();
-      return;
-    }
-
-    if (_gameState.isGameOver &&
-        _winnerFromReason(_gameState.gameOverReason) == _playerColor) {
-      if (mounted) {
-        setState(() {
-          _wrongMoveMessage = null;
-        });
-      }
-      _showPuzzleCompleteDialogOnce();
-      return;
-    }
-
-    if (_gameState.isGameOver) {
-      _handlePuzzleFailure();
-      return;
+    final terminalStatus = evaluatePuzzleTerminalStatus(
+      gameState: _gameState,
+      playerColor: _playerColor,
+      playerSolvedMoveCount: _playerSolvedMoveCount(),
+      playerTotalMoveCount: _playerTotalMoveCount(),
+    );
+    switch (terminalStatus) {
+      case PuzzleTerminalStatus.solved:
+        if (mounted) {
+          setState(() {
+            _wrongMoveMessage = null;
+          });
+        }
+        _showPuzzleCompleteDialogOnce();
+        return;
+      case PuzzleTerminalStatus.failed:
+        _handlePuzzleFailure();
+        return;
+      case PuzzleTerminalStatus.none:
+        break;
     }
 
     if (mounted) {
@@ -147,16 +188,6 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
       }
       _playOpponentMoveIfNeeded();
     }
-  }
-
-  bool _isPuzzleSolvedByNoEscape() {
-    if (_gameState.currentPlayer == _playerColor) {
-      return false;
-    }
-    if (!_gameState.currentPlayerHasNoEscape) {
-      return false;
-    }
-    return _playerSolvedMoveCount() <= _playerTotalMoveCount();
   }
 
   Future<void> _initializePuzzle() async {
@@ -244,7 +275,7 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
 
     Move? autoMove = _expectedSolutionMoveForCurrentTurn();
     if (autoMove == null && _isMaterialGainPuzzle) {
-      _handlePuzzleFailure(message: '검증된 응수 수순을 찾지 못했습니다.');
+      _handlePuzzleDataFailure(message: '검증된 응수 수순을 찾지 못했습니다.');
       return;
     }
     if (autoMove == null) {
@@ -257,12 +288,23 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
 
     if (autoMove == null) {
       debugPrint('No opponent response available for current puzzle state.');
+      _handlePuzzleDataFailure(message: '검증된 응수 수순을 찾지 못했습니다.');
       return;
     }
 
     final piece = _gameState.board.getPiece(autoMove.from);
     if (piece == null || piece.color != _gameState.currentPlayer) {
       debugPrint('Auto move mismatch for ${autoMove.toUCI()}');
+      _handlePuzzleDataFailure(message: '검증된 응수 수순이 현재 국면과 맞지 않습니다.');
+      return;
+    }
+
+    if (!_gameState.canPlayMove(
+      autoMove,
+      requiredColor: _gameState.currentPlayer,
+    )) {
+      debugPrint('Auto move is not playable: ${autoMove.toUCI()}');
+      _handlePuzzleDataFailure(message: '검증된 응수 수순이 현재 규칙과 맞지 않습니다.');
       return;
     }
 
@@ -283,6 +325,20 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
         setState(() {});
       }
     }
+  }
+
+  void _handlePuzzleDataFailure({required String message}) {
+    if (widget.game['feedType'] == 'generated') {
+      if (_isResolvingWrongMove) return;
+      _isResolvingWrongMove = true;
+      _recordAttemptResult(solved: false);
+      if (mounted) {
+        Navigator.pop(context, false);
+      }
+      return;
+    }
+
+    _handlePuzzleFailure(message: message);
   }
 
   void _handlePuzzleFailure({
@@ -452,21 +508,6 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
     return color == PieceColor.blue ? PieceColor.red : PieceColor.blue;
   }
 
-  PieceColor? _winnerFromReason(String? reason) {
-    switch (reason) {
-      case 'blue_wins_checkmate':
-      case 'blue_wins_capture':
-      case 'blue_wins_points':
-        return PieceColor.blue;
-      case 'red_wins_checkmate':
-      case 'red_wins_capture':
-      case 'red_wins_points':
-        return PieceColor.red;
-      default:
-        return null;
-    }
-  }
-
   String _sideLabel(PieceColor color) {
     return color == PieceColor.blue ? '초' : '한';
   }
@@ -525,9 +566,20 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
         ),
       );
     }
+
+    if (widget.game['feedType'] == 'generated') {
+      unawaited(
+        RandomPuzzleService.recordAttempt(
+          puzzleId: puzzleId,
+          solved: solved,
+          completedAt: completedAt,
+        ),
+      );
+    }
   }
 
   void _showPuzzleCompleteDialog() {
+    final isGeneratedFeed = widget.game['feedType'] == 'generated';
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -538,16 +590,24 @@ class _PuzzleGameScreenState extends State<PuzzleGameScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              Navigator.pop(context);
+              if (isGeneratedFeed) {
+                Navigator.popUntil(context, (route) => route.isFirst);
+              } else {
+                Navigator.pop(context, true);
+              }
             },
-            child: const Text('목록으로'),
+            child: Text(isGeneratedFeed ? '메인 메뉴' : '목록으로'),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              _resetPuzzle();
+              if (isGeneratedFeed) {
+                Navigator.pop(context, true);
+              } else {
+                _resetPuzzle();
+              }
             },
-            child: const Text('다시 풀기'),
+            child: Text(isGeneratedFeed ? '다음 문제' : '다시 풀기'),
           ),
         ],
       ),

@@ -1,7 +1,7 @@
 {
   "version": "1.2-strict-local-legal",
   "generated": "2026-04-11T18:40:05.941060",
-  "total": 175,
+  "total": 179,
   "categories": {
     "mate1": {
       "name": "1수 외통",
@@ -11,12 +11,12 @@
     "mate2": {
       "name": "2수 외통",
       "description": "두 수 만에 외통을 잡는 묘수",
-      "count": 29
+      "count": 28
     },
     "mate3": {
       "name": "3수 외통",
       "description": "세 수 만에 외통을 잡는 묘수",
-      "count": 3
+      "count": 8
     }
   },
   "puzzles": [
@@ -51,7 +51,7 @@
       "id": "m1_03",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #3",
+      "title": "1수 외통 #2",
       "fen": "r4a3/3ka4/2cb5/1pp2B3/1r7/4R3P/1n2NPPN1/3KC4/3A1A1n1/9 b - - 0 1",
       "solution": [
         "c8c2"
@@ -78,7 +78,7 @@
       "id": "m1_05",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #4",
+      "title": "1수 외통 #3",
       "fen": "C4a3/1R1ak4/3ccb3/6pp1/3p1p3/9/B4NPP1/5B3/2nA5/4KA2r b - - 0 1",
       "solution": [
         "d6e6"
@@ -105,7 +105,7 @@
       "id": "m1_06",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #5",
+      "title": "1수 외통 #4",
       "fen": "N2a5/5R3/3k1c3/4R4/2p6/7P1/1PPN5/5n1c1/4KA1r1/9 w - - 0 1",
       "solution": [
         "d4c6"
@@ -132,7 +132,7 @@
       "id": "m1_07",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #6",
+      "title": "1수 외통 #5",
       "fen": "4k1b2/4a4/6n1r/1p2p1B1p/5N3/1R7/3b1PPP1/3cC4/4K2C1/2r6 w - - 0 1",
       "solution": [
         "h2h10"
@@ -159,7 +159,7 @@
       "id": "m1_08",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #7",
+      "title": "1수 외통 #6",
       "fen": "2b1ka3/4a4/2ncc4/1p5p1/3P3P1/1PR2b3/7R1/4N3C/4AB3/r2AKCr2 b - - 0 1",
       "solution": [
         "a1d1"
@@ -186,7 +186,7 @@
       "id": "m1_12",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #11",
+      "title": "1수 외통 #7",
       "fen": "3k2c2/3aa4/1c1b5/4N1Brb/1pp1p3n/3P5/P1P5B/9/3NAA3/R3KC3 w - - 0 1",
       "solution": [
         "e7c8"
@@ -213,7 +213,7 @@
       "id": "m1_15",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #13",
+      "title": "1수 외통 #8",
       "fen": "2b2a3/2Rak4/5c1r1/2p3p1p/5P3/2C6/4c3P/3N1A3/5K3/5AB2 b - - 0 1",
       "solution": [
         "h8h2"
@@ -240,7 +240,7 @@
       "id": "m1_16",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #14",
+      "title": "1수 외통 #9",
       "fen": "9/3ka4/2Na5/p4npp1/2p6/6PP1/c1Pp5/2N1C4/1R2KA3/3A2B2 w - - 0 1",
       "solution": [
         "b2b9"
@@ -267,7 +267,7 @@
       "id": "m1_17",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #15",
+      "title": "1수 외통 #10",
       "fen": "C1bak4/3Rac3/3N5/5p3/1p4p2/4P4/4P1P2/4N4/4K4/2C5r w - - 0 1",
       "solution": [
         "d9d10"
@@ -294,7 +294,7 @@
       "id": "m1_18",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #16",
+      "title": "1수 외통 #11",
       "fen": "r3c4/9/4kCn2/b4R3/7p1/3n5/1P5P1/3K1B3/3A1Ar2/3N5 b - - 0 1",
       "solution": [
         "d5b4"
@@ -321,7 +321,7 @@
       "id": "m1_19",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #17",
+      "title": "1수 외통 #12",
       "fen": "5a3/4ka2R/4cb3/9/1pp3p2/7NB/P1n1PP3/3C3B1/c8/4CK3 b - - 0 1",
       "solution": [
         "c4d2"
@@ -348,7 +348,7 @@
       "id": "m1_20",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #18",
+      "title": "1수 외통 #13",
       "fen": "5k3/4aa3/5c3/4c4/9/5p3/4p3R/9/4A4/4K4 w - - 0 1",
       "solution": [
         "i4i10"
@@ -375,7 +375,7 @@
       "id": "m1_23",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #21",
+      "title": "1수 외통 #14",
       "fen": "3a1k3/3ca4/9/9/2n2p3/4b2b1/1BP2P3/2R6/3A4r/4CK3 b - - 0 1",
       "solution": [
         "i2f2"
@@ -402,7 +402,7 @@
       "id": "m1_25",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #23",
+      "title": "1수 외통 #15",
       "fen": "4k4/3aa4/3c5/3R5/p2b5/2P4N1/9/3AA4/3K2p2/4r4 b - - 0 1",
       "solution": [
         "d6a4"
@@ -429,7 +429,7 @@
       "id": "m1_27",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #24",
+      "title": "1수 외통 #16",
       "fen": "1R2R4/3k1a3/5a3/2pr5/9/9/9/4r4/4A4/4KC3 w - - 0 1",
       "solution": [
         "b10d10"
@@ -456,7 +456,7 @@
       "id": "m1_29",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #25",
+      "title": "1수 외통 #17",
       "fen": "3k2Cc1/Nr1aan3/4c4/R5pp1/4b4/9/9/4CB3/3AA4/3K5 b - - 0 1",
       "solution": [
         "b9b1"
@@ -483,7 +483,7 @@
       "id": "m1_32",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #27",
+      "title": "1수 외통 #18",
       "fen": "9/3a5/1N1k5/4Bp3/3p5/9/1PP3r2/5A3/4AC3/4CK3 w - - 0 1",
       "solution": [
         "e7b5"
@@ -510,7 +510,7 @@
       "id": "m1_33",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #28",
+      "title": "1수 외통 #19",
       "fen": "4ak3/5a3/9/9/6n2/8R/3PP4/4C4/4KAr2/3A5 w - - 0 1",
       "solution": [
         "i5i10"
@@ -537,7 +537,7 @@
       "id": "m1_35",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #30",
+      "title": "1수 외통 #20",
       "fen": "2rka3R/3a5/1c7/3b5/9/5PB2/4P4/4C4/4AA3/4KCr2 w - - 0 1",
       "solution": [
         "i10e10"
@@ -564,7 +564,7 @@
       "id": "m1_36",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #31",
+      "title": "1수 외통 #21",
       "fen": "2b3b2/r8/2nkc4/2Rc3r1/1B2p1B2/9/1PP2Pp2/4C4/4A4/1N2KA3 w - - 0 1",
       "solution": [
         "c7d7"
@@ -591,7 +591,7 @@
       "id": "m1_38",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #33",
+      "title": "1수 외통 #22",
       "fen": "4k4/6R2/9/9/2p1ppp2/9/1P1P1Pb2/1C1c3r1/3A3r1/3A1K3 b - - 0 1",
       "solution": [
         "h3f3"
@@ -618,7 +618,7 @@
       "id": "m1_39",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #34",
+      "title": "1수 외통 #23",
       "fen": "4k4/3aa4/9/bp3p3/6pp1/3N1P3/5nc2/3BKC3/1C1A4r/7R1 b - - 0 1",
       "solution": [
         "f4d5"
@@ -645,7 +645,7 @@
       "id": "m1_40",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #35",
+      "title": "1수 외통 #24",
       "fen": "4k4/4a4/1BR2a3/1N2bc3/9/2np5/5PP1P/3A5/4A4/3K5 w - - 0 1",
       "solution": [
         "c8c10"
@@ -672,7 +672,7 @@
       "id": "m1_41",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #36",
+      "title": "1수 외통 #25",
       "fen": "R8/4a4/3ka4/B8/9/9/3p2r2/9/3AA4/3KC4 w - - 0 1",
       "solution": [
         "a10a8"
@@ -699,7 +699,7 @@
       "id": "m1_42",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #37",
+      "title": "1수 외통 #26",
       "fen": "4kc3/R2aa3n/4c4/7p1/1P2PP3/1pp6/2b6/4rA3/5A3/3C1K3 b - - 0 1",
       "solution": [
         "e3e1"
@@ -726,7 +726,7 @@
       "id": "m1_43",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #38",
+      "title": "1수 외통 #27",
       "fen": "4kc3/R3ab3/4n4/3pp4/9/9/5C3/3ACK3/6r2/3A5 b - - 0 1",
       "solution": [
         "f9h6"
@@ -753,7 +753,7 @@
       "id": "m1_44",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #39",
+      "title": "1수 외통 #28",
       "fen": "4k4/4a4/9/9/9/9/2b1p4/3A1p3/3A5/4CK3 b - - 0 1",
       "solution": [
         "f3f2"
@@ -780,7 +780,7 @@
       "id": "m1_46",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #41",
+      "title": "1수 외통 #29",
       "fen": "3ck4/4aa3/4c4/P4p3/1P7/9/4p4/3A5/2rA1BR2/3K1C3 b - - 0 1",
       "solution": [
         "c2d2"
@@ -807,7 +807,7 @@
       "id": "m1_48",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #42",
+      "title": "1수 외통 #30",
       "fen": "3aka2R/9/4c4/3r5/1p5P1/1br2b3/8B/3n1C3/4A4/4CK3 b - - 0 1",
       "solution": [
         "f5i3"
@@ -834,7 +834,7 @@
       "id": "m1_51",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #44",
+      "title": "1수 외통 #31",
       "fen": "3k1c3/3aa4/3bc4/9/1pp3bB1/9/4N4/2N6/3AAB3/1R2KC1r1 b - - 0 1",
       "solution": [
         "h1f1"
@@ -861,7 +861,7 @@
       "id": "m1_53",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #46",
+      "title": "1수 외통 #32",
       "fen": "4ck3/3C5/R1R6/6p1p/2Ncn4/9/3r2b2/9/3NA4/3K1A3 b - - 0 1",
       "solution": [
         "d4d2"
@@ -888,7 +888,7 @@
       "id": "m1_55",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #48",
+      "title": "1수 외통 #33",
       "fen": "4k4/2R1a4/3ac4/2B6/9/1P7/5p3/2r6/4AA3/5K1C1 w - - 0 1",
       "solution": [
         "c9c10"
@@ -915,7 +915,7 @@
       "id": "m1_56",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #49",
+      "title": "1수 외통 #34",
       "fen": "3kc4/3aa4/9/1R7/9/2PP1PP2/9/5A3/3r1B3/3C1K3 b - - 0 1",
       "solution": [
         "d2d1"
@@ -942,7 +942,7 @@
       "id": "m1_57",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #50",
+      "title": "1수 외통 #35",
       "fen": "4ck3/4aa3/1R7/7p1/8r/2b1B4/2P2PP2/4C4/2c1AA3/3C1K3 w - - 0 1",
       "solution": [
         "e5h7"
@@ -969,7 +969,7 @@
       "id": "m1_58",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #51",
+      "title": "1수 외통 #36",
       "fen": "4kc3/4a3R/3ac1r2/1pr6/9/N8/P1PPN1nB1/5A3/5A3/3C1K3 b - - 0 1",
       "solution": [
         "g4h2"
@@ -996,7 +996,7 @@
       "id": "m1_60",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #53",
+      "title": "1수 외통 #37",
       "fen": "3C5/4ak3/9/9/3P5/3c2p2/PP1n5/2R1Cr3/9/4KA3 b - - 0 1",
       "solution": [
         "f3d1"
@@ -1023,7 +1023,7 @@
       "id": "m1_61",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #54",
+      "title": "1수 외통 #38",
       "fen": "3kc4/R8/3P1a3/9/3r5/6P2/9/4C4/4A4/4KA3 w - - 0 1",
       "solution": [
         "a9d9"
@@ -1050,7 +1050,7 @@
       "id": "m1_63",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #56",
+      "title": "1수 외통 #39",
       "fen": "3ak4/4a4/2Rcc4/3p4r/2p6/5P3/4PP3/9/4A4/4K4 b - - 0 1",
       "solution": [
         "i7i1"
@@ -1077,7 +1077,7 @@
       "id": "m1_65",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #58",
+      "title": "1수 외통 #40",
       "fen": "4ck3/2R6/3b2c2/9/3N5/6P2/1PP6/3Cb4/4A4/r2AK4 w - - 0 1",
       "solution": [
         "d6e8"
@@ -1104,7 +1104,7 @@
       "id": "m1_66",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #59",
+      "title": "1수 외통 #41",
       "fen": "4k4/3baa3/4cc3/5R3/9/2N2nPP1/9/4CK3/4A4/9 b - - 0 1",
       "solution": [
         "f5d4"
@@ -1131,7 +1131,7 @@
       "id": "m1_69",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #61",
+      "title": "1수 외통 #42",
       "fen": "2c1k4/4aa1R1/4Bb3/1Nr6/5n3/3p1b3/1P7/4C4/3CA4/3K1AB2 b - - 0 1",
       "solution": [
         "c7c1"
@@ -1158,7 +1158,7 @@
       "id": "m1_70",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #62",
+      "title": "1수 외통 #43",
       "fen": "1c7/5k3/9/1p4B1r/3B4p/1b7/5PPP1/r8/3AKA3/4CC2R w - - 0 1",
       "solution": [
         "f1f3"
@@ -1185,7 +1185,7 @@
       "id": "m1_72",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #64",
+      "title": "1수 외통 #44",
       "fen": "9/4k4/4c1P2/4p4/9/3P5/6b2/5A3/3r1B3/3C1K3 b - - 0 1",
       "solution": [
         "d2d1"
@@ -1212,7 +1212,7 @@
       "id": "m1_73",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #65",
+      "title": "1수 외통 #45",
       "fen": "3a5/8R/3b1k3/6N2/9/5n3/9/5A1r1/4AK3/4C4 w - - 0 1",
       "solution": [
         "i9f9"
@@ -1239,7 +1239,7 @@
       "id": "m1_75",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #67",
+      "title": "1수 외통 #46",
       "fen": "4kcR2/3b5/9/3pp4/2r6/4n2b1/R3B1P2/4NK3/4A3r/3A1C3 b - - 0 1",
       "solution": [
         "i2i3"
@@ -1266,7 +1266,7 @@
       "id": "m1_77",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #69",
+      "title": "1수 외통 #47",
       "fen": "3cck3/4a4/5a3/2pp5/9/5R3/4n4/9/5A3/5K3 b - - 0 1",
       "solution": [
         "e4g3"
@@ -1293,7 +1293,7 @@
       "id": "m1_80",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #71",
+      "title": "1수 외통 #48",
       "fen": "3ack3/2Rn1a2R/5b3/3P2pp1/3c5/3r5/5p3/9/2rNAA3/3KCC3 b - - 0 1",
       "solution": [
         "d5d2"
@@ -1320,7 +1320,7 @@
       "id": "m1_81",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #72",
+      "title": "1수 외통 #49",
       "fen": "3aka3/9/9/2R6/7p1/4p4/4n1b2/9/2N3r2/R2K1B3 b - - 0 1",
       "solution": [
         "g2d2"
@@ -1347,7 +1347,7 @@
       "id": "m1_82",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #73",
+      "title": "1수 외통 #50",
       "fen": "9/4ka3/3acc3/3P2R2/1p3C3/9/5p3/9/r3AK1n1/4C1B2 b - - 0 1",
       "solution": [
         "f4f3"
@@ -1374,7 +1374,7 @@
       "id": "m1_85",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #76",
+      "title": "1수 외통 #51",
       "fen": "4ck3/6R2/3r5/7p1/3B5/9/9/9/9/3KA4 w - - 0 1",
       "solution": [
         "g9f9"
@@ -1401,7 +1401,7 @@
       "id": "m1_86",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #77",
+      "title": "1수 외통 #52",
       "fen": "9/5R1B1/3kc2N1/9/9/9/4p2PP/4C4/2r1AK3/6B2 w - - 0 1",
       "solution": [
         "h8f7"
@@ -1428,7 +1428,7 @@
       "id": "m1_91",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #82",
+      "title": "1수 외통 #53",
       "fen": "3ck4/4aa3/4c4/5p1p1/4b4/1P4PP1/9/3C5/3AA4/3K1B2R b - - 0 1",
       "solution": [
         "e6b4"
@@ -1455,7 +1455,7 @@
       "id": "m1_94",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #85",
+      "title": "1수 외통 #54",
       "fen": "3c1a3/3bk4/4n4/5pp2/4P4/9/9/4r4/4A4/r2CKA3 b - - 0 1",
       "solution": [
         "a1d1"
@@ -1482,7 +1482,7 @@
       "id": "m1_98",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #86",
+      "title": "1수 외통 #55",
       "fen": "4k4/4a4/3bc4/2p4P1/3P1P3/9/6r2/b2A5/3KA4/5C3 b - - 0 1",
       "solution": [
         "d8b5"
@@ -1509,7 +1509,7 @@
       "id": "m1_99",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #87",
+      "title": "1수 외통 #56",
       "fen": "3a5/3k5/9/5R1pp/9/9/3PP4/4C4/4A4/b3KCr2 w - - 0 1",
       "solution": [
         "f7d7"
@@ -1536,7 +1536,7 @@
       "id": "m1_100",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #88",
+      "title": "1수 외통 #57",
       "fen": "3kca3/3c5/3a5/1PB4pp/9/9/8P/1R2R4/3rN4/2B1KC3 b - - 0 1",
       "solution": [
         "d2e2"
@@ -1563,7 +1563,7 @@
       "id": "m1_101",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #89",
+      "title": "1수 외통 #58",
       "fen": "3c1k3/5a3/1B1a5/9/5ppp1/4R2nc/NPP6/4C4/4AA3/4K2C1 w - - 0 1",
       "solution": [
         "e5e10"
@@ -1590,7 +1590,7 @@
       "id": "m1_103",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #90",
+      "title": "1수 외통 #59",
       "fen": "2bRck3/5c3/9/9/3n5/9/1PPNNP3/9/4A4/4KA1r1 b - - 0 1",
       "solution": [
         "h1f1"
@@ -1617,7 +1617,7 @@
       "id": "m1_104",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #91",
+      "title": "1수 외통 #60",
       "fen": "3k1c3/2Rna4/9/3pb1pp1/9/n8/3Nb2PP/r4A3/1r3A3/4CK3 b - - 0 1",
       "solution": [
         "b2f2"
@@ -1644,7 +1644,7 @@
       "id": "m1_105",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #92",
+      "title": "1수 외통 #61",
       "fen": "1R1c1k3/4aa3/9/1p1b3p1/9/4P4/4B3B/2N1C2N1/3A5/3KA2n1 b - - 0 1",
       "solution": [
         "d7b4"
@@ -1671,7 +1671,7 @@
       "id": "m1_106",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #93",
+      "title": "1수 외통 #62",
       "fen": "2Rck2C1/4a4/4B4/p8/9/9/2P3RP1/4CB3/2nr5/4K4 w - - 0 1",
       "solution": [
         "g4g10"
@@ -1698,7 +1698,7 @@
       "id": "m1_110",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #97",
+      "title": "1수 외통 #63",
       "fen": "4kab2/1r2a4/4c4/1C1N1p1p1/2p6/7P1/1P2Pn3/3K1pC2/5RcB1/2BA1A3 b - - 0 1",
       "solution": [
         "f3e3"
@@ -1725,7 +1725,7 @@
       "id": "m1_114",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #101",
+      "title": "1수 외통 #64",
       "fen": "3k1c3/3aa4/2R6/1B4b2/1c1P1r3/9/9/5C3/4AA3/4CK3 w - - 0 1",
       "solution": [
         "c8c10"
@@ -1752,7 +1752,7 @@
       "id": "m1_116",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #103",
+      "title": "1수 외통 #65",
       "fen": "3c1k3/5a3/5a3/9/4Rb3/5p3/6PP1/9/4K4/4C4 w - - 0 1",
       "solution": [
         "e6e10"
@@ -1779,7 +1779,7 @@
       "id": "m1_118",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #105",
+      "title": "1수 외통 #66",
       "fen": "R1bkcar2/4ac3/6N2/3p3p1/9/7P1/2P2R3/9/n2r1A3/5KC2 b - - 0 1",
       "solution": [
         "d2f2"
@@ -1806,7 +1806,7 @@
       "id": "m1_120",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #106",
+      "title": "1수 외통 #67",
       "fen": "3k5/9/9/1ppp2B2/4R4/1P1c1r1n1/9/5C3/4AA3/4K4 w - - 0 1",
       "solution": [
         "e6e10"
@@ -1833,7 +1833,7 @@
       "id": "m1_122",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #108",
+      "title": "1수 외통 #68",
       "fen": "3c1k3/4aa3/4c4/1RBp1pp2/5n1N1/7PP/2r6/3AC4/4A4/3CK4 w - - 0 1",
       "solution": [
         "h6g8"
@@ -1860,7 +1860,7 @@
       "id": "m1_123",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #109",
+      "title": "1수 외통 #69",
       "fen": "R2ak2r1/3cab3/3bc4/1p2pp3/9/6PN1/2P1B4/1C1B5/3A1A3/3K4R w - - 0 1",
       "solution": [
         "b3b10"
@@ -1887,7 +1887,7 @@
       "id": "m1_124",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #110",
+      "title": "1수 외통 #70",
       "fen": "2ck5/4a4/3ac4/2B1R2pp/7r1/3B1PP2/2pp5/4C4/3AA1n2/3CK4 b - - 0 1",
       "solution": [
         "h6h1"
@@ -1914,7 +1914,7 @@
       "id": "m1_125",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #111",
+      "title": "1수 외통 #71",
       "fen": "9/4k4/3a2n2/P3b4/5cpp1/5R3/6b2/3A5/2r1A4/1C1K5 b - - 0 1",
       "solution": [
         "c2c1"
@@ -1941,7 +1941,7 @@
       "id": "m1_126",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #112",
+      "title": "1수 외통 #72",
       "fen": "7n1/R2bka3/5c3/9/9/2rn5/4c4/5A3/3B1A3/3C1K3 b - - 0 1",
       "solution": [
         "d5e3"
@@ -1968,7 +1968,7 @@
       "id": "m1_129",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #114",
+      "title": "1수 외통 #73",
       "fen": "4k4/4a4/9/3R5/2r6/2c2P3/7P1/2n6/3AA4/3CCK3 w - - 0 1",
       "solution": [
         "d7d10"
@@ -1995,7 +1995,7 @@
       "id": "m1_130",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #115",
+      "title": "1수 외통 #74",
       "fen": "3kc4/R4a2R/5a3/9/9/2PP3P1/7n1/4NC3/3A2r1c/3KA4 w - - 0 1",
       "solution": [
         "f3d3"
@@ -2022,7 +2022,7 @@
       "id": "m1_132",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #116",
+      "title": "1수 외통 #75",
       "fen": "3ak4/5a3/4c1n2/6B2/9/3n2P2/5NP1B/2b2A3/4AC3/cr2CK3 b - - 0 1",
       "solution": [
         "b1e1"
@@ -2049,7 +2049,7 @@
       "id": "m1_133",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #117",
+      "title": "1수 외통 #76",
       "fen": "c3k1bR1/4a4/4c4/p2pp4/9/9/3b1r1P1/5B3/4A4/3ACK3 b - - 0 1",
       "solution": [
         "f4f3"
@@ -2076,7 +2076,7 @@
       "id": "m1_134",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #118",
+      "title": "1수 외통 #77",
       "fen": "2C6/r1n2R3/3kc4/4p2b1/2pc1P3/9/PP1N5/3B1B3/3AA4/3K5 w - - 0 1",
       "solution": [
         "d4c6"
@@ -2103,7 +2103,7 @@
       "id": "m1_136",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #119",
+      "title": "1수 외통 #78",
       "fen": "4kc3/4a4/3bc2B1/9/9/2P3p2/R4p3/6n2/Nr1AAN3/3KC4 w - - 0 1",
       "solution": [
         "a4a10"
@@ -2130,7 +2130,7 @@
       "id": "m1_138",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #121",
+      "title": "1수 외통 #79",
       "fen": "9/3k1a3/3b5/6ppb/9/1P3P3/1C2R4/4C4/4NK1n1/3r5 b - - 0 1",
       "solution": [
         "d1f1"
@@ -2157,7 +2157,7 @@
       "id": "m1_139",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #122",
+      "title": "1수 외통 #80",
       "fen": "5ab2/3k1an2/Brc6/7P1/1Bb2N3/9/2R6/9/4KA3/3AC4 w - - 0 1",
       "solution": [
         "c4d4"
@@ -2184,7 +2184,7 @@
       "id": "m1_140",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #123",
+      "title": "1수 외통 #81",
       "fen": "3kcR3/3a5/r8/4B4/2b2pp2/1P7/1P7/4C4/4A4/3AK4 w - - 0 1",
       "solution": [
         "f10e10"
@@ -2211,7 +2211,7 @@
       "id": "m1_141",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #124",
+      "title": "1수 외통 #82",
       "fen": "2R1ck3/4a4/3ca1n2/Ppp2ppp1/4P4/2P1P4/4B1b2/5r3/3N1A3/4KC3 b - - 0 1",
       "solution": [
         "f3e3"
@@ -2238,7 +2238,7 @@
       "id": "m1_142",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #125",
+      "title": "1수 외통 #83",
       "fen": "3ck4/1r2a2R1/2ca5/1pp3B2/9/9/PP7/3A5/3A5/1C1K5 w - - 0 1",
       "solution": [
         "h9h10"
@@ -2265,7 +2265,7 @@
       "id": "m1_150",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #133",
+      "title": "1수 외통 #84",
       "fen": "3c1k3/2N2a1R1/5a3/4bC3/9/9/cr7/9/3NAA3/4K4 w - - 0 1",
       "solution": [
         "h9f9"
@@ -2292,7 +2292,7 @@
       "id": "m1_151",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #134",
+      "title": "1수 외통 #85",
       "fen": "3k1a1bC/4a4/2R6/3ppp3/9/2PP2B2/1n2C2r1/4KA3/r8/3A5 b - - 0 1",
       "solution": [
         "h4e4"
@@ -2319,7 +2319,7 @@
       "id": "m1_153",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #135",
+      "title": "1수 외통 #86",
       "fen": "1c1k5/3aa4/2P2b3/9/3P5/2P6/r8/p2A1B3/3KAN3/1R7 w - - 0 1",
       "solution": [
         "b1b10"
@@ -2346,7 +2346,7 @@
       "id": "m1_154",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #136",
+      "title": "1수 외통 #87",
       "fen": "3ak4/4a4/4c4/9/3Rnp2p/6P2/9/3KCA3/2r2A3/3N5 b - - 0 1",
       "solution": [
         "e6f4"
@@ -2373,7 +2373,7 @@
       "id": "m1_156",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #138",
+      "title": "1수 외통 #88",
       "fen": "3a1a3/3c1k3/9/6R2/9/3N1P3/4P4/3BCB3/4A4/2rcK4 w - - 0 1",
       "solution": [
         "g7f7"
@@ -2400,7 +2400,7 @@
       "id": "m1_157",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #139",
+      "title": "1수 외통 #89",
       "fen": "3ck2n1/4aa3/9/6ppb/1BbRP4/4c1P2/4P4/5B3/4A4/4KA1r1 b - - 0 1",
       "solution": [
         "i7g4"
@@ -2427,7 +2427,7 @@
       "id": "m1_159",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #141",
+      "title": "1수 외통 #90",
       "fen": "R2Ck4/9/4c4/2r2p3/9/9/9/4A4/4A4/4K4 b - - 0 1",
       "solution": [
         "c7c1"
@@ -2454,7 +2454,7 @@
       "id": "m1_160",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #142",
+      "title": "1수 외통 #91",
       "fen": "3k5/4a1R2/1c1a5/9/9/5P2p/B4r3/1C3N1p1/5A3/1N1C1K3 w - - 0 1",
       "solution": [
         "g9g10"
@@ -2481,7 +2481,7 @@
       "id": "m1_161",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #143",
+      "title": "1수 외통 #92",
       "fen": "1r1kca3/R8/3C5/3bp2p1/1B7/1b7/B3PP3/5A3/9/1N2KA2r w - - 0 1",
       "solution": [
         "a9d9"
@@ -2508,7 +2508,7 @@
       "id": "m1_163",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #145",
+      "title": "1수 외통 #93",
       "fen": "4k4/4aC3/3bc4/7p1/5R3/3r5/8B/3C2N2/3KA1R2/2r6 b - - 0 1",
       "solution": [
         "d8b5"
@@ -2535,7 +2535,7 @@
       "id": "m1_164",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #146",
+      "title": "1수 외통 #94",
       "fen": "5k2C/7R1/3B5/4cpp2/8p/4nn3/1P1PP4/9/4KA3/3c2r2 w - - 0 1",
       "solution": [
         "d8g10"
@@ -2562,7 +2562,7 @@
       "id": "m1_165",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #147",
+      "title": "1수 외통 #95",
       "fen": "5c3/5aR2/4ak3/6nB1/9/9/1P1P5/4C4/4K4/6r2 w - - 0 1",
       "solution": [
         "g9g8"
@@ -2589,7 +2589,7 @@
       "id": "m1_166",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #148",
+      "title": "1수 외통 #96",
       "fen": "4ka3/4a4/4c4/9/9/9/2B1n4/3A1R3/8r/5K3 b - - 0 1",
       "solution": [
         "i2i1"
@@ -2616,7 +2616,7 @@
       "id": "m1_167",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #149",
+      "title": "1수 외통 #97",
       "fen": "3cck3/4aa3/3b5/4r4/3p5/R2p2B2/1PP3PPB/3A5/4A1N2/3K5 w - - 0 1",
       "solution": [
         "g5i8"
@@ -2643,7 +2643,7 @@
       "id": "m1_173",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #154",
+      "title": "1수 외통 #98",
       "fen": "4kc3/4a1r2/3bnR3/2P6/4C3p/2PP5/R8/2N2B3/4A4/4KC1r1 w - - 0 1",
       "solution": [
         "f8f10"
@@ -2670,7 +2670,7 @@
       "id": "m1_177",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #158",
+      "title": "1수 외통 #99",
       "fen": "4rk3/9/4R4/2B3p2/1p7/2P1P4/1P7/9/4AA3/4K4 w - - 0 1",
       "solution": [
         "e8e10"
@@ -2697,7 +2697,7 @@
       "id": "m1_178",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #159",
+      "title": "1수 외통 #100",
       "fen": "R4a3/3ka4/5c3/5R3/9/9/3r4P/4K4/5N3/3r5 b - - 0 1",
       "solution": [
         "d1e1"
@@ -2724,7 +2724,7 @@
       "id": "m1_179",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #160",
+      "title": "1수 외통 #101",
       "fen": "R2c1kc1R/5a3/3a1b3/3pbp1p1/1B7/9/7P1/3ACK3/4A1r2/9 w - - 0 1",
       "solution": [
         "a10d10"
@@ -2751,7 +2751,7 @@
       "id": "m1_181",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #161",
+      "title": "1수 외통 #102",
       "fen": "3c5/R3a4/3ka4/1p4B2/9/4p4/5N3/9/3AA4/4KC1r1 w - - 0 1",
       "solution": [
         "f4e6"
@@ -2778,7 +2778,7 @@
       "id": "m1_182",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #162",
+      "title": "1수 외통 #103",
       "fen": "4ck3/3na4/5c3/3B5/7p1/3P5/9/2R2B1C1/4A3r/3CK4 b - - 0 1",
       "solution": [
         "i2e2"
@@ -2805,7 +2805,7 @@
       "id": "m1_185",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #165",
+      "title": "1수 외통 #104",
       "fen": "4k4/4aa3/2n1cc3/8b/6p2/4pp3/6PPB/3C5/5N2R/r2A1K1N1 b - - 0 1",
       "solution": [
         "a1d1"
@@ -2832,7 +2832,7 @@
       "id": "m1_186",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #166",
+      "title": "1수 외통 #105",
       "fen": "3k1c1r1/3aa4/3b5/6p2/1R7/5P1P1/9/1CpA2N2/3KA4/1r2C4 b - - 0 1",
       "solution": [
         "c3c2"
@@ -2859,7 +2859,7 @@
       "id": "m1_187",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #167",
+      "title": "1수 외통 #106",
       "fen": "2R1c4/3c1a3/3k5/3N5/3p5/9/1P1PP4/4AC3/5K3/8r w - - 0 1",
       "solution": [
         "c10c8"
@@ -2886,7 +2886,7 @@
       "id": "m1_191",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #170",
+      "title": "1수 외통 #107",
       "fen": "3c1k1n1/5b3/3a3c1/3N1ppp1/9/4B4/1r7/4C4/3AA4/4KC3 w - - 0 1",
       "solution": [
         "f1f8"
@@ -2913,7 +2913,7 @@
       "id": "m1_193",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #172",
+      "title": "1수 외통 #108",
       "fen": "3kc4/3n1b1b1/3R5/1p1p2B2/r3C2r1/2P1P4/1P5p1/3B5/4AA3/3CK4 w - - 0 1",
       "solution": [
         "d8d9"
@@ -2940,7 +2940,7 @@
       "id": "m1_194",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #173",
+      "title": "1수 외통 #109",
       "fen": "3ck1n2/4a1R2/4cr3/3N2B2/1p6p/9/4p1PPB/9/3A5/3KC4 w - - 0 1",
       "solution": [
         "g9g10"
@@ -2967,7 +2967,7 @@
       "id": "m1_195",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #174",
+      "title": "1수 외통 #110",
       "fen": "5k3/9/2n2c3/4p4/5bp2/9/2n1C1b2/5Ar2/4A4/2RCK4 b - - 0 1",
       "solution": [
         "g3g1"
@@ -2994,7 +2994,7 @@
       "id": "m1_200",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #179",
+      "title": "1수 외통 #111",
       "fen": "1R1ak4/9/1n2c4/8p/9/9/2PPPP3/2CK5/5Cn2/1r3A3 b - - 0 1",
       "solution": [
         "b1d1"
@@ -3021,7 +3021,7 @@
       "id": "m1_201",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #180",
+      "title": "1수 외통 #112",
       "fen": "3ak4/4a4/8R/4rn3/9/2P6/4C2b1/2N6/3AA4/2BCK4 w - - 0 1",
       "solution": [
         "i8i10"
@@ -3048,7 +3048,7 @@
       "id": "m1_202",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #181",
+      "title": "1수 외통 #113",
       "fen": "r4k3/4n4/4C4/5pp2/r4R3/5C3/4PP3/3A5/4A4/5K3 w - - 0 1",
       "solution": [
         "f6f7"
@@ -3075,7 +3075,7 @@
       "id": "m1_204",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #182",
+      "title": "1수 외통 #114",
       "fen": "r3ka1R1/4a4/cb7/1p3R3/4p4/2B2P3/1P2P2P1/5K3/4A3r/3n5 b - - 0 1",
       "solution": [
         "i2i3"
@@ -3102,7 +3102,7 @@
       "id": "m1_206",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #184",
+      "title": "1수 외통 #115",
       "fen": "c1b6/5R3/3k5/1p1B4P/9/9/1PP6/4C4/r4A2c/4K4 b - - 0 1",
       "solution": [
         "a2a1"
@@ -3129,7 +3129,7 @@
       "id": "m1_207",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #185",
+      "title": "1수 외통 #116",
       "fen": "3ck4/C2ba4/4c4/b8/9/1R7/3r5/4A4/4A4/4K4 b - - 0 1",
       "solution": [
         "d4d1"
@@ -3156,7 +3156,7 @@
       "id": "m1_209",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #187",
+      "title": "1수 외통 #117",
       "fen": "4ka2R/3a5/3ccb3/bN7/6pp1/1P3p3/3B2PP1/3r5/3A5/3KC4 b - - 0 1",
       "solution": [
         "d3d2"
@@ -3183,7 +3183,7 @@
       "id": "m1_210",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #188",
+      "title": "1수 외통 #118",
       "fen": "8R/4ak3/3acc3/b4R3/1p1P5/4r4/4B4/9/4AA3/3C1K3 w - - 0 1",
       "solution": [
         "e4h6"
@@ -3210,7 +3210,7 @@
       "id": "m1_212",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #189",
+      "title": "1수 외통 #119",
       "fen": "5k3/4a2b1/B4a3/3P2B2/5Nc2/9/9/4C4/3AA4/4KC3 w - - 0 1",
       "solution": [
         "f6g8"
@@ -3237,7 +3237,7 @@
       "id": "m1_214",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #191",
+      "title": "1수 외통 #120",
       "fen": "3ack3/1b1a5/6R2/2Bb5/7P1/9/2PPB4/4C4/4A4/3AK4 w - - 0 1",
       "solution": [
         "g8f8"
@@ -3264,7 +3264,7 @@
       "id": "m1_215",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #192",
+      "title": "1수 외통 #121",
       "fen": "3a1a3/4k4/4c3R/3n1pp2/9/2r4P1/4B2P1/9/3KC4/6B2 b - - 0 1",
       "solution": [
         "c5d5"
@@ -3291,7 +3291,7 @@
       "id": "m1_218",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #195",
+      "title": "1수 외통 #122",
       "fen": "2b1k4/4aa3/4r4/p8/3p5/2P6/3P2b2/4NC3/3AAKcn1/3C5 b - - 0 1",
       "solution": [
         "g2i2"
@@ -3318,7 +3318,7 @@
       "id": "m1_219",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #196",
+      "title": "1수 외통 #123",
       "fen": "3R5/5k3/3a5/9/9/1r3P3/9/1b7/3CA4/4CK3 w - - 0 1",
       "solution": [
         "d2f2"
@@ -3345,7 +3345,7 @@
       "id": "m1_220",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #197",
+      "title": "1수 외통 #124",
       "fen": "4k4/3aa4/3cc4/2n6/3Rb4/3b5/9/3A1B3/3A5/3K1C3 b - - 0 1",
       "solution": [
         "d5a3"
@@ -3372,7 +3372,7 @@
       "id": "m1_222",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #199",
+      "title": "1수 외통 #125",
       "fen": "4kc3/4aaN2/2n1c4/9/4P4/9/4n4/3CK4/6C2/9 b - - 0 1",
       "solution": [
         "e8e5"
@@ -3399,7 +3399,7 @@
       "id": "m1_223",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #200",
+      "title": "1수 외통 #126",
       "fen": "3cka2R/3bc4/4R4/4pp3/9/3r5/9/4C4/4A4/5K3 w - - 0 1",
       "solution": [
         "e8e9"
@@ -3426,7 +3426,7 @@
       "id": "m1_224",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #201",
+      "title": "1수 외통 #127",
       "fen": "4kaR2/4a4/2C1c4/9/7p1/3p5/2P1P4/3c5/r3AB3/r2AKC3 b - - 0 1",
       "solution": [
         "a2e2"
@@ -3453,7 +3453,7 @@
       "id": "m1_225",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #202",
+      "title": "1수 외통 #128",
       "fen": "3k5/8R/3a1a3/p6r1/2R1bp3/9/1p7/2p6/1c2AA3/5K3 b - - 0 1",
       "solution": [
         "h7h1"
@@ -3480,7 +3480,7 @@
       "id": "m1_227",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #204",
+      "title": "1수 외통 #129",
       "fen": "3a1k3/R8/5r3/6N2/9/3PP4/4Cn3/9/3KA4/5N3 w - - 0 1",
       "solution": [
         "g7h9"
@@ -3507,7 +3507,7 @@
       "id": "m1_229",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #206",
+      "title": "1수 외통 #130",
       "fen": "4k4/1c1a5/4ca3/b4N3/5B3/5n3/9/9/4AA3/3CCK3 b - - 0 1",
       "solution": [
         "f5g3"
@@ -3534,7 +3534,7 @@
       "id": "m1_231",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #208",
+      "title": "1수 외통 #131",
       "fen": "3c1k3/4aa3/9/9/1B7/P3B4/3p5/4C4/2bA5/3CK4 w - - 0 1",
       "solution": [
         "e5h7"
@@ -3561,7 +3561,7 @@
       "id": "m1_233",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #209",
+      "title": "1수 외통 #132",
       "fen": "4ka3/4a4/3bcb3/9/1pp6/7n1/3P5/3B5/4AA3/r2C1K2C b - - 0 1",
       "solution": [
         "h5g3"
@@ -3588,7 +3588,7 @@
       "id": "m1_235",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #211",
+      "title": "1수 외통 #133",
       "fen": "2Rak4/5a3/4c4/9/9/1P2BP3/9/9/3A5/3KA2r1 b - - 0 1",
       "solution": [
         "h1e1"
@@ -3615,7 +3615,7 @@
       "id": "m1_237",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #212",
+      "title": "1수 외통 #134",
       "fen": "9/4kc3/4cb3/1p1p4R/9/3PP4/9/3B5/4A4/4KNr2 b - - 0 1",
       "solution": [
         "g1f1"
@@ -3642,7 +3642,7 @@
       "id": "m1_241",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #215",
+      "title": "1수 외통 #135",
       "fen": "2r1kcR2/3R1a3/1C3C3/1p1pc1B2/9/3P5/5p3/2N6/9/4K4 w - - 0 1",
       "solution": [
         "g10f10"
@@ -3669,7 +3669,7 @@
       "id": "m1_244",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #217",
+      "title": "1수 외통 #136",
       "fen": "4c4/3rk4/9/6R2/9/9/9/5K3/5C3/9 b - - 0 1",
       "solution": [
         "d9d3"
@@ -3696,7 +3696,7 @@
       "id": "m1_245",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #218",
+      "title": "1수 외통 #137",
       "fen": "5a3/3ka4/5R3/1p1N5/9/c1r6/BP1P5/3CK4/4A4/9 w - - 0 1",
       "solution": [
         "d7b8"
@@ -3723,7 +3723,7 @@
       "id": "m1_249",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #222",
+      "title": "1수 외통 #138",
       "fen": "3k5/3r5/2P6/9/9/9/3p1p3/4R4/4K4/4C4 w - - 0 1",
       "solution": [
         "e3e10"
@@ -3750,7 +3750,7 @@
       "id": "m1_250",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #223",
+      "title": "1수 외통 #139",
       "fen": "B2k5/3a5/3a5/2N6/6p2/9/1P2p1b2/1B2C4/3K1An2/3A5 w - - 0 1",
       "solution": [
         "c7b9"
@@ -3777,7 +3777,7 @@
       "id": "m1_251",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #224",
+      "title": "1수 외통 #140",
       "fen": "CR3a3/5k3/4c4/1p1cp1p2/9/9/NPP3b2/9/3r1A3/5K3 b - - 0 1",
       "solution": [
         "d2d1"
@@ -3804,7 +3804,7 @@
       "id": "m1_252",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #225",
+      "title": "1수 외통 #141",
       "fen": "4ck3/4aa3/2R2b3/9/9/3p3p1/9/4rA3/9/3K1C3 b - - 0 1",
       "solution": [
         "e3d3"
@@ -3831,7 +3831,7 @@
       "id": "m1_253",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #226",
+      "title": "1수 외통 #142",
       "fen": "3k5/2R1a4/3P5/5P3/4r2b1/9/9/5A3/9/5K3 w - - 0 1",
       "solution": [
         "c9c10"
@@ -3858,7 +3858,7 @@
       "id": "m1_254",
       "difficulty": 1,
       "mateIn": 1,
-      "title": "1수 외통 #227",
+      "title": "1수 외통 #143",
       "fen": "9/4a2C1/3akc3/3pp4/9/4R4/9/2r2B3/4A4/5K3 w - - 0 1",
       "solution": [
         "f3h6"
@@ -4030,7 +4030,7 @@
       "id": "m2_07",
       "difficulty": 2,
       "mateIn": 2,
-      "title": "2수 외통 #7",
+      "title": "2수 외통 #6",
       "fen": "9/3ka1R2/4C4/2B6/2r6/6R2/P3p2P1/9/4A4/c3KA3 w - - 0 1",
       "solution": [
         "g5d5",
@@ -4059,7 +4059,7 @@
       "id": "m2_08",
       "difficulty": 2,
       "mateIn": 2,
-      "title": "2수 외통 #8",
+      "title": "2수 외통 #7",
       "fen": "2rk1a3/4n3r/4B4/6pp1/9/p2b5/1R1n2P1P/9/3C5/4CK3 b - - 0 1",
       "solution": [
         "i9f9",
@@ -4088,7 +4088,7 @@
       "id": "m2_09",
       "difficulty": 2,
       "mateIn": 2,
-      "title": "2수 외통 #9",
+      "title": "2수 외통 #8",
       "fen": "5k1r1/2C1a3R/4ca3/2B6/5p1p1/9/3PB1P2/3A5/4A4/4KC3 w - - 0 1",
       "solution": [
         "f1f7",
@@ -4117,7 +4117,7 @@
       "id": "m2_13",
       "difficulty": 2,
       "mateIn": 2,
-      "title": "2수 외통 #11",
+      "title": "2수 외통 #9",
       "fen": "1C1ab4/3a3rC/3k1cR2/N2ppn1p1/4c4/2B2p3/8R/2N6/4AA3/3K5 w - - 0 1",
       "solution": [
         "g8f8",
@@ -4146,7 +4146,7 @@
       "id": "m2_22",
       "difficulty": 2,
       "mateIn": 2,
-      "title": "2수 외통 #18",
+      "title": "2수 외통 #10",
       "fen": "4kc3/4a4/3ac4/8b/9/9/2P1P4/C4A3/4A1r2/3CK1p2 b - - 0 1",
       "solution": [
         "g2e2",
@@ -4175,7 +4175,7 @@
       "id": "m2_25",
       "difficulty": 2,
       "mateIn": 2,
-      "title": "2수 외통 #21",
+      "title": "2수 외통 #11",
       "fen": "4c4/4k4/8R/1p1p2pp1/5B3/P1b2C1n1/5P3/4p4/3K5/9 b - - 0 1",
       "solution": [
         "e3e2",
@@ -4204,7 +4204,7 @@
       "id": "m2_26",
       "difficulty": 2,
       "mateIn": 2,
-      "title": "2수 외통 #22",
+      "title": "2수 외통 #12",
       "fen": "4kc3/2C1a4/5r3/1pp6/3r5/5npp1/1PP3b2/R8/4A1N2/4CK3 b - - 0 1",
       "solution": [
         "f5e3",
@@ -4233,7 +4233,7 @@
       "id": "m2_27",
       "difficulty": 2,
       "mateIn": 2,
-      "title": "2수 외통 #23",
+      "title": "2수 외통 #13",
       "fen": "9/9/4k4/3P5/2B1P2p1/5P3/1Nn6/9/4A4/2cC1K3 w - - 0 1",
       "solution": [
         "e6e7",
@@ -4262,7 +4262,7 @@
       "id": "m2_28",
       "difficulty": 2,
       "mateIn": 2,
-      "title": "2수 외통 #24",
+      "title": "2수 외통 #14",
       "fen": "4ck3/4a4/9/6r2/B8/5n3/5B3/3A5/4AK3/8r b - - 0 1",
       "solution": [
         "g7g2",
@@ -4291,7 +4291,7 @@
       "id": "m2_29",
       "difficulty": 2,
       "mateIn": 2,
-      "title": "2수 외통 #25",
+      "title": "2수 외통 #15",
       "fen": "4kc2R/3na4/4c4/b3r4/9/1PP6/9/1b3R3/3r1A3/3N1KC2 b - - 0 1",
       "solution": [
         "d2d1",
@@ -4320,7 +4320,7 @@
       "id": "m2_30",
       "difficulty": 2,
       "mateIn": 2,
-      "title": "2수 외통 #26",
+      "title": "2수 외통 #16",
       "fen": "5c3/5k3/9/9/9/4R4/9/4p3r/4A4/4K4 b - - 0 1",
       "solution": [
         "i3i1",
@@ -4349,7 +4349,7 @@
       "id": "m2_35",
       "difficulty": 2,
       "mateIn": 2,
-      "title": "2수 외통 #30",
+      "title": "2수 외통 #17",
       "fen": "9/9/3k5/b2p2pp1/2Rn5/9/1PP1B3P/9/3KN4/2n2rB2 b - - 0 1",
       "solution": [
         "c1b3",
@@ -4378,7 +4378,7 @@
       "id": "m2_38",
       "difficulty": 2,
       "mateIn": 2,
-      "title": "2수 외통 #31",
+      "title": "2수 외통 #18",
       "fen": "4c4/3R5/3bk4/3C5/2p3r2/8P/3PP3N/9/2r6/2BAK1p2 b - - 0 1",
       "solution": [
         "g1f1",
@@ -4404,39 +4404,10 @@
       }
     },
     {
-      "id": "m2_39",
-      "difficulty": 2,
-      "mateIn": 2,
-      "title": "2수 외통 #32",
-      "fen": "3ak4/4a4/2n1c4/2ppp1pp1/9/2r6/9/2nB3R1/4AN3/3K1C3 b - - 0 1",
-      "solution": [
-        "c5e5",
-        "d1d2",
-        "e5e2"
-      ],
-      "toMove": "red",
-      "source": "Game 47, Move 73",
-      "validation": {
-        "strictPass": true,
-        "relaxedPass": true,
-        "forcedMateStart": true,
-        "exactMateLengthStart": true,
-        "solutionLengthMatches": true,
-        "firstMoveMatches": true,
-        "uniqueFirstMove": true,
-        "sameMateCandidates": [
-          "c5e5"
-        ],
-        "linePerfect": true,
-        "finalMateResolved": true,
-        "depth": 8
-      }
-    },
-    {
       "id": "m2_40",
       "difficulty": 2,
       "mateIn": 2,
-      "title": "2수 외통 #33",
+      "title": "2수 외통 #19",
       "fen": "R2bk4/4aa3/4P4/4r4/9/2p6/2c6/3AC4/3C5/3K1A3 w - - 0 1",
       "solution": [
         "e8e9",
@@ -4465,7 +4436,7 @@
       "id": "m2_44",
       "difficulty": 2,
       "mateIn": 2,
-      "title": "2수 외통 #35",
+      "title": "2수 외통 #20",
       "fen": "7n1/3k5/9/7pb/5P3/1pp1N4/8B/4C4/3CK4/9 w - - 0 1",
       "solution": [
         "e5d7",
@@ -4494,7 +4465,7 @@
       "id": "m2_45",
       "difficulty": 2,
       "mateIn": 2,
-      "title": "2수 외통 #36",
+      "title": "2수 외통 #21",
       "fen": "3a1a3/4k4/4c4/1pp2C1p1/9/2R3N2/9/4A4/4AK1n1/2B3r2 b - - 0 1",
       "solution": [
         "g1g2",
@@ -4523,7 +4494,7 @@
       "id": "m2_46",
       "difficulty": 2,
       "mateIn": 2,
-      "title": "2수 외통 #37",
+      "title": "2수 외통 #22",
       "fen": "5a3/3ak4/9/4b1p1p/5R3/1P7/2c3b2/4AB3/3KAC3/r8 b - - 0 1",
       "solution": [
         "e7b5",
@@ -4552,7 +4523,7 @@
       "id": "m2_48",
       "difficulty": 2,
       "mateIn": 2,
-      "title": "2수 외통 #38",
+      "title": "2수 외통 #23",
       "fen": "4kc3/4a4/2n1c3R/b3p2C1/6n2/1r7/9/2CN5/4AA3/4K4 b - - 0 1",
       "solution": [
         "b5b1",
@@ -4581,7 +4552,7 @@
       "id": "m2_52",
       "difficulty": 2,
       "mateIn": 2,
-      "title": "2수 외통 #41",
+      "title": "2수 외통 #24",
       "fen": "1c2k4/2raa4/R3c4/4p1pp1/1r7/9/4P4/9/3BA4/3K1C3 b - - 0 1",
       "solution": [
         "b6b1",
@@ -4610,7 +4581,7 @@
       "id": "m2_54",
       "difficulty": 2,
       "mateIn": 2,
-      "title": "2수 외통 #43",
+      "title": "2수 외통 #25",
       "fen": "3kc4/3ca4/2R6/1pp1p4/5bpp1/9/4r4/4C4/3BA4/4KC3 b - - 0 1",
       "solution": [
         "f6h3",
@@ -4639,7 +4610,7 @@
       "id": "m2_55",
       "difficulty": 2,
       "mateIn": 2,
-      "title": "2수 외통 #44",
+      "title": "2수 외통 #26",
       "fen": "4k4/4a4/4c4/9/6pp1/9/2b2NPP1/3AR4/5C3/r2A1K3 b - - 0 1",
       "solution": [
         "a1d1",
@@ -4668,7 +4639,7 @@
       "id": "m2_56",
       "difficulty": 2,
       "mateIn": 2,
-      "title": "2수 외통 #45",
+      "title": "2수 외통 #27",
       "fen": "3c1kb2/3aa4/6R2/5p1p1/1p3P3/N8/6b1r/4A4/4K4/5C3 b - - 0 1",
       "solution": [
         "i4i2",
@@ -4697,7 +4668,7 @@
       "id": "m2_59",
       "difficulty": 2,
       "mateIn": 2,
-      "title": "2수 외통 #47",
+      "title": "2수 외통 #28",
       "fen": "2Rck4/3aa4/9/7pp/3Nc4/4p2P1/6b2/6R2/4N4/r2AKC2r b - - 0 1",
       "solution": [
         "a1d1",
@@ -4726,7 +4697,7 @@
       "id": "m3_12",
       "difficulty": 3,
       "mateIn": 3,
-      "title": "3수 외통 #7",
+      "title": "3수 외통 #1",
       "fen": "c2k5/n3a4/3a5/1N2cN2C/9/1B3P1P1/1r7/9/4AA3/n2K5 b - - 0 1",
       "solution": [
         "b4b1",
@@ -4757,7 +4728,7 @@
       "id": "m3_22",
       "difficulty": 3,
       "mateIn": 3,
-      "title": "3수 외통 #13",
+      "title": "3수 외통 #2",
       "fen": "4k4/4a1P2/5a3/1pp3RB1/9/3r5/2b6/4A4/1b1cK4/9 b - - 0 1",
       "solution": [
         "d2a2",
@@ -4788,7 +4759,7 @@
       "id": "m3_26",
       "difficulty": 3,
       "mateIn": 3,
-      "title": "3수 외통 #15",
+      "title": "3수 외통 #3",
       "fen": "3c5/4c4/4k4/3PC4/4N4/9/9/9/4K4/9 w - - 0 1",
       "solution": [
         "e6g7",
@@ -4809,6 +4780,161 @@
         "uniqueFirstMove": true,
         "sameMateCandidates": [
           "e6g7"
+        ],
+        "linePerfect": true,
+        "finalMateResolved": true,
+        "depth": 8
+      }
+    },
+    {
+      "id": "m3_27",
+      "difficulty": 3,
+      "mateIn": 3,
+      "title": "3수 외통 #4",
+      "fen": "2R5C/1N1k5/1c2n1n2/4p1p2/9/P8/4P2RP/5N2C/4K4/3A5 w - - 3 16",
+      "solution": [
+        "h4h9",
+        "e8g9",
+        "h9g9",
+        "g8e9",
+        "c10d10"
+      ],
+      "toMove": "blue",
+      "source": "Generated feed candidate #41",
+      "validation": {
+        "strictPass": true,
+        "relaxedPass": true,
+        "forcedMateStart": true,
+        "exactMateLengthStart": true,
+        "solutionLengthMatches": true,
+        "firstMoveMatches": true,
+        "uniqueFirstMove": true,
+        "sameMateCandidates": [
+          "h4h9"
+        ],
+        "linePerfect": true,
+        "finalMateResolved": true,
+        "depth": 8
+      }
+    },
+    {
+      "id": "m3_28",
+      "difficulty": 3,
+      "mateIn": 3,
+      "title": "3수 외통 #5",
+      "fen": "2bar4/1R3a3/3kb3R/2N1p4/6p2/9/P6P1/4C2C1/3AK4/5AN2 w - - 3 14",
+      "solution": [
+        "b9b8",
+        "d8e9",
+        "b8e8",
+        "e9f10",
+        "i8i10"
+      ],
+      "toMove": "blue",
+      "source": "Generated feed candidate #137",
+      "validation": {
+        "strictPass": true,
+        "relaxedPass": true,
+        "forcedMateStart": true,
+        "exactMateLengthStart": true,
+        "solutionLengthMatches": true,
+        "firstMoveMatches": true,
+        "uniqueFirstMove": true,
+        "sameMateCandidates": [
+          "b9b8"
+        ],
+        "linePerfect": true,
+        "finalMateResolved": true,
+        "depth": 8
+      }
+    },
+    {
+      "id": "m3_29",
+      "difficulty": 3,
+      "mateIn": 3,
+      "title": "3수 외통 #6",
+      "fen": "1b1aa3r/3k5/1R7/1pp5p/3n5/9/P3P1B1P/2N1C4/4K4/3RAA3 w - - 3 15",
+      "solution": [
+        "b8b9",
+        "d9d8",
+        "d1d6",
+        "c7d7",
+        "d6d7"
+      ],
+      "toMove": "blue",
+      "source": "Generated feed candidate #140",
+      "validation": {
+        "strictPass": true,
+        "relaxedPass": true,
+        "forcedMateStart": true,
+        "exactMateLengthStart": true,
+        "solutionLengthMatches": true,
+        "firstMoveMatches": true,
+        "uniqueFirstMove": true,
+        "sameMateCandidates": [
+          "b8b9"
+        ],
+        "linePerfect": true,
+        "finalMateResolved": true,
+        "depth": 8
+      }
+    },
+    {
+      "id": "m3_30",
+      "difficulty": 3,
+      "mateIn": 3,
+      "title": "3수 외통 #7",
+      "fen": "r3aa1bR/4k4/2n1cn3/4p1p2/9/9/P1P2B3/2N6/3K5/R1BA5 b - - 8 5",
+      "solution": [
+        "a10d10",
+        "f4d7",
+        "d10d7",
+        "c4d4",
+        "d7d4"
+      ],
+      "toMove": "red",
+      "source": "Generated feed candidate #143",
+      "validation": {
+        "strictPass": true,
+        "relaxedPass": true,
+        "forcedMateStart": true,
+        "exactMateLengthStart": true,
+        "solutionLengthMatches": true,
+        "firstMoveMatches": true,
+        "uniqueFirstMove": true,
+        "sameMateCandidates": [
+          "a10d10"
+        ],
+        "linePerfect": true,
+        "finalMateResolved": true,
+        "depth": 8
+      }
+    },
+    {
+      "id": "m3_31",
+      "difficulty": 3,
+      "mateIn": 3,
+      "title": "3수 외통 #8",
+      "fen": "4R4/9/1c3k3/5b3/r4Pp2/1b7/2PN4P/1C1CB4/4K4/3A1A2R w - - 11 15",
+      "solution": [
+        "f6f7",
+        "f8f9",
+        "d3f3",
+        "g6f6",
+        "f7f8"
+      ],
+      "toMove": "blue",
+      "source": "Generated feed candidate #151",
+      "validation": {
+        "strictPass": true,
+        "relaxedPass": true,
+        "forcedMateStart": true,
+        "exactMateLengthStart": true,
+        "solutionLengthMatches": true,
+        "firstMoveMatches": true,
+        "uniqueFirstMove": true,
+        "sameMateCandidates": [
+          "f6f7"
         ],
         "linePerfect": true,
         "finalMateResolved": true,

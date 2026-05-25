@@ -21,6 +21,8 @@ class MonetizationProvider extends ChangeNotifier {
   bool _purchasePending = false;
   bool _removeAdsPurchased = false;
   bool _premiumPurchased = false;
+  bool _dailyPuzzlePlusSubscribed = false;
+  int _dailyPuzzleStartedToday = 0;
   String? _errorMessage;
 
   List<ProductDetails> _products = const [];
@@ -37,14 +39,17 @@ class MonetizationProvider extends ChangeNotifier {
   bool get purchasePending => _purchasePending;
   bool get removeAdsPurchased => _removeAdsPurchased;
   bool get premiumPurchased => _premiumPurchased;
+  bool get dailyPuzzlePlusSubscribed => _dailyPuzzlePlusSubscribed;
   bool get adSdkInitialized => _adSdkInitialized;
-  bool get isPremiumUnlocked => _premiumPurchased;
-  bool get isAdFree => _removeAdsPurchased || _premiumPurchased;
+  bool get isPremiumUnlocked =>
+      _premiumPurchased || _dailyPuzzlePlusSubscribed;
+  bool get isAdFree =>
+      _removeAdsPurchased || _premiumPurchased || _dailyPuzzlePlusSubscribed;
   bool get canShowAds => MonetizationConfig.isAdsSupportedPlatform && !isAdFree;
   String? get errorMessage => _errorMessage;
   List<ProductDetails> get products => _products;
-  ProductDetails? get removeAdsProduct =>
-      _productById(MonetizationConfig.removeAdsProductId);
+  ProductDetails? get dailyPuzzlePlusProduct =>
+      _productById(MonetizationConfig.dailyPuzzlePlusMonthlyProductId);
   int get maxDifficulty => MonetizationConfig.maxDifficulty;
   int get maxThinkingTimeSec => MonetizationConfig.maxThinkingTimeSec;
 
@@ -55,7 +60,10 @@ class MonetizationProvider extends ChangeNotifier {
       await _service.init();
       _removeAdsPurchased = _service.removeAdsPurchased;
       _premiumPurchased = _service.premiumPurchased;
-      if (_premiumPurchased) {
+      _dailyPuzzlePlusSubscribed = _service.dailyPuzzlePlusSubscribed;
+      await _service.normalizeDailyPuzzleUseCounter(DateTime.now());
+      _dailyPuzzleStartedToday = _service.dailyPuzzleStartedToday;
+      if (_premiumPurchased || _dailyPuzzlePlusSubscribed) {
         _removeAdsPurchased = true;
       }
 
@@ -146,8 +154,8 @@ class MonetizationProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> buyRemoveAds() async {
-    await _buyById(MonetizationConfig.removeAdsProductId);
+  Future<void> buyDailyPuzzlePlus() async {
+    await _buyById(MonetizationConfig.dailyPuzzlePlusMonthlyProductId);
   }
 
   Future<void> _buyById(String productId) async {
@@ -176,6 +184,104 @@ class MonetizationProvider extends ChangeNotifier {
       _errorMessage = 'Purchase failed: $error';
       notifyListeners();
     }
+  }
+
+  Future<void> normalizeDailyPuzzleUseCounter() async {
+    await _service.normalizeDailyPuzzleUseCounter(DateTime.now());
+    _dailyPuzzleStartedToday = _service.dailyPuzzleStartedToday;
+  }
+
+  int get dailyPuzzleStartedToday => _dailyPuzzleStartedToday;
+  int get freeDailyPuzzleRemaining {
+    if (_dailyPuzzlePlusSubscribed) {
+      return MonetizationConfig.freeDailyPuzzleLimit;
+    }
+    final remaining =
+        MonetizationConfig.freeDailyPuzzleLimit - dailyPuzzleStartedToday;
+    return remaining < 0 ? 0 : remaining;
+  }
+
+  bool get hasUnlimitedDailyPuzzles => _dailyPuzzlePlusSubscribed;
+  bool get shouldShowDailyPuzzleStartAd =>
+      !_dailyPuzzlePlusSubscribed &&
+      _dailyPuzzleStartedToday >= MonetizationConfig.freeDailyPuzzleLimit;
+
+  Future<bool> canStartDailyPuzzle() async {
+    await normalizeDailyPuzzleUseCounter();
+    return true;
+  }
+
+  Future<bool> shouldShowDailyPuzzleStartAdNow() async {
+    await normalizeDailyPuzzleUseCounter();
+    return shouldShowDailyPuzzleStartAd;
+  }
+
+  Future<void> registerDailyPuzzleStarted() async {
+    if (_dailyPuzzlePlusSubscribed) return;
+    _dailyPuzzleStartedToday =
+        await _service.registerDailyPuzzleStarted(DateTime.now());
+    if (shouldShowDailyPuzzleStartAd && canShowAds) {
+      if (!_adSdkInitialized) {
+        await ensureAdsInitialized();
+      } else if (_interstitialAd == null) {
+        _loadInterstitial();
+      }
+    }
+    notifyListeners();
+  }
+
+  Future<bool> maybeShowDailyPuzzleStartInterstitial() async {
+    if (canShowAds && !_adSdkInitialized) {
+      await ensureAdsInitialized();
+    }
+    if (!_adSdkInitialized || !canShowAds) {
+      return false;
+    }
+    if (_interstitialShowing) {
+      return false;
+    }
+
+    if (_interstitialAd == null) {
+      _loadInterstitial();
+      await _waitForInterstitialToLoad();
+    }
+
+    if (_interstitialAd == null) {
+      return false;
+    }
+
+    final ad = _interstitialAd!;
+    _interstitialAd = null;
+    _interstitialShowing = true;
+    final completer = Completer<bool>();
+
+    ad.fullScreenContentCallback = FullScreenContentCallback(
+      onAdDismissedFullScreenContent: (ad) {
+        ad.dispose();
+        unawaited(_onInterstitialDismissed());
+        if (!completer.isCompleted) {
+          completer.complete(true);
+        }
+      },
+      onAdFailedToShowFullScreenContent: (ad, error) {
+        ad.dispose();
+        _interstitialShowing = false;
+        _loadInterstitial();
+        if (!completer.isCompleted) {
+          completer.complete(false);
+        }
+      },
+    );
+
+    ad.show();
+    return completer.future.timeout(
+      const Duration(seconds: 15),
+      onTimeout: () {
+        _interstitialShowing = false;
+        _loadInterstitial();
+        return false;
+      },
+    );
   }
 
   Future<void> restorePurchases() async {
@@ -327,6 +433,17 @@ class MonetizationProvider extends ChangeNotifier {
     );
   }
 
+  Future<void> _waitForInterstitialToLoad({
+    Duration timeout = const Duration(seconds: 4),
+  }) async {
+    final deadline = DateTime.now().add(timeout);
+    while (_interstitialAd == null &&
+        _interstitialLoading &&
+        DateTime.now().isBefore(deadline)) {
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+    }
+  }
+
   void _disposeInterstitial() {
     _interstitialAd?.dispose();
     _interstitialAd = null;
@@ -375,7 +492,10 @@ class MonetizationProvider extends ChangeNotifier {
   }
 
   Future<void> _deliverPurchase(String productId) async {
-    if (productId == MonetizationConfig.removeAdsProductId) {
+    if (productId == MonetizationConfig.dailyPuzzlePlusMonthlyProductId) {
+      _dailyPuzzlePlusSubscribed = true;
+      _removeAdsPurchased = true;
+    } else if (productId == MonetizationConfig.removeAdsProductId) {
       _removeAdsPurchased = true;
     } else if (productId == MonetizationConfig.premiumAiProductId) {
       _premiumPurchased = true;
@@ -387,6 +507,7 @@ class MonetizationProvider extends ChangeNotifier {
     await _service.setEntitlements(
       removeAdsPurchased: _removeAdsPurchased,
       premiumPurchased: _premiumPurchased,
+      dailyPuzzlePlusSubscribed: _dailyPuzzlePlusSubscribed,
     );
 
     if (isAdFree) {

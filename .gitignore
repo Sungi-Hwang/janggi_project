@@ -57,6 +57,20 @@ flutter_setup.log
 setup_status.log
 janggi_master/build_stockfish.rsp
 
+# Local verification/generated artifacts
+tools/bundletool-*.jar
+janggi_master/dev/design_preview/
+janggi_master/dev/screenshots/
+janggi_master/dev/verify/
+janggi_master/dev/local_gib_*
+janggi_master/dev/tail_*.json
+janggi_master/dev/tail_batches/
+janggi_master/dev/tail_validation_chunks/
+janggi_master/dev/*_report.json
+janggi_master/dev/published_generated_*.json
+janggi_master/dev/new_bundled_mate3_flow_report.json
+janggi_master/dev/reject_immediate_capture_generated_puzzles.sql
+
 # Claude AI
 .claude/
 
