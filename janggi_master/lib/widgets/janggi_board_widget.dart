@@ -141,6 +141,7 @@ class _JanggiBoardWidgetState extends State<JanggiBoardWidget> {
                     gridSpacing: gridSpacing,
                     flipBoard: widget.flipBoard,
                     lineColor: boardLineColor,
+                    lineWidth: _getBoardLineWidth(),
                   ),
                 ),
               ),
@@ -363,6 +364,8 @@ class _JanggiBoardWidgetState extends State<JanggiBoardWidget> {
     switch (widget.boardSkin) {
       case 'dark':
         return const Color(0xFF4A3A2A);
+      case JanggiSkin.boardReadable:
+        return const Color(0xFFECCB8A);
       case JanggiSkin.boardKoreanWood:
         return const Color(0xFFE6D8BE);
       case 'classic':
@@ -377,6 +380,8 @@ class _JanggiBoardWidgetState extends State<JanggiBoardWidget> {
     switch (widget.boardSkin) {
       case 'dark':
         return const Color(0xFFF2E9D8);
+      case JanggiSkin.boardReadable:
+        return const Color(0xFF3A2416);
       case JanggiSkin.boardKoreanWood:
         return const Color(0xFF4C2F1B);
       case 'classic':
@@ -387,10 +392,23 @@ class _JanggiBoardWidgetState extends State<JanggiBoardWidget> {
     }
   }
 
+  double _getBoardLineWidth() {
+    switch (widget.boardSkin) {
+      case JanggiSkin.boardReadable:
+        return 2.05;
+      case 'dark':
+        return 1.7;
+      default:
+        return 1.5;
+    }
+  }
+
   double _getBoardTextureOpacity() {
     switch (widget.boardSkin) {
       case 'dark':
         return 0.45;
+      case JanggiSkin.boardReadable:
+        return 0.05;
       case JanggiSkin.boardKoreanWood:
         return 0.24;
       case 'classic':
@@ -405,6 +423,8 @@ class _JanggiBoardWidgetState extends State<JanggiBoardWidget> {
     switch (widget.boardSkin) {
       case 'dark':
         return const Color(0x66000000);
+      case JanggiSkin.boardReadable:
+        return const Color(0x08FFFFFF);
       case JanggiSkin.boardKoreanWood:
         return const Color(0x26FFF8EB);
       case 'classic':
@@ -418,6 +438,9 @@ class _JanggiBoardWidgetState extends State<JanggiBoardWidget> {
   Color? _getSquareColor(Position position) {
     // Only show highlight for valid move positions, not the selected piece
     if (widget.validMoves.contains(position)) {
+      if (widget.boardSkin == JanggiSkin.boardReadable) {
+        return const Color(0xFF2E7D32).withValues(alpha: 0.23);
+      }
       return Colors.yellow.withValues(alpha: 0.3); // Valid move cells
     }
     return Colors.transparent;
@@ -429,7 +452,8 @@ class _JanggiBoardWidgetState extends State<JanggiBoardWidget> {
     }
     return TraditionalPieceWidget(
       piece: piece,
-      size: size * 0.85,
+      size: size *
+          (widget.pieceSkin == JanggiSkin.pieceReadableDisc ? 0.93 : 0.85),
       skin: widget.pieceSkin,
     );
   }
@@ -438,6 +462,7 @@ class _JanggiBoardWidgetState extends State<JanggiBoardWidget> {
     switch (widget.boardSkin) {
       case JanggiSkin.boardKoreanWood:
         return 'assets/images/장기판.png';
+      case JanggiSkin.boardReadable:
       case 'classic':
       case 'dark':
       case 'wood':
@@ -450,6 +475,7 @@ class _JanggiBoardWidgetState extends State<JanggiBoardWidget> {
     switch (widget.boardSkin) {
       case JanggiSkin.boardKoreanWood:
         return 0;
+      case JanggiSkin.boardReadable:
       case 'classic':
       case 'dark':
       case 'wood':
@@ -519,18 +545,20 @@ class BoardLinesPainter extends CustomPainter {
   final double gridSpacing;
   final bool flipBoard;
   final Color lineColor;
+  final double lineWidth;
 
   BoardLinesPainter({
     required this.gridSpacing,
     required this.flipBoard,
     required this.lineColor,
+    this.lineWidth = 1.5,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = lineColor
-      ..strokeWidth = 1.5
+      ..strokeWidth = lineWidth
       ..style = PaintingStyle.stroke;
 
     // Draw horizontal lines (10 lines for 10 ranks: 0-9)
@@ -606,7 +634,8 @@ class BoardLinesPainter extends CustomPainter {
   bool shouldRepaint(BoardLinesPainter oldDelegate) =>
       gridSpacing != oldDelegate.gridSpacing ||
       flipBoard != oldDelegate.flipBoard ||
-      lineColor != oldDelegate.lineColor;
+      lineColor != oldDelegate.lineColor ||
+      lineWidth != oldDelegate.lineWidth;
 }
 
 /// Extension for _JanggiBoardWidgetState to add hint arrow

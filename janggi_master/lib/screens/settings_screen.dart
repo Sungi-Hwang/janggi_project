@@ -205,6 +205,10 @@ class SettingsScreen extends StatelessWidget {
                           child: Text('한국 장기판'),
                         ),
                         DropdownMenuItem(
+                          value: JanggiSkin.boardReadable,
+                          child: Text('선명한 보드'),
+                        ),
+                        DropdownMenuItem(
                           value: JanggiSkin.boardLegacyGold,
                           child: Text('금빛 보드'),
                         ),
@@ -232,6 +236,10 @@ class SettingsScreen extends StatelessWidget {
                         DropdownMenuItem(
                           value: JanggiSkin.pieceTraditional,
                           child: Text('한국 전통'),
+                        ),
+                        DropdownMenuItem(
+                          value: JanggiSkin.pieceReadableDisc,
+                          child: Text('선명한 원형'),
                         ),
                         DropdownMenuItem(
                           value: JanggiSkin.pieceLegacyGold,

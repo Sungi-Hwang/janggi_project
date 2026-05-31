@@ -46,9 +46,14 @@ class TraditionalPiecePainter extends CustomPainter {
   });
 
   bool get _isLegacyGoldSkin => skin == JanggiSkin.pieceLegacyGold;
+  bool get _isReadableDiscSkin => skin == JanggiSkin.pieceReadableDisc;
 
   @override
   void paint(Canvas canvas, Size size) {
+    if (_isReadableDiscSkin) {
+      _paintReadableDisc(canvas, size);
+      return;
+    }
     if (_isLegacyGoldSkin) {
       _paintLegacyGold(canvas, size);
       return;
@@ -66,9 +71,8 @@ class TraditionalPiecePainter extends CustomPainter {
     final midTone = const Color(0xFFE8D4B0);
     final shadowColor = const Color(0xFFD4B184);
     final darkEdge = const Color(0xFF745536);
-    final textColor = isBlue
-        ? const Color(0xFF244E87)
-        : const Color(0xFFA12B2F);
+    final textColor =
+        isBlue ? const Color(0xFF244E87) : const Color(0xFFA12B2F);
 
     final shadowPaint = Paint()
       ..color = Colors.black.withValues(alpha: 0.18)
@@ -84,7 +88,8 @@ class TraditionalPiecePainter extends CustomPainter {
     final edgePaint = Paint()
       ..color = darkEdge
       ..style = PaintingStyle.fill;
-    _drawOctagon(canvas, center + const Offset(3, 3), radius, darkEdge, edgePaint);
+    _drawOctagon(
+        canvas, center + const Offset(3, 3), radius, darkEdge, edgePaint);
 
     final bodyPaint = Paint()
       ..shader = LinearGradient(
@@ -118,7 +123,8 @@ class TraditionalPiecePainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5
       ..color = darkEdge.withValues(alpha: 0.28);
-    _drawOctagon(canvas, center, radius * 0.88, Colors.transparent, borderPaint);
+    _drawOctagon(
+        canvas, center, radius * 0.88, Colors.transparent, borderPaint);
 
     _paintCharacter(
       canvas,
@@ -143,9 +149,8 @@ class TraditionalPiecePainter extends CustomPainter {
     final mainColor = const Color(0xFFFFF8DC);
     final shadowColor = const Color(0xFFD4A574);
     final darkEdge = const Color(0xFF8B6F47);
-    final textColor = isBlue
-        ? const Color(0xFF2E3192)
-        : const Color(0xFFB8232F);
+    final textColor =
+        isBlue ? const Color(0xFF2E3192) : const Color(0xFFB8232F);
 
     final shadowPaint = Paint()
       ..color = Colors.black.withValues(alpha: 0.3)
@@ -161,7 +166,8 @@ class TraditionalPiecePainter extends CustomPainter {
     final edgePaint = Paint()
       ..color = darkEdge
       ..style = PaintingStyle.fill;
-    _drawOctagon(canvas, center + const Offset(3, 3), radius, darkEdge, edgePaint);
+    _drawOctagon(
+        canvas, center + const Offset(3, 3), radius, darkEdge, edgePaint);
 
     final bodyPaint = Paint()
       ..shader = LinearGradient(
@@ -199,7 +205,8 @@ class TraditionalPiecePainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0
       ..color = textColor.withValues(alpha: 0.25);
-    _drawOctagon(canvas, center, radius * 0.88, Colors.transparent, borderPaint);
+    _drawOctagon(
+        canvas, center, radius * 0.88, Colors.transparent, borderPaint);
 
     _paintCharacter(
       canvas,
@@ -228,6 +235,95 @@ class TraditionalPiecePainter extends CustomPainter {
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
       canvas.drawCircle(center, radius + 2, glowPaint);
     }
+  }
+
+  void _paintReadableDisc(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final isBlue = piece.color == PieceColor.blue;
+    final scale = switch (piece.type) {
+      PieceType.general => 1.05,
+      PieceType.chariot => 1.01,
+      PieceType.horse || PieceType.elephant => 0.98,
+      PieceType.cannon => 0.97,
+      PieceType.guard => 0.94,
+      PieceType.soldier => 0.92,
+    };
+    final radius = this.size * 0.43 * scale;
+    final accentColor =
+        isBlue ? const Color(0xFF1E63B6) : const Color(0xFFB12E2E);
+    final rimColor = isBlue ? const Color(0xFF15447E) : const Color(0xFF7F1E1E);
+    final bodyTop = isBlue ? const Color(0xFFFFFBF0) : const Color(0xFFFFF5E8);
+    final bodyBottom =
+        isBlue ? const Color(0xFFE8D7AF) : const Color(0xFFE7CBA4);
+
+    final shadowPaint = Paint()
+      ..color = Colors.black.withValues(alpha: 0.28)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
+    canvas.drawCircle(center + const Offset(2.5, 3), radius, shadowPaint);
+
+    canvas.drawCircle(
+      center + const Offset(1.6, 1.8),
+      radius,
+      Paint()..color = const Color(0xFF6A4A2F),
+    );
+
+    final bodyPaint = Paint()
+      ..shader = LinearGradient(
+        colors: [bodyTop, const Color(0xFFF6E5C1), bodyBottom],
+        stops: const [0.0, 0.55, 1.0],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ).createShader(Rect.fromCircle(center: center, radius: radius));
+    canvas.drawCircle(center, radius * 0.96, bodyPaint);
+
+    final accentRing = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = radius * 0.09
+      ..color = accentColor.withValues(alpha: 0.55);
+    canvas.drawCircle(center, radius * 0.80, accentRing);
+
+    final edgePaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.6
+      ..color = rimColor.withValues(alpha: 0.75);
+    canvas.drawCircle(center, radius * 0.96, edgePaint);
+
+    final highlightPaint = Paint()
+      ..shader = RadialGradient(
+        colors: [
+          Colors.white.withValues(alpha: 0.55),
+          Colors.white.withValues(alpha: 0.0),
+        ],
+      ).createShader(
+        Rect.fromCircle(
+          center: center - Offset(radius * 0.30, radius * 0.32),
+          radius: radius * 0.55,
+        ),
+      );
+    canvas.drawCircle(
+      center - Offset(radius * 0.27, radius * 0.30),
+      radius * 0.38,
+      highlightPaint,
+    );
+
+    _paintCharacter(
+      canvas,
+      center: center,
+      textColor: accentColor,
+      fontSize: this.size * 0.51 * piece.type.glyphScale,
+      shadows: [
+        Shadow(
+          color: Colors.white.withValues(alpha: 0.95),
+          offset: const Offset(1.1, 1.1),
+          blurRadius: 1.2,
+        ),
+        Shadow(
+          color: Colors.black.withValues(alpha: 0.14),
+          offset: const Offset(0.8, 1.0),
+          blurRadius: 1.1,
+        ),
+      ],
+    );
   }
 
   void _paintCharacter(
