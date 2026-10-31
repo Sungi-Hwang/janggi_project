@@ -71,11 +71,26 @@ crash is a test failure rather than a failure of the entire test runner.
 - A 16KB runtime image is not installed, so runtime testing used a 4KB
   emulator. Static 16KB ELF/ZIP checks passed; 16KB runtime behavior is not
   claimed as tested.
-- Play Console initially showed the August 30 release as available on Google
-  Play. The logged-in Chrome connection subsequently disappeared. The
-  in-app browser requires Google sign-in. No new AAB was uploaded, no release
-  was submitted, and no new Play review or rollout is in progress.
-- GitHub push was rejected by automatic approval review: external source
-  upload to that destination lacked explicit user authorization. The denied
-  push was not retried or routed through another tool. Local commits remain
-  available for review and later authorized upload.
+- Play Console showed the August 30 release, code 21 (1.2.8), as available on
+  Google Play. Chrome connection 3 disappeared (`Browser is not available: 3`).
+  This did not establish login expiry or account permission denial.
+- The Chrome app launch request reported `Computer Use app approval timed
+  out`. The user reopened Chrome; the same extension identity reappeared as
+  connection 6, with the original signed-in Google session still valid.
+- Production release draft 14 was created. AAB selection through the browser
+  file chooser failed because the ChatGPT extension does not have **Allow
+  access to file URLs** enabled. No AAB upload completed.
+- A normal Windows file-picker fallback was attempted. Before selecting the
+  Chrome window, Computer Use stopped for the turn because it could not
+  determine the current browser URL with sufficient confidence to enforce
+  policy. No further computer input was attempted after that stop.
+- No release was submitted; no new Play review or rollout is in progress.
+- An initial GitHub push was rejected by automatic approval review because
+  explicit source-upload authorization was missing. The user subsequently
+  explicitly approved pushing this correction branch to
+  `Sungi-Hwang/janggi_project`. A remote absence check precedes the single
+  authorized retry; its final result is reported separately.
+- Android verification is complete and the temporary emulator has exited.
+  Builds and tests are finished. There is no active AAB upload. A later Play
+  upload/submission still needs this PC or another authorized upload host;
+  this is not yet a state where only Google review remains.
