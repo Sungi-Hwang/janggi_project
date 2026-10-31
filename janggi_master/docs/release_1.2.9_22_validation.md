@@ -62,7 +62,7 @@ crash is a test failure rather than a failure of the entire test runner.
   production AAB and passed using a local, untracked defines file. No values
   or signing passwords are stored in this report or committed source.
 
-## Remaining limits and deployment status
+## Remaining verification limits
 
 - A real crash in the saved production engine is reproduced and repaired.
   Its observed symbol is `stockfish_analyze`; the exact relationship to the
@@ -71,26 +71,43 @@ crash is a test failure rather than a failure of the entire test runner.
 - A 16KB runtime image is not installed, so runtime testing used a 4KB
   emulator. Static 16KB ELF/ZIP checks passed; 16KB runtime behavior is not
   claimed as tested.
-- Play Console showed the August 30 release, code 21 (1.2.8), as available on
-  Google Play. Chrome connection 3 disappeared (`Browser is not available: 3`).
-  This did not establish login expiry or account permission denial.
-- The Chrome app launch request reported `Computer Use app approval timed
-  out`. The user reopened Chrome; the same extension identity reappeared as
-  connection 6, with the original signed-in Google session still valid.
-- Production release draft 14 was created. AAB selection through the browser
-  file chooser failed because the ChatGPT extension does not have **Allow
-  access to file URLs** enabled. No AAB upload completed.
-- A normal Windows file-picker fallback was attempted. Before selecting the
-  Chrome window, Computer Use stopped for the turn because it could not
-  determine the current browser URL with sufficient confidence to enforce
-  policy. No further computer input was attempted after that stop.
-- No release was submitted; no new Play review or rollout is in progress.
-- An initial GitHub push was rejected by automatic approval review because
-  explicit source-upload authorization was missing. The user subsequently
-  explicitly approved pushing this correction branch to
-  `Sungi-Hwang/janggi_project`. A remote absence check precedes the single
-  authorized retry; its final result is reported separately.
-- Android verification is complete and the temporary emulator has exited.
-  Builds and tests are finished. There is no active AAB upload. A later Play
-  upload/submission still needs this PC or another authorized upload host;
-  this is not yet a state where only Google review remains.
+
+## Deployment update — 2026-11-01 (Asia/Seoul)
+
+- The user enabled **Allow access to file URLs** on the ChatGPT Chrome
+  extension. The original signed-in Google session was valid. Upload through
+  the normal browser file chooser then succeeded without changing credentials
+  or security settings through automation.
+- The exact AAB above was reverified before upload: 85,110,253 bytes,
+  SHA-256 unchanged, package and version 1.2.9 / 22 confirmed from its manifest.
+- Production release 14 contains `22 (1.2.9)`. Release name:
+  `1.2.9 (22) - 엔진 안정성 개선`.
+- Korean release note:
+  `AI 분석과 대국 중 발생할 수 있는 엔진 종료 문제를 수정하고 안정성을 개선했습니다.`
+- Play Console's release review showed **ready to release**, no decrease in
+  supported devices, and no blocking release error. Full rollout is 100% of
+  the existing targeted countries. The country scope was not expanded.
+- The release was saved and exactly one production change was submitted
+  using **Send changes for review**.
+- Verified publishing state: **Changes in review** (`검토 중인 변경사항`),
+  production `1.2.9 (22) - 엔진 안정성 개선`, **Start full rollout**.
+- Google's quick pre-review checks were still running. The page explicitly
+  states that the changes will be sent for review immediately after these
+  checks pass. This is not evidence that 1.2.9 is already live to users.
+- Managed publishing is disabled, as it was before submission. No separate
+  managed-publishing hold was enabled.
+- Publishing page:
+  <https://play.google.com/console/u/0/developers/5732992240317379178/app/4974783501798255227/publishing>
+- Local proof screenshot: `play-submission-1.2.9-22.jpg` in the task workspace
+  outside the repository. It shows the submitted production version and
+  Google's running checks.
+- An initial GitHub push was denied for missing explicit destination approval.
+  After the user explicitly approved this branch upload, a remote absence
+  check and one retry succeeded. Remote commit
+  `b49d0fb17104e4c0c0e45adacf0a839a805b6c92` was verified; `main` remained at
+  `cfb2fd7b43519368b5132b128fa30577cb88b90f`. This documentation update is
+  committed separately on the same approved branch.
+- Android verification and the temporary emulator are finished. The AAB
+  upload and submission are complete; no local build or upload must keep
+  running. Google's remaining checks/review run remotely, so the PC may be
+  powered off after local result recording finishes.
