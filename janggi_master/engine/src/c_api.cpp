@@ -495,6 +495,9 @@ extern "C" {
                 std::string error;
                 const Variant* variant = find_variant_by_name(variant_name, error);
                 if (variant != nullptr) {
+                    // start_thinking() transfers ownership to Threads, leaving
+                    // g_states empty after a search through another API entry.
+                    g_states = StateListPtr(new std::deque<StateInfo>(1));
                     g_pos.set(variant, variant->startFen, false, &g_states->back(), Threads.main());
                 } else {
                     LOGE("%s", error.c_str());
@@ -659,6 +662,9 @@ extern "C" {
                 const std::string variant_name = normalized_variant_name(variant);
                 const Variant* resolvedVariant = find_variant_by_name(variant_name, error);
                 if (resolvedVariant != nullptr) {
+                    // The command API may already have transferred this state
+                    // list to Threads. Recreate it before setting the position.
+                    g_states = StateListPtr(new std::deque<StateInfo>(1));
                     g_pos.set(resolvedVariant, resolvedVariant->startFen, false, &g_states->back(), Threads.main());
                 } else {
                     LOGE("[ANALYZE] %s", error.c_str());
