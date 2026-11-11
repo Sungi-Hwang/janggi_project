@@ -5,6 +5,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../community/community_config.dart';
+import '../community/public_display_name.dart';
 
 class CommunityAuthProvider extends ChangeNotifier {
   CommunityAuthProvider() {
@@ -38,12 +39,10 @@ class CommunityAuthProvider extends ChangeNotifier {
 
   String get displayName {
     final metadata = user?.userMetadata ?? const <String, dynamic>{};
-    final name = metadata['full_name'] as String? ??
-        metadata['name'] as String? ??
-        metadata['email'] as String? ??
-        user?.email ??
-        'Google 사용자';
-    return name.trim().isEmpty ? 'Google 사용자' : name;
+    return publicDisplayName(
+      [metadata['full_name'], metadata['name']],
+      fallback: 'Google 사용자',
+    );
   }
 
   Future<bool> ensureSignedIn() async {

@@ -1,3 +1,4 @@
+import '../community/public_display_name.dart';
 import 'puzzle_objective.dart';
 
 class CommunityPuzzle {
@@ -47,7 +48,7 @@ class CommunityPuzzle {
     return CommunityPuzzle(
       id: json['id'] as String? ?? '',
       authorId: json['author_id'] as String? ?? '',
-      authorName: (profile['display_name'] as String? ?? '익명 사용자').trim(),
+      authorName: publicDisplayName([profile['display_name']]),
       authorAvatarUrl: profile['avatar_url'] as String?,
       title: (json['title'] as String? ?? '공유 문제').trim(),
       description: (json['description'] as String? ?? '').trim(),

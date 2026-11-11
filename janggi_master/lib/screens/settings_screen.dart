@@ -3,6 +3,7 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:provider/provider.dart';
 
 import '../models/rule_mode.dart';
+import 'privacy_screen.dart';
 import '../providers/monetization_provider.dart';
 import '../providers/settings_provider.dart';
 import '../theme/janggi_skin.dart';
@@ -45,6 +46,16 @@ class SettingsScreen extends StatelessWidget {
           ),
           body: ListView(
             children: [
+              ListTile(
+                leading: const Icon(Icons.privacy_tip_outlined),
+                title: const Text('개인정보 및 계정·데이터 삭제'),
+                subtitle: const Text('처리방침 확인 · 삭제 요청 안내'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.of(context).push<void>(
+                  MaterialPageRoute(builder: (_) => const PrivacyScreen()),
+                ),
+              ),
+              const Divider(height: 1),
               _buildSection(
                 title: '사운드',
                 children: [
